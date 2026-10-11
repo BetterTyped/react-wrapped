@@ -150,8 +150,15 @@ test.describe("the bar", () => {
     // Act
     await page.getByRole("button", { name: "Grape" }).first().click();
 
-    // Assert: the page's own light is the palette's, not only the stage's.
-    await expect.poll(light).not.toBe(before);
+    // Assert: the page's own light is the palette's, not only the stage's. The colour fades to the new one, so it
+    // is read once it has stopped moving.
+    await expect
+      .poll(async () => {
+        const first = await light();
+        await page.waitForTimeout(200);
+        return first !== before && first === (await light());
+      })
+      .toBe(true);
     const picked = await light();
 
     // Act
