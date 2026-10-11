@@ -1,26 +1,20 @@
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 
 import type { Demo } from "../content/types";
+import { PARTS } from "../demos";
+import { curtain, tilt } from "../demos/custom-transition";
 import { CHART_EXAMPLES } from "../registry/charts";
-import type { TransitionId } from "../registry/transitions";
+import { isPart } from "../registry/parts";
+import { demoScene } from "../registry/scenes";
+import { LookControls, useLook, useLookConfig } from "./look";
+import { PART_CSS } from "./part-styles";
 import {
   CutPreview,
-  DEFAULT_WRAPPED_CONFIG,
   factScene,
+  isTransition,
   type SceneInstance,
   SceneThumb,
   WRAPPED_FORMATS,
-  WRAPPED_PALETTES,
-  type WrappedConfig,
 } from "@react-wrapped/kit";
 
 /*
@@ -28,99 +22,14 @@ import {
  * and format the reader last picked: the choice follows them from page to page.
  */
 
-type Look = Pick<WrappedConfig, "palette" | "mode" | "format">;
+// The look lives in its own file. It is handed on from here because the rest of the site has always found it here.
+export { LookControls, LookProvider, useLook, useLookConfig } from "./look";
 
-// Square by default: a chart fills the frame, so it reads at the size of a docs page and of a small tile.
-const DEFAULT_LOOK: Look = { palette: DEFAULT_WRAPPED_CONFIG.palette, mode: "dark", format: "square" };
-const STORED = "react-wrapped:docs:look";
-
-const LookContext = createContext<{ look: Look; setLook: (next: Look) => void }>({
-  look: DEFAULT_LOOK,
-  setLook: () => {},
-});
-
-export function LookProvider({ children }: { children: ReactNode }) {
-  const [look, setLookState] = useState(DEFAULT_LOOK);
-  // After the first paint, so the server's HTML and the browser's first render agree.
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORED);
-      const parsed: unknown = raw ? JSON.parse(raw) : null;
-      if (!parsed || typeof parsed !== "object") return;
-      const { palette, mode, format } = parsed as Partial<Look>;
-      setLookState({
-        palette: typeof palette === "string" && palette in WRAPPED_PALETTES ? palette : DEFAULT_LOOK.palette,
-        mode: mode === "light" ? "light" : "dark",
-        format: format && format in WRAPPED_FORMATS ? format : DEFAULT_LOOK.format,
-      });
-    } catch {
-      // Blocked storage: the default look.
-    }
-  }, []);
-  const value = useMemo(
-    () => ({
-      look,
-      setLook: (next: Look) => {
-        setLookState(next);
-        try {
-          window.localStorage.setItem(STORED, JSON.stringify(next));
-        } catch {
-          // Blocked storage: the choice lasts for this page.
-        }
-      },
-    }),
-    [look],
-  );
-  return <LookContext.Provider value={value}>{children}</LookContext.Provider>;
-}
-
-export const useLook = () => useContext(LookContext);
-
-export const useLookConfig = (): WrappedConfig => {
-  const { look } = useLook();
-  return useMemo(() => ({ ...DEFAULT_WRAPPED_CONFIG, ...look }), [look]);
-};
-
-/** Palette, dark or light, and format: what a reader can change about every preview on the site. */
-export function LookControls() {
-  const { look, setLook } = useLook();
-  return (
-    <div className="d-look">
-      <div role="group" aria-label="Palette" className="d-look-swatches">
-        {Object.entries(WRAPPED_PALETTES).map(([id, palette]) => (
-          <button
-            key={id}
-            type="button"
-            title={palette.label}
-            aria-label={palette.label}
-            aria-pressed={look.palette === id}
-            onClick={() => setLook({ ...look, palette: id })}
-            style={{ background: palette.levels[4] }}
-          />
-        ))}
-      </div>
-      <div role="group" aria-label="Dark or light" className="d-look-chips">
-        {(["dark", "light"] as const).map((mode) => (
-          <button key={mode} type="button" aria-pressed={look.mode === mode} onClick={() => setLook({ ...look, mode })}>
-            {mode === "dark" ? "Dark" : "Light"}
-          </button>
-        ))}
-      </div>
-      <div role="group" aria-label="Format" className="d-look-chips">
-        {Object.entries(WRAPPED_FORMATS).map(([id, format]) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={look.format === id}
-            onClick={() => setLook({ ...look, format: id as Look["format"] })}
-          >
-            {format.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
+/**
+ * The transitions the custom transition guide defines. Naming them here loads their file with the first page of the
+ * site, before any stage is on it: a stage draws every transition's cover when it mounts.
+ */
+export const GUIDE_TRANSITIONS = [curtain.id, tilt.id];
 
 /** The widest a preview is drawn in each format, so a tall one does not run off the bottom of the screen. */
 const WIDEST = { story: 340, square: 520, landscape: 720 } as const;
@@ -174,19 +83,19 @@ const SECOND = chartScenes.get("Rings");
 
 export function sceneOf(demo: Demo): SceneInstance | undefined {
   if (demo.type === "chart") return chartScenes.get(demo.example);
+  if (demo.type === "scene") return demoScene(demo.key);
   return undefined;
 }
 
-/** One live preview, the size of the room it is given. */
+/** One live preview, the size of the room it is given. A part is a whole component and is not drawn this small. */
 export function DemoStage({ demo, max }: { demo: Demo; max?: number }) {
   const config = useLookConfig();
   if (demo.type === "transition") {
-    if (!FIRST || !SECOND) return null;
+    if (!FIRST || !SECOND || !isTransition(demo.id)) return null;
+    const style = demo.id;
     return (
       <Fit max={max}>
-        {(width) => (
-          <CutPreview style={demo.id as TransitionId} first={FIRST} second={SECOND} config={config} width={width} />
-        )}
+        {(width) => <CutPreview style={style} first={FIRST} second={SECOND} config={config} width={width} />}
       </Fit>
     );
   }
@@ -195,8 +104,30 @@ export function DemoStage({ demo, max }: { demo: Demo; max?: number }) {
   return <Fit max={max}>{(width) => <SceneThumb scene={scene} config={config} width={width} loop />}</Fit>;
 }
 
+/**
+ * An interactive part as a page shows it: the real component with the sample year, given the width of the page.
+ * The buttons and readouts a demo adds around the library's own are plain elements, styled from here.
+ */
+function PartPreview({ id, caption }: { id: string; caption?: string }) {
+  if (!isPart(id)) return null;
+  const part = PARTS[id];
+  return (
+    <figure className="d-preview">
+      <style>{PART_CSS}</style>
+      <div className="d-part">{part.render()}</div>
+      {part.look || caption ? (
+        <figcaption>
+          {part.look ? <LookControls /> : null}
+          {caption ? <p>{caption}</p> : null}
+        </figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
 /** A preview as a page shows it: the stage on a plate, the look controls under it. */
 export function Preview({ demo, caption }: { demo: Demo; caption?: string }) {
+  if (demo.type === "part") return <PartPreview id={demo.id} caption={caption} />;
   return (
     <figure className="d-preview">
       <div className="d-preview-plate">

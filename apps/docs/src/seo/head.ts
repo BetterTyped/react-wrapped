@@ -28,11 +28,26 @@ export interface SeoInput {
   noindex?: boolean;
 }
 
-/** Which drawn image a page shares with: one per section. */
+/** The sections that have a drawn image of their own (see apps/docs-e2e/og). */
+const DRAWN = [
+  "charts",
+  "transitions",
+  "scenes",
+  "player",
+  "scanner",
+  "graphics",
+  "marks",
+  "guides",
+  "designs",
+  "examples",
+  "docs",
+];
+
+/** Which drawn image a page shares with: its section's, or the docs' for a page that is in none, or the site's. */
 const imageFor = (path: string) => {
-  const section = /^\/docs\/([^/]+)\/[^/]+\/$/.exec(path)?.[1] ?? /^\/([^/]+)\//.exec(path)?.[1] ?? "home";
-  const known = ["charts", "transitions", "scenes", "player", "scanner", "graphics", "guides", "designs", "docs"];
-  return absoluteUrl(`/og/${known.includes(section) ? section : "home"}.png`);
+  const [first, second] = path.split("/").filter(Boolean);
+  const section = first === "docs" && second && DRAWN.includes(second) ? second : first;
+  return absoluteUrl(`/og/${section && DRAWN.includes(section) ? section : "home"}.png`);
 };
 
 export const fullTitle = (title: string) =>

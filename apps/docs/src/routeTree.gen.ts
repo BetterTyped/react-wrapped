@@ -14,6 +14,7 @@ import { Route as R404RouteImport } from "./routes/404"
 import { Route as DesignsIndexRouteImport } from "./routes/designs/index"
 import { Route as DocsIndexRouteImport } from "./routes/docs/index"
 import { Route as DocsSplatRouteImport } from "./routes/docs/$"
+import { Route as ExamplesFromPartsIndexRouteImport } from "./routes/examples/from-parts/index"
 import { Route as ExamplesFullWrappedIndexRouteImport } from "./routes/examples/full-wrapped/index"
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
   path: "/docs/$",
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamplesFromPartsIndexRoute = ExamplesFromPartsIndexRouteImport.update({
+  id: "/examples/from-parts/",
+  path: "/examples/from-parts/",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExamplesFullWrappedIndexRoute =
   ExamplesFullWrappedIndexRouteImport.update({
     id: "/examples/full-wrapped/",
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   "/docs/$": typeof DocsSplatRoute
   "/designs/": typeof DesignsIndexRoute
   "/docs/": typeof DocsIndexRoute
+  "/examples/from-parts/": typeof ExamplesFromPartsIndexRoute
   "/examples/full-wrapped/": typeof ExamplesFullWrappedIndexRoute
 }
 export interface FileRoutesByTo {
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   "/docs/$": typeof DocsSplatRoute
   "/designs": typeof DesignsIndexRoute
   "/docs": typeof DocsIndexRoute
+  "/examples/from-parts": typeof ExamplesFromPartsIndexRoute
   "/examples/full-wrapped": typeof ExamplesFullWrappedIndexRoute
 }
 export interface FileRoutesById {
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   "/docs/$": typeof DocsSplatRoute
   "/designs/": typeof DesignsIndexRoute
   "/docs/": typeof DocsIndexRoute
+  "/examples/from-parts/": typeof ExamplesFromPartsIndexRoute
   "/examples/full-wrapped/": typeof ExamplesFullWrappedIndexRoute
 }
 export interface FileRouteTypes {
@@ -81,9 +90,17 @@ export interface FileRouteTypes {
     | "/docs/$"
     | "/designs/"
     | "/docs/"
+    | "/examples/from-parts/"
     | "/examples/full-wrapped/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/404" | "/docs/$" | "/designs" | "/docs" | "/examples/full-wrapped"
+  to:
+    | "/"
+    | "/404"
+    | "/docs/$"
+    | "/designs"
+    | "/docs"
+    | "/examples/from-parts"
+    | "/examples/full-wrapped"
   id:
     | "__root__"
     | "/"
@@ -91,6 +108,7 @@ export interface FileRouteTypes {
     | "/docs/$"
     | "/designs/"
     | "/docs/"
+    | "/examples/from-parts/"
     | "/examples/full-wrapped/"
   fileRoutesById: FileRoutesById
 }
@@ -100,6 +118,7 @@ export interface RootRouteChildren {
   DocsSplatRoute: typeof DocsSplatRoute
   DesignsIndexRoute: typeof DesignsIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
+  ExamplesFromPartsIndexRoute: typeof ExamplesFromPartsIndexRoute
   ExamplesFullWrappedIndexRoute: typeof ExamplesFullWrappedIndexRoute
 }
 
@@ -140,6 +159,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DocsSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/examples/from-parts/": {
+      id: "/examples/from-parts/"
+      path: "/examples/from-parts"
+      fullPath: "/examples/from-parts/"
+      preLoaderRoute: typeof ExamplesFromPartsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/examples/full-wrapped/": {
       id: "/examples/full-wrapped/"
       path: "/examples/full-wrapped"
@@ -156,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsSplatRoute: DocsSplatRoute,
   DesignsIndexRoute: DesignsIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
+  ExamplesFromPartsIndexRoute: ExamplesFromPartsIndexRoute,
   ExamplesFullWrappedIndexRoute: ExamplesFullWrappedIndexRoute,
 }
 export const routeTree = rootRouteImport

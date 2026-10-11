@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useId, useState } from "react";
 
 import { SECTIONS } from "../registry/pages";
 import { hypeStack, SITE } from "../site";
+import { Search } from "./search";
 import { SiteLink } from "./site-link";
 
 /*
@@ -130,6 +131,7 @@ function Navbar({ onMenu }: { onMenu: () => void }) {
           </SiteLink>
         </nav>
         <div className="d-bar-end">
+          <Search />
           <a
             className="d-icon-button"
             href={SITE.repo}

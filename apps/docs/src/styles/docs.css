@@ -79,6 +79,9 @@ html {
 }
 
 body {
+  /* The library's chrome takes the site's green wherever it uses an accent: its own theming hook, used here. */
+  --wr-ui-primary: var(--d-brand);
+  --wr-ui-primary-fg: var(--d-on-brand);
   margin: 0;
   background: var(--d-page);
   color: var(--d-ink);
@@ -105,7 +108,7 @@ body {
   top: 12px;
 }
 
-:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-hero, .d-band, .d-toc, .d-drawer) a {
+:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-hero, .d-band, .d-promo, .d-toc, .d-drawer) a {
   color: inherit;
   text-decoration: none;
 }
@@ -259,6 +262,127 @@ body {
   color: oklch(0.985 0 0) !important;
   box-shadow: none;
   font-size: 14px;
+}
+
+/* ---------- search ---------- */
+
+.d-search-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin-right: 4px;
+  padding: 0 10px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--d-sunk);
+  color: var(--d-dim);
+  font-size: 14px;
+  cursor: pointer;
+}
+.d-search-button:hover {
+  color: var(--d-ink);
+}
+.d-search-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.d-search-button span {
+  min-width: 7.5em;
+  text-align: left;
+}
+.d-search-button kbd {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--d-panel);
+  box-shadow: 0 0 0 1px var(--d-line);
+  font-family: var(--d-mono);
+  font-size: 11.5px;
+}
+.d-search {
+  width: min(92vw, 620px);
+  max-height: min(78vh, 640px);
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: var(--d-panel);
+  color: var(--d-ink);
+  box-shadow:
+    0 0 0 1px var(--d-line),
+    0 40px 90px -30px oklch(0.15 0.02 60 / 0.6);
+}
+.d-search::backdrop {
+  background: oklch(0.15 0.01 70 / 0.5);
+}
+.d-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.d-search-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+}
+.d-search input {
+  width: 100%;
+  padding: 20px 24px;
+  border: 0;
+  border-bottom: 1px solid var(--d-line);
+  outline: none;
+  background: none;
+  font-size: 17px;
+}
+.d-search input::placeholder {
+  color: var(--d-faint);
+}
+.d-search ul {
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+  list-style: none;
+}
+.d-search li button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.d-search li button[aria-current="true"] {
+  background: var(--d-sunk);
+}
+.d-search strong {
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+.d-search small {
+  color: var(--d-faint);
+  font-size: 12.5px;
+}
+.d-search li span {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--d-dim);
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.d-search-none {
+  padding: 18px 14px;
+  color: var(--d-dim);
 }
 
 /* ---------- docs layout ---------- */
@@ -669,7 +793,7 @@ body {
   margin-top: 24px !important;
 }
 .d-cards-wide {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .d-cards li {
   margin: 0 !important;
@@ -808,7 +932,7 @@ body {
   background: var(--d-panel);
   box-shadow: 0 0 0 1px var(--d-line);
 }
-main:has(> .d-plain, > .d-hero) {
+main:has(> .d-plain, > .d-hero, > .d-example) {
   padding: 0 16px;
 }
 .d-plain > p {
@@ -847,37 +971,58 @@ main:has(> .d-example) > .d-plain:last-child {
 
 .d-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: center;
   gap: clamp(24px, 4vw, 64px);
+  overflow: hidden;
+  background:
+    radial-gradient(60% 70% at 100% 0%, color-mix(in oklch, var(--d-brand) 14%, transparent), transparent 70%),
+    var(--d-panel);
 }
 .d-hero-kicker {
-  margin: 0 0 18px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+  margin: 0 0 22px;
+  padding: 7px 14px 7px 12px;
+  border-radius: 18px;
+  background: var(--d-sunk);
   color: var(--d-dim);
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 500;
 }
 .d-hero-kicker a {
-  color: var(--d-brand-ink);
+  color: var(--d-ink);
   font-weight: 650;
   text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, currentColor 30%, transparent);
   text-underline-offset: 3px;
 }
+.d-dot {
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+  border-radius: 999px;
+  background: var(--d-brand);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--d-brand) 22%, transparent);
+}
 .d-hero-copy > h1 {
-  font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+  font-size: clamp(2.6rem, 5.8vw, 5rem);
   letter-spacing: -0.055em;
-  line-height: 0.98;
+  line-height: 0.96;
 }
 .d-hero-copy > h1 em {
   color: var(--d-brand);
   font-style: normal;
 }
 .d-hero-lead {
-  max-width: 56ch;
-  margin: 22px 0 0;
+  max-width: 54ch;
+  margin: 24px 0 0;
   color: var(--d-dim);
   font-size: clamp(1.0625rem, 1.35vw, 1.25rem);
   line-height: 1.5;
+  text-wrap: pretty;
 }
 .d-hero-actions {
   display: flex;
@@ -886,79 +1031,207 @@ main:has(> .d-example) > .d-plain:last-child {
   margin-top: 28px;
 }
 .d-hero .d-code {
-  max-width: 440px;
+  max-width: 420px;
   margin-top: 28px;
 }
 .d-hero-stage {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  align-items: stretch;
+  gap: 12px;
   min-width: 0;
 }
-.d-hero-stage > .d-fit {
-  border-radius: 18px;
-  box-shadow: 0 40px 80px -40px oklch(0.15 0.02 60 / 0.6);
+/* The room the player fits its frame into. A fixed height, so the page does not move when the player arrives. */
+.d-hero-player {
+  display: flex;
+  height: clamp(520px, 74vh, 720px);
+}
+.d-hero-player > * {
+  flex: 1;
+}
+.d-hero-note {
+  margin: 0;
+  color: var(--d-faint);
+  font-size: 13.5px;
+  text-align: center;
 }
 
-.d-band > h2,
-.d-split > div > h2 {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
+.d-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 1400px;
+  margin: 12px auto 0;
 }
-.d-band > p,
-.d-split > div > p {
-  max-width: 60ch;
+.d-facts p {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: clamp(18px, 2.4vw, 28px);
+  border-radius: 24px;
+  background: var(--d-panel);
+  box-shadow: 0 0 0 1px var(--d-line);
+}
+.d-facts strong {
+  font-size: clamp(2.25rem, 4.4vw, 3.5rem);
+  font-weight: 650;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.d-facts span {
+  color: var(--d-dim);
+  font-size: 14.5px;
+  line-height: 1.35;
+}
+main:has(> .d-facts) > .d-facts {
+  margin-top: 12px;
+}
+
+.d-band {
+  margin-top: 12px;
+}
+.d-band > h2,
+.d-band-head h2,
+.d-split > div > h2,
+.d-promo h2 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.d-band-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 40px;
+}
+.d-band-head > div {
+  max-width: 62ch;
+}
+.d-band-head p,
+.d-split > div > p,
+.d-promo p {
+  max-width: 58ch;
   margin: 14px 0 0;
   color: var(--d-dim);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.d-band-head code,
+.d-split > div code {
+  padding: 0.14em 0.4em;
+  border-radius: 7px;
+  background: var(--d-sunk);
+  font-family: var(--d-mono);
+  font-size: 0.875em;
+}
+.d-band-more {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0 0;
 }
 .d-split {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: clamp(24px, 4vw, 56px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
 }
 .d-split .d-code {
   margin: 0;
 }
-.d-plain-list {
-  margin-top: 22px;
-}
-.d-plain-list li {
+
+.d-wall {
   display: grid;
-  grid-template-columns: minmax(0, 13.5em) minmax(0, 1fr);
-  gap: 4px 16px;
-  padding: 10px 0;
-  border-top: 1px solid var(--d-line);
-  font-size: 14.5px;
-}
-.d-plain-list span {
-  color: var(--d-dim);
-}
-.d-index {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 24px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
 }
-.d-index a {
+.d-wall a {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 18px 20px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 10px 14px;
   border-radius: 20px;
   background: var(--d-sunk);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.d-wall a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px var(--d-line);
+}
+.d-wall .d-fit {
+  margin: 0 auto;
+}
+.d-wall strong {
+  padding: 0 6px;
+  font-size: 15px;
   font-weight: 650;
   letter-spacing: -0.02em;
 }
-.d-index a:hover {
-  box-shadow: inset 0 0 0 1px var(--d-line);
+
+.d-packages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 40px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
 }
-.d-index span {
-  color: var(--d-faint);
-  font-size: 13.5px;
-  font-weight: 500;
-  letter-spacing: 0;
+.d-packages li {
+  display: grid;
+  grid-template-columns: minmax(0, 13.5em) minmax(0, 1fr);
+  gap: 4px 16px;
+  padding: 11px 0;
+  border-top: 1px solid var(--d-line);
+  font-size: 14.5px;
+}
+.d-packages code {
+  font-family: var(--d-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+.d-packages span {
+  color: var(--d-dim);
+}
+
+/* The one place the site sells something: where the library runs for real. In Hype Stack's own colour. */
+.d-promo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 48px;
+  max-width: 1400px;
+  margin: 12px auto 0;
+  padding: clamp(24px, 4.5vw, 56px);
+  border-radius: var(--d-radius);
+  background:
+    radial-gradient(70% 120% at 100% 0%, color-mix(in oklch, var(--d-hype) 26%, transparent), transparent 70%),
+    var(--d-panel);
+  box-shadow: 0 0 0 1px var(--d-line);
+}
+.d-promo > div:first-child {
+  max-width: 60ch;
+}
+.d-promo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.d-pill-hype {
+  background: var(--d-hype);
+  color: oklch(0.985 0 0) !important;
+  box-shadow: none;
 }
 
 /* ---------- footer ---------- */
@@ -1043,12 +1316,35 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-bar-wide {
     display: none;
   }
+  .d-search-button span,
+  .d-search-button kbd {
+    display: none;
+  }
+  .d-search-button {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    background: none;
+  }
+  .d-bar-end {
+    gap: 0;
+  }
   .d-hero,
   .d-split {
     grid-template-columns: minmax(0, 1fr);
   }
-  .d-plain-list li {
+  .d-facts,
+  .d-wall {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .d-cards-wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .d-packages {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .d-hero-player {
+    height: clamp(480px, 70vh, 620px);
   }
 }
 
@@ -1066,7 +1362,28 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-bar-end > a.d-icon-button {
     display: none;
   }
+  /* On a phone the bar holds five things. The link to Hype Stack keeps its words and gives up its arrow. */
+  .d-pill-brand {
+    padding: 0 13px;
+  }
+  .d-pill-brand svg {
+    display: none;
+  }
+  .d-brand {
+    gap: 8px;
+    min-width: 0;
+  }
+  .d-mark {
+    width: 26px;
+    height: 26px;
+  }
   .d-pager {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d-packages li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d-cards-wide {
     grid-template-columns: minmax(0, 1fr);
   }
   .d-pager a[rel="next"] {

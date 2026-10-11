@@ -1,8 +1,17 @@
-import { toSource } from "../content/source";
+import { excerpt, toSource } from "../content/source";
+import { sourceOf } from "../content/sources";
 import type { Block, DocPage, Section } from "../content/types";
 import { PACKAGES } from "../site";
 import { CHART_DOCS, CHART_TYPES, type ChartType, examplesOf } from "./charts";
+import { graphicsPages, marksPages } from "./graphics-pages";
+import { guidePages } from "./guide-pages";
+import { playerPages } from "./player-pages";
+import { type PropDocs, propsTable } from "./props";
+import { scannerPages } from "./scanner-pages";
+import { scenePages } from "./scene-pages";
+import { fileBlock } from "./shared";
 import { TRANSITIONS } from "./transitions";
+import type { WrappedView } from "@react-wrapped/kit";
 
 /*
  * Every page of the docs, built from the registries. The sidebar, the routes, the sitemap, the Markdown twins and
@@ -126,7 +135,7 @@ const chartsOverview: DocPage = {
       text: "A chart reads the palette of the stage it is on. The lit part takes `--wr-rarity`, the quiet part the palette's five levels, text takes `--wr-fg`. Change the palette and every chart follows; see [theming](/docs/theming/).",
     },
   ],
-  related: ["/docs/transitions/", "/docs/", "/docs/installation/", "/designs/"],
+  related: ["/docs/scenes/chart/", "/docs/transitions/", "/docs/graphics/insight-cards/", "/docs/", "/designs/"],
   updated: UPDATED,
 };
 
@@ -219,7 +228,7 @@ const transitionsOverview: DocPage = {
       })),
     },
   ],
-  related: ["/docs/charts/", "/docs/", "/docs/installation/", "/designs/"],
+  related: ["/docs/guides/custom-transition/", "/docs/charts/", "/docs/player/scene-editor/", "/docs/", "/designs/"],
   updated: UPDATED,
 };
 
@@ -245,11 +254,13 @@ const introduction: DocPage = {
     {
       kind: "list",
       items: [
-        "A **scene** is a React node and a GSAP timeline that brings it in. You declare one with `defineScene` or use a ready-made one.",
+        "A **scene** is a React node and a GSAP timeline that brings it in. Use one of the [eleven ready-made ones](/docs/scenes/) or declare your own with `defineScene`.",
         "A **cut** is a list of scenes. The stage plays them in order on one master timeline, with a [transition](/docs/transitions/) between each pair.",
         "A **chart** is data a scene hands over. There are [twenty-one](/docs/charts/), and they all animate on the same timeline.",
-        "The **player** puts controls and a timeline around the stage. Its timeline is also the editor.",
-        "Everything a viewer can change (palette, format, speed, transitions, edited texts) is one config object that fits in a URL.",
+        "The [**player**](/docs/player/) puts controls and a timeline around the stage. Its timeline is also the editor.",
+        "The [**scanner**](/docs/scanner/) hides some scenes in the year and lets the viewer find them.",
+        "The [**graphics**](/docs/graphics/) are the cards a viewer keeps: one for the whole year and one per finding.",
+        "Everything a viewer can change (palette, format, speed, transitions, edited texts) is one config object that [fits in a URL](/docs/guides/config-in-the-url/).",
       ],
     },
     { kind: "h2", text: "Built on GSAP" },
@@ -258,7 +269,7 @@ const introduction: DocPage = {
       text: "All motion runs on [GSAP](https://gsap.com) timelines. That is what makes a video seekable, scrubbable from the timeline, and exportable frame by frame. GSAP is a peer dependency and you install it yourself.",
     },
   ],
-  related: ["/docs/installation/", "/docs/theming/", "/docs/charts/", "/docs/transitions/", "/examples/full-wrapped/"],
+  related: ["/docs/installation/", "/docs/first-wrapped/", "/docs/scenes/", "/docs/player/", "/examples/full-wrapped/"],
   updated: UPDATED,
 };
 
@@ -279,13 +290,47 @@ const installation: DocPage = {
     { kind: "h2", text: "Only the parts you need" },
     {
       kind: "p",
-      text: "Each package has its own stylesheet and depends only on the ones before it in the list on the [introduction](/docs/). A page that only draws charts on a stage needs two packages:",
+      text: "Each package depends only on the ones before it in the list on the [introduction](/docs/). A page that only draws charts on a stage needs two packages:",
     },
     { kind: "code", language: "bash", code: "pnpm add @react-wrapped/core @react-wrapped/charts gsap" },
+    { kind: "code", language: "tsx", code: `import "@react-wrapped/core/styles.css";` },
+    {
+      kind: "p",
+      text: "Four packages have a stylesheet. Core's holds the frame, the scenes and the charts, so load it first. The player, the scan and the graphics each add their own on top:",
+    },
+    {
+      kind: "table",
+      head: ["Package", "Stylesheet"],
+      rows: [
+        ["`@react-wrapped/core`", "`@react-wrapped/core/styles.css`"],
+        ["`@react-wrapped/charts`, `scenes`, `marks`", "None. What they draw is styled by core's."],
+        ["`@react-wrapped/player`", "`@react-wrapped/player/styles.css`"],
+        ["`@react-wrapped/scan`", "`@react-wrapped/scan/styles.css`"],
+        ["`@react-wrapped/graphics`", "`@react-wrapped/graphics/styles.css`"],
+        ["`@react-wrapped/kit`", "`@react-wrapped/kit/styles.css`, all of the above in one file."],
+      ],
+    },
+    { kind: "h2", text: "The font" },
+    {
+      kind: "p",
+      text: "The library ships no font file. The frame, the share card and the insight cards are set in `Inter` where the page or the machine has a font by that name, and in the system's own sans otherwise. Both look right: the scenes measure their big numbers by the ink of whatever font is in use. To get the same type on every machine, load Inter under exactly that family name, with the `@fontsource/inter` package or a rule of your own.",
+    },
     {
       kind: "code",
-      language: "tsx",
-      code: `import "@react-wrapped/core/styles.css";\nimport "@react-wrapped/charts/styles.css";`,
+      language: "css",
+      code: [
+        `@font-face {`,
+        `  font-family: "Inter";`,
+        `  font-style: normal;`,
+        `  font-weight: 100 900;`,
+        `  font-display: swap;`,
+        `  src: url("/fonts/inter-latin-wght-normal.woff2") format("woff2");`,
+        `}`,
+      ].join("\n"),
+    },
+    {
+      kind: "p",
+      text: "The controls around the frame use the font of your page. To set the video and the controls in a typeface of your choice, set `--wr-font` on any element above them. The share card is drawn on a canvas, which cannot read the variable, so it stays in Inter or the system's sans. See [custom palette and chrome colours](/docs/guides/palette-and-chrome/).",
     },
     { kind: "h2", text: "Requirements" },
     {
@@ -294,10 +339,11 @@ const installation: DocPage = {
         "React 19 and React DOM 19.",
         "GSAP 3.13 or newer, installed by you as a peer dependency.",
         "No Tailwind, no CSS framework and no reset: the stylesheets bring everything the components need and stay inside their own `wr-` classes.",
+        "A browser for anything that plays or draws. The markup itself [renders on a server](/docs/guides/server-rendering/).",
       ],
     },
   ],
-  related: ["/docs/", "/docs/theming/", "/docs/formats/", "/docs/charts/"],
+  related: ["/docs/first-wrapped/", "/docs/", "/docs/theming/", "/docs/guides/server-rendering/"],
   updated: UPDATED,
 };
 
@@ -338,7 +384,11 @@ const theming: DocPage = {
     {
       kind: "code",
       language: "tsx",
-      code: `const config: WrappedConfig = { ...DEFAULT_WRAPPED_CONFIG, palette: "custom", accent: "#ff5c8a" };`,
+      code: [
+        `import { DEFAULT_WRAPPED_CONFIG, type WrappedConfig } from "@react-wrapped/kit";`,
+        ``,
+        `const config: WrappedConfig = { ...DEFAULT_WRAPPED_CONFIG, palette: "custom", accent: "#ff5c8a" };`,
+      ].join("\n"),
     },
     { kind: "h2", text: "The variables" },
     {
@@ -367,7 +417,7 @@ const theming: DocPage = {
       code: `.my-badge {\n  background: var(--wr-card);\n  color: var(--wr-fg);\n  box-shadow: inset 0 0 0 1px var(--wr-l2);\n}`,
     },
   ],
-  related: ["/docs/formats/", "/docs/charts/", "/docs/transitions/", "/designs/"],
+  related: ["/docs/guides/palette-and-chrome/", "/docs/formats/", "/docs/player/configurator/", "/designs/"],
   updated: UPDATED,
 };
 
@@ -395,7 +445,11 @@ const formats: DocPage = {
     {
       kind: "code",
       language: "tsx",
-      code: `const config: WrappedConfig = { ...DEFAULT_WRAPPED_CONFIG, format: "landscape" };`,
+      code: [
+        `import { DEFAULT_WRAPPED_CONFIG, type WrappedConfig } from "@react-wrapped/kit";`,
+        ``,
+        `const config: WrappedConfig = { ...DEFAULT_WRAPPED_CONFIG, format: "landscape" };`,
+      ].join("\n"),
     },
     { kind: "h2", text: "How a scene fits" },
     {
@@ -407,16 +461,148 @@ const formats: DocPage = {
       ],
     },
   ],
-  related: ["/docs/theming/", "/docs/charts/", "/docs/installation/", "/designs/"],
+  related: ["/docs/theming/", "/docs/player/video-export/", "/docs/scenes/", "/designs/"],
+  updated: UPDATED,
+};
+
+/** The props of `WrappedView` once the year is in: the page as one component. */
+const VIEW_PROPS: PropDocs<Extract<Parameters<typeof WrappedView>[0], { subject: unknown }>> = {
+  subject: ["WrappedSubject", "Who the video is about."],
+  seed: ["string", "Picks the transitions and the small variations. Give each person their own."],
+  scenes: ["readonly SceneInstance[]", "The scenes in story order."],
+  config: ["WrappedConfig", "Everything a viewer can change."],
+  onConfigChange: ["(next: WrappedConfig) => void", "Called with the whole next config on every change."],
+  editable: [
+    "boolean",
+    "Whether this is the creator. Off, there are no settings, no editing and no scan: only the video. On unless you say otherwise.",
+    "optional",
+  ],
+  share: [
+    "{ fileName: string; graphics?: readonly WrappedGraphic[]; onError?: (message: string) => void }",
+    "Adds the link and download buttons, and the [gallery](/docs/graphics/gallery/) when there are graphics.",
+    "optional",
+  ],
+  opening: [
+    "{ calendar; drops; found; onOpen; describeDay; actions?; sessionKey?; gate? }",
+    "Adds the [scan](/docs/scanner/) and the scenes hidden in the year.",
+    "optional",
+  ],
+  viewer: [
+    "ReactNode",
+    "Shown under the video to someone who is not the creator, usually a way to make their own.",
+    "optional",
+  ],
+  autoplay: ["boolean", "Starts playing as soon as the video is built. On unless you say otherwise.", "optional"],
+  playerRef: [
+    "Ref<WrappedPlayerHandle | null>",
+    "The [player's handle](/docs/player/wrapped-player/): play, pause, seek.",
+    "optional",
+  ],
+  loading: [
+    "undefined",
+    "Not passed with a year. Pass it in place of the year and the view is the [loading page](/docs/player/loading/).",
+    "optional",
+  ],
+};
+
+const firstWrapped: DocPage = {
+  path: "/docs/first-wrapped/",
+  section: "get-started",
+  title: "Your first Wrapped",
+  tagline: "install to a playing video",
+  nav: "Your first Wrapped",
+  description:
+    "Build a first year in review video with react-wrapped in five steps: install, name the subject, bring your numbers, place three scenes, render WrappedView.",
+  lead: "This page goes from an empty file to a video that plays: who it is about, a seed, three scenes and one component, with the settings working. It takes one file of about seventy lines. Everything comes from `@react-wrapped/kit`, the package with all the others in it.",
+  blocks: [
+    {
+      kind: "preview",
+      demo: { type: "part", id: "first-wrapped" },
+      caption: "What the file on this page renders. Three scenes, and the settings beside them.",
+    },
+    { kind: "h2", text: "1. Install" },
+    { kind: "code", language: "bash", code: "pnpm add @react-wrapped/kit gsap" },
+    { kind: "p", text: "Load the stylesheet once, where your app starts:" },
+    { kind: "code", language: "tsx", code: `import "@react-wrapped/kit/styles.css";` },
+    {
+      kind: "p",
+      text: "The frame is set in Inter. [Installation](/docs/installation/) says how to load it.",
+    },
+    { kind: "h2", text: "2. Say who it is about" },
+    {
+      kind: "p",
+      text: "The subject is the person the year belongs to. The handle and the caption sit in the top corner of every frame.",
+    },
+    { kind: "code", language: "tsx", code: excerpt(sourceOf("demos/first-wrapped.tsx"), "// Who the video is about.") },
+    { kind: "h2", text: "3. Bring your numbers" },
+    {
+      kind: "p",
+      text: "Scenes say what you hand them, so the numbers are yours to work out. Here they are made up: a count per day. Two of the scenes draw the year as a grid of cells, and `calendarFromCounts` turns the counts into that grid.",
+    },
+    { kind: "code", language: "tsx", code: excerpt(sourceOf("demos/first-wrapped.tsx"), "// Your numbers.") },
+    { kind: "h2", text: "4. Place three scenes" },
+    {
+      kind: "p",
+      text: "A scene is a function. The first argument is what it says, the second is its key and its label on the timeline. The array is the video, in play order. These three are the [opening](/docs/scenes/opening/), a [big number](/docs/scenes/big-number/) and a [list](/docs/scenes/list/).",
+    },
+    { kind: "code", language: "tsx", code: excerpt(sourceOf("demos/first-wrapped.tsx"), "// A scene is a function:") },
+    {
+      kind: "p",
+      text: "Stars in a text are marks: single stars put words in the accent colour, double stars make them bold.",
+    },
+    { kind: "h2", text: "5. Render WrappedView" },
+    {
+      kind: "p",
+      text: "`WrappedView` is the whole page: the player, its timeline and the settings. It needs the subject, the scenes, a seed and a config. The seed picks the transitions between scenes, so use something that is the person's own, such as their handle and the year. The config is everything a viewer can change, and it lives in your state.",
+    },
+    {
+      kind: "code",
+      language: "tsx",
+      code: excerpt(sourceOf("demos/first-wrapped.tsx"), "export function FirstWrapped()"),
+    },
+    {
+      kind: "p",
+      text: "That is a playing video. Hover the timeline to switch a scene off, move it, or open it and rewrite its headline. Change the palette and the format in the settings. All of it lands in `config`.",
+    },
+    { kind: "h2", text: "The whole file" },
+    fileBlock(sourceOf("demos/first-wrapped.tsx"), "first-wrapped.tsx"),
+    { kind: "h2", text: "WrappedView props" },
+    propsTable(VIEW_PROPS),
+    { kind: "h2", text: "Where to go next" },
+    {
+      kind: "list",
+      items: [
+        "**More scenes.** There are [eleven](/docs/scenes/), and the [chart scene](/docs/scenes/chart/) takes any of the [twenty-one charts](/docs/charts/).",
+        "**A link that is the video.** Keep the [config in the URL](/docs/guides/config-in-the-url/) and a shared link plays exactly what its owner set.",
+        "**Things to keep.** Pass `share` for the download button and the [graphics](/docs/graphics/).",
+        "**Hidden scenes.** Pass `opening` and the [scanner](/docs/scanner/) finds them.",
+        "**Your own page.** [Build the page from parts](/docs/guides/from-parts/) when `WrappedView` is not the layout you want.",
+        "**All of it at once.** The [full example](/examples/full-wrapped/) is a whole year, directed from data.",
+      ],
+    },
+  ],
+  related: [
+    "/docs/installation/",
+    "/docs/scenes/",
+    "/docs/player/",
+    "/docs/guides/config-in-the-url/",
+    "/examples/full-wrapped/",
+  ],
   updated: UPDATED,
 };
 
 /* ---------- the whole site ---------- */
 
 export const SECTIONS: readonly Section[] = [
-  { id: "get-started", title: "Get started", pages: [introduction, installation, theming, formats] },
+  { id: "get-started", title: "Get started", pages: [introduction, installation, firstWrapped, theming, formats] },
+  { id: "scenes", title: "Scenes", pages: scenePages },
   { id: "charts", title: "Charts", pages: [chartsOverview, ...CHART_TYPES.map(chartPage)] },
   { id: "transitions", title: "Transitions", pages: [transitionsOverview, ...transitionPages] },
+  { id: "player", title: "Player", pages: playerPages },
+  { id: "scanner", title: "Scanner", pages: scannerPages },
+  { id: "graphics", title: "Graphics", pages: graphicsPages },
+  { id: "marks", title: "Marks", pages: marksPages },
+  { id: "guides", title: "Guides", pages: guidePages },
 ];
 
 export const PAGES: readonly DocPage[] = SECTIONS.flatMap((section) => section.pages);
@@ -430,6 +616,7 @@ const OTHER_TITLES: Readonly<Record<string, string>> = {
   "/": "React Wrapped",
   "/designs/": "Designs",
   "/examples/full-wrapped/": "Full Wrapped example",
+  "/examples/from-parts/": "From parts example",
 };
 
 export const titleOf = (path: string) => BY_PATH.get(path)?.title ?? OTHER_TITLES[path];

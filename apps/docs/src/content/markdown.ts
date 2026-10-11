@@ -11,14 +11,9 @@ const withAddresses = (text: string) =>
   text.replaceAll(/\]\((\/[^)]*)\)/g, (_match, path: string) => `](${absoluteUrl(path)})`);
 
 const demoLine = (demo: Demo, pagePath: string) => {
-  const what =
-    demo.type === "chart"
-      ? "the chart"
-      : demo.type === "transition"
-        ? "the transition"
-        : demo.type === "scene"
-          ? "the scene"
-          : "it";
+  // A part is something to use, not something to watch.
+  if (demo.type === "part") return `> Live preview: try it at ${absoluteUrl(pagePath)}`;
+  const what = demo.type === "chart" ? "the chart" : demo.type === "transition" ? "the transition" : "the scene";
   return `> Live preview: see ${what} playing at ${absoluteUrl(pagePath)}`;
 };
 
