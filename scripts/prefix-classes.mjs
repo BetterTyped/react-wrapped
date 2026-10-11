@@ -84,14 +84,23 @@ for (const name of readdirSync(dir, { recursive: true })) {
       return;
     } else if (ts.isCallExpression(node)) {
       // `cn(...)` and friends: the arguments are classes. A call on a string (`.replace`) is not.
-      if (ts.isIdentifier(node.expression)) for (const argument of node.arguments) take(argument);
+      if (ts.isIdentifier(node.expression)) {
+        // `slot("player-play", ...)` names its element first: the name is not a class, the rest are.
+        const classes = node.expression.text === "slot" ? node.arguments.slice(1) : node.arguments;
+        for (const argument of classes) take(argument);
+      }
       return;
     }
     ts.forEachChild(node, take);
   };
+  const isSlotCall = (node) =>
+    ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "slot";
   const walk = (node) => {
     if (ts.isJsxAttribute(node) && /^(className|[a-z]+ClassName)$/.test(node.name.getText()) && node.initializer)
       take(node.initializer);
+    // An element that is a slot gets its classes from `{...slot("name", ...)}`, and a shared piece is handed
+    // `slot("name", ...)` as a prop. Either way the classes are in the call.
+    else if (isSlotCall(node)) take(node);
     ts.forEachChild(node, walk);
   };
   walk(tree);

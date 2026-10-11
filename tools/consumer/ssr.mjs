@@ -17,6 +17,7 @@ const html = renderToString(
     scenes,
     config: DEFAULT_WRAPPED_CONFIG,
     onConfigChange: () => {},
+    classNames: { "player-play": "go-button" },
   }),
 );
 console.log(
@@ -26,4 +27,6 @@ console.log(
   html.includes("wr-stage"),
   "has Download:",
   html.includes("Download"),
+  "has a restyled slot:",
+  /data-wr-slot="player-play" class="[^"]* go-button"/.test(html),
 );

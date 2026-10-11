@@ -153,6 +153,11 @@ const overview: DocPage = {
           text: "One accent colour for the video, and ten tokens for everything around it.",
         },
         {
+          path: "/docs/guides/styling/",
+          title: "Styling",
+          text: "A class of your own on any part of the chrome, and how to make Tailwind utilities win.",
+        },
+        {
           path: "/docs/guides/config-in-the-url/",
           title: "The config in the URL",
           text: "Short query keys, so a shared link plays the video exactly as its owner set it.",
@@ -503,6 +508,11 @@ const paletteAndChrome: DocPage = {
       caption: "The same parts with and without a set of tokens on the wrapper.",
     },
     fileBlock(sourceOf("demos/own-chrome.tsx"), "own-chrome.tsx"),
+    { kind: "h2", text: "Past colour: slots" },
+    {
+      kind: "p",
+      text: 'The tokens change colours, the radius and the font. To change the shape or the size of one part, such as the play button or a settings chip, give that part a class of your own. Every part of the chrome is a slot with a name: it carries `data-wr-slot="player-play"` and takes a class through `classNames`. The [styling guide](/docs/guides/styling/) lists every slot, and says how to make Tailwind utilities win over the library\'s classes.',
+    },
     { kind: "h2", text: "Dark mode" },
     {
       kind: "p",
@@ -519,6 +529,7 @@ const paletteAndChrome: DocPage = {
     },
   ],
   related: [
+    "/docs/guides/styling/",
     "/docs/theming/",
     "/docs/player/configurator/",
     "/docs/installation/",

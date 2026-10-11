@@ -1,4 +1,5 @@
 import { cn } from "./internal/cn";
+import type { SlotProps } from "./internal/slots";
 
 const chip =
   "wr:inline-flex wr:h-9 wr:flex-none wr:cursor-pointer wr:items-center wr:justify-center wr:rounded-full wr:bg-muted wr:px-3.5 wr:text-[13.5px] wr:font-semibold wr:whitespace-nowrap wr:outline-none wr:transition-colors wr:hover:text-foreground wr:focus-visible:ring-[3px] wr:focus-visible:ring-ring/50 wr:aria-checked:bg-foreground wr:aria-checked:text-background";
@@ -9,17 +10,21 @@ export function Chips<T extends string>({
   value,
   options,
   onChange,
+  slots,
 }: {
   label: string;
   value: T;
   options: readonly { value: T; label: string }[];
   onChange: (value: T) => void;
+  /** What the component using the chips calls them: the row, and each chip in it. */
+  slots?: { group?: SlotProps; chip?: SlotProps };
 }) {
   return (
     <div
       role="radiogroup"
       aria-label={label}
-      className="wr-root wr:flex wr:w-fit wr:flex-wrap wr:items-center wr:gap-1.5"
+      {...slots?.group}
+      className={cn("wr-root wr:flex wr:w-fit wr:flex-wrap wr:items-center wr:gap-1.5", slots?.group?.className)}
     >
       {options.map((option) => (
         <button
@@ -45,7 +50,8 @@ export function Chips<T extends string>({
             const buttons = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
             buttons?.[(index + step + options.length) % options.length]?.focus();
           }}
-          className={cn(chip)}
+          {...slots?.chip}
+          className={cn(chip, slots?.chip?.className)}
         >
           {option.label}
         </button>

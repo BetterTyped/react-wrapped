@@ -1,7 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useLabels, type WrappedPalette } from "@react-wrapped/core";
-import { Check, cn, Copy, Download, Lock, useCopied } from "@react-wrapped/core/internal";
+import { type SlotClassNames, useLabels, type WrappedPalette } from "@react-wrapped/core";
+import { Check, cn, Copy, Download, Lock, type Slots, useCopied, useSlots } from "@react-wrapped/core/internal";
+
+/** Every part of the gallery a class can be given to, by its `data-wr-slot`. */
+export const GRAPHICS_GALLERY_SLOTS = [
+  // The root: the heading, the line under it and the tiles.
+  "gallery",
+  // The heading, and its half in the accent colour.
+  "gallery-heading",
+  "gallery-heading-accent",
+  "gallery-about",
+  "gallery-grid",
+  // A graphic that can be taken.
+  "gallery-tile",
+  // The plate the picture stands on, the picture, and the dot that waits where a picture is still being drawn.
+  "gallery-art",
+  "gallery-image",
+  "gallery-placeholder",
+  "gallery-title",
+  "gallery-line",
+  // The row of buttons, and each button.
+  "gallery-actions",
+  "gallery-download",
+  "gallery-markdown",
+  // Said under a tile whose picture did not come through.
+  "gallery-problem",
+  // A graphic the scan has not found yet, and the lock on it.
+  "gallery-locked",
+  "gallery-lock",
+] as const;
+
+export type GraphicsGallerySlot = (typeof GRAPHICS_GALLERY_SLOTS)[number];
 
 /** One thing a Wrapped hands its owner to keep: a card, a badge, the trophy case. */
 export interface WrappedGraphic {
@@ -59,7 +89,15 @@ function save(blob: Blob, fileName: string) {
 const action =
   "wr:inline-flex wr:h-10 wr:min-w-0 wr:cursor-pointer wr:items-center wr:justify-center wr:gap-2 wr:whitespace-nowrap wr:rounded-full wr:px-4 wr:text-[13.5px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px wr:disabled:pointer-events-none wr:disabled:opacity-55 wr:[&_svg]:size-4";
 
-function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: WrappedPalette }) {
+function GraphicTile({
+  graphic,
+  palette,
+  slot,
+}: {
+  graphic: WrappedGraphic;
+  palette: WrappedPalette;
+  slot: Slots<GraphicsGallerySlot>;
+}) {
   const labels = useLabels();
   const [copied, copy] = useCopied();
   const [busy, setBusy] = useState(false);
@@ -136,25 +174,30 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
   if (locked) {
     return (
       <article
-        className="wr:flex wr:min-h-[340px] wr:flex-col wr:rounded-[32px] wr:p-7"
+        {...slot("gallery-locked", "wr:flex wr:min-h-[340px] wr:flex-col wr:rounded-[32px] wr:p-7")}
         style={{
           background: palette.bg,
           color: soft,
           boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${ink} 12%, transparent)`,
         }}
       >
-        <div className="wr:grid wr:flex-1 wr:place-items-center">
+        <div {...slot("gallery-art", "wr:grid wr:flex-1 wr:place-items-center")}>
           <span
-            className="wr:grid wr:size-16 wr:place-items-center wr:rounded-full"
+            {...slot("gallery-lock", "wr:grid wr:size-16 wr:place-items-center wr:rounded-full")}
             style={{ background: `color-mix(in oklch, ${ink} 7%, transparent)` }}
           >
             <Lock className="wr:size-6" />
           </span>
         </div>
-        <h4 className="wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]">
+        <h4
+          {...slot(
+            "gallery-title",
+            "wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]",
+          )}
+        >
           {labels.gallery.lockedTitle}
         </h4>
-        <p className="wr:mt-2 wr:text-[14.5px] wr:leading-[1.4]">{labels.gallery.lockedLine}</p>
+        <p {...slot("gallery-line", "wr:mt-2 wr:text-[14.5px] wr:leading-[1.4]")}>{labels.gallery.lockedLine}</p>
       </article>
     );
   }
@@ -162,7 +205,8 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
   return (
     <article
       ref={tileRef}
-      className={cn(
+      {...slot(
+        "gallery-tile",
         "wr:group/tile wr:relative wr:flex wr:min-h-[340px] wr:flex-col wr:overflow-hidden wr:rounded-[32px] wr:p-7 wr:transition-transform wr:duration-500 wr:ease-[cubic-bezier(0.2,0.8,0.2,1)] wr:hover:-translate-y-1.5",
         graphic.wide && "wr:md:col-span-2",
       )}
@@ -172,13 +216,14 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
         boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${ink} 8%, transparent)`,
       }}
     >
-      <div className="wr:@container wr:grid wr:flex-1 wr:place-items-center wr:py-6">
+      <div {...slot("gallery-art", "wr:@container wr:grid wr:flex-1 wr:place-items-center wr:py-6")}>
         {src ? (
           <img
             src={src}
             alt={graphic.title}
             loading="lazy"
-            className={cn(
+            {...slot(
+              "gallery-image",
               "wr:w-auto wr:max-w-full wr:object-contain wr:transition-transform wr:duration-500 wr:ease-[cubic-bezier(0.2,1.4,0.4,1)] wr:group-hover/tile:scale-[1.04]",
               // A badge's height follows its tile's width, so every badge is shown at one scale: the widest ("2,052
               // contributions made") fits, and a short one beside it is not drawn bigger just because it had room.
@@ -194,7 +239,7 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
           />
         ) : (
           <span
-            className="wr:size-8 wr:animate-pulse wr:rounded-full"
+            {...slot("gallery-placeholder", "wr:size-8 wr:animate-pulse wr:rounded-full")}
             style={{ background: `color-mix(in oklch, ${ink} 15%, transparent)` }}
           />
         )}
@@ -206,20 +251,28 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
         )}
       >
         <div className="wr:min-w-0 wr:flex-1">
-          <h4 className="wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]">
+          <h4
+            {...slot(
+              "gallery-title",
+              "wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]",
+            )}
+          >
             {graphic.title}
           </h4>
-          <p className="wr:mt-2 wr:max-w-[46ch] wr:text-[14.5px] wr:leading-[1.4]" style={{ color: soft }}>
+          <p
+            {...slot("gallery-line", "wr:mt-2 wr:max-w-[46ch] wr:text-[14.5px] wr:leading-[1.4]")}
+            style={{ color: soft }}
+          >
             {graphic.line}
           </p>
         </div>
         {/* Side by side, always. */}
-        <div className="wr:flex wr:shrink-0 wr:items-center wr:gap-2">
+        <div {...slot("gallery-actions", "wr:flex wr:shrink-0 wr:items-center wr:gap-2")}>
           <button
             type="button"
             onClick={() => void download()}
             disabled={busy}
-            className={action}
+            {...slot("gallery-download", action)}
             style={{ background: ink, color: palette.bg }}
           >
             <Download />
@@ -230,7 +283,7 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
               type="button"
               onClick={() => copy(graphic.markdown ?? "")}
               title={labels.gallery.markdownHint}
-              className={action}
+              {...slot("gallery-markdown", action)}
               style={{ background: `color-mix(in oklch, ${ink} 10%, transparent)`, color: ink }}
             >
               {copied ? <Check /> : <Copy />}
@@ -240,7 +293,7 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
         </div>
       </div>
       {failed ? (
-        <p role="alert" className="wr:mt-3 wr:text-[13px]" style={{ color: soft }}>
+        <p role="alert" {...slot("gallery-problem", "wr:mt-3 wr:text-[13px]")} style={{ color: soft }}>
           {labels.gallery.failed}
         </p>
       ) : null}
@@ -256,28 +309,50 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
 export function GraphicsGallery({
   graphics,
   palette,
+  className,
+  classNames,
 }: {
   graphics: readonly WrappedGraphic[];
   /** The picked theme: the plates follow it, like the images on them. */
   palette: WrappedPalette;
+  /** A class for the gallery's root. */
+  className?: string;
+  /**
+   * A class per part, by slot name (`"gallery-tile"`). Added after the library's own classes on that part. The tiles
+   * are painted in the video's palette with inline styles: a class of yours changes their colours only with
+   * `!important`, and everything else freely.
+   */
+  classNames?: SlotClassNames<GraphicsGallerySlot>;
 }) {
   const labels = useLabels();
+  const slot = useSlots<GraphicsGallerySlot>(classNames);
   const unlocked = graphics.filter((graphic) => !graphic.locked).length;
   const locked = graphics.length - unlocked;
   return (
-    <section className="wr-root wr:pt-10 wr:md:pt-14">
-      <h3 className="wr:text-[clamp(1.75rem,2.6vw,2.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.05em]">
-        {labels.gallery.count(unlocked)} <span className="wr:text-primary">{labels.gallery.toKeep}</span>
+    <section {...slot("gallery", "wr-root wr:pt-10 wr:md:pt-14", className)}>
+      <h3
+        {...slot(
+          "gallery-heading",
+          "wr:text-[clamp(1.75rem,2.6vw,2.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.05em]",
+        )}
+      >
+        {labels.gallery.count(unlocked)}{" "}
+        <span {...slot("gallery-heading-accent", "wr:text-primary")}>{labels.gallery.toKeep}</span>
       </h3>
-      <p className="wr:mt-3 wr:mb-7 wr:max-w-[60ch] wr:text-[17px] wr:leading-[1.5] wr:text-muted-foreground">
+      <p
+        {...slot(
+          "gallery-about",
+          "wr:mt-3 wr:mb-7 wr:max-w-[60ch] wr:text-[17px] wr:leading-[1.5] wr:text-muted-foreground",
+        )}
+      >
         {locked > 0 ? labels.gallery.aboutLocked(locked) : labels.gallery.about}
       </p>
-      <div className="wr:grid wr:gap-3.5 wr:md:grid-cols-2 wr:xl:grid-cols-4">
+      <div {...slot("gallery-grid", "wr:grid wr:gap-3.5 wr:md:grid-cols-2 wr:xl:grid-cols-4")}>
         {/* What can be taken first; what is still locked after it. */}
         {graphics
           .toSorted((a, b) => Number(Boolean(a.locked)) - Number(Boolean(b.locked)))
           .map((graphic) => (
-            <GraphicTile key={graphic.id} graphic={graphic} palette={palette} />
+            <GraphicTile key={graphic.id} graphic={graphic} palette={palette} slot={slot} />
           ))}
       </div>
     </section>

@@ -47,6 +47,18 @@ node scripts/prefix-classes.mjs packages/core/src --write
 
 It leaves prefixed classes and the library's own `wr-` classes alone, so it is safe to run again.
 
+## The chrome's elements are slots here
+
+In the app an element of the chrome has a plain `className`. Here every part somebody might restyle is a slot (see
+`DESIGN.md`): `className={cn(control, "wr:bg-foreground")}` is written
+`{...slot("player-play", control, "wr:bg-foreground")}`, which puts the same classes on the element plus its name. So a
+diff against the app's file shows that rewrite on most elements of the player, the timeline, the settings, the scan, the
+gallery and the editor, and nothing else about them.
+
+When a change comes across, keep the slot and carry the classes into it. A new element that someone might want to
+restyle gets a name in its component's list. The prefixer reads the classes inside `slot(...)` too and leaves the name
+alone.
+
 ## Carrying a later change across
 
 File names and the `wr-` class names are kept the same on purpose, so a change made on either side can be read as a diff

@@ -20,6 +20,7 @@ import { WaitingForTheYear } from "./loading";
 import { MarkPicker } from "./marks";
 import { OwnChrome } from "./own-chrome";
 import { OwnColour } from "./own-colour";
+import { OwnStyle } from "./own-style";
 import { OwnTransport } from "./own-transport";
 import { PlayerRemote } from "./player-remote";
 import { Rarities } from "./rarities";
@@ -167,6 +168,11 @@ function OwnChromePart() {
   return <OwnChrome subject={subject} seed={seed} scenes={SHORT_SCENES} config={config} onConfigChange={change} />;
 }
 
+function OwnStylePart() {
+  const [config, change] = useOwnConfig();
+  return <OwnStyle subject={subject} seed={seed} scenes={SHORT_SCENES} config={config} onConfigChange={change} />;
+}
+
 export const PARTS: Record<PartId, { render: () => ReactNode; look: boolean }> = {
   // These keep a whole config of their own, the way an app does, so the site's look controls do not reach them.
   "first-wrapped": { render: () => <FirstWrapped />, look: false },
@@ -192,4 +198,5 @@ export const PARTS: Record<PartId, { render: () => ReactNode; look: boolean }> =
   marks: { render: () => <MarksPart />, look: true },
   "own-colour": { render: () => <OwnColourPart />, look: true },
   "own-chrome": { render: () => <OwnChromePart />, look: true },
+  "own-style": { render: () => <OwnStylePart />, look: true },
 };

@@ -1,16 +1,20 @@
 import type { ComponentProps } from "react";
 
 import { cn } from "./cn";
+import type { SlotProps } from "./slots";
 
 /** An on/off switch on a plain button, so the library needs no component kit to draw one. */
 export function Switch({
   checked,
   onCheckedChange,
   className,
+  thumb,
   ...props
 }: Omit<ComponentProps<"button">, "onChange" | "role"> & {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  /** What the component using the switch calls the dot that slides. The switch itself takes its slot as props. */
+  thumb?: SlotProps;
 }) {
   const state = checked ? "checked" : "unchecked";
   return (
@@ -28,7 +32,11 @@ export function Switch({
     >
       <span
         data-state={state}
-        className="wr:pointer-events-none wr:block wr:size-4 wr:rounded-full wr:bg-background wr:ring-0 wr:transition-transform wr:data-[state=checked]:translate-x-[calc(100%-2px)] wr:data-[state=unchecked]:translate-x-0 wr:dark:data-[state=checked]:bg-primary-foreground wr:dark:data-[state=unchecked]:bg-foreground"
+        {...thumb}
+        className={cn(
+          "wr:pointer-events-none wr:block wr:size-4 wr:rounded-full wr:bg-background wr:ring-0 wr:transition-transform wr:data-[state=checked]:translate-x-[calc(100%-2px)] wr:data-[state=unchecked]:translate-x-0 wr:dark:data-[state=checked]:bg-primary-foreground wr:dark:data-[state=unchecked]:bg-foreground",
+          thumb?.className,
+        )}
       />
     </button>
   );

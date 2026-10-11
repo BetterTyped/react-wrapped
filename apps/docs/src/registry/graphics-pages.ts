@@ -79,6 +79,12 @@ const GRAPHIC_DOCS: PropDocs<WrappedGraphic> = {
 const GALLERY_PROPS: PropDocs<Parameters<typeof GraphicsGallery>[0]> = {
   graphics: ["readonly WrappedGraphic[]", "The tiles. Unlocked ones are shown first, whatever order you pass."],
   palette: ["WrappedPalette", "The video's palette: `resolvePalette(config)`. Each tile sits on its background."],
+  className: ["string", "A class for the gallery's root.", "optional"],
+  classNames: [
+    "SlotClassNames<GraphicsGallerySlot>",
+    'A class per part, by slot name: `"gallery-tile"`, `"gallery-download"`. See [styling](/docs/guides/styling/).',
+    "optional",
+  ],
 };
 
 const overview: DocPage = {

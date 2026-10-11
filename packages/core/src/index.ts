@@ -13,6 +13,7 @@ export * from "./platform-mark";
 export * from "./primitives";
 export * from "./rarity";
 export * from "./rng";
+export * from "./slots";
 export * from "./stage";
 export * from "./types";
 export * from "./use-wrapped-timeline";

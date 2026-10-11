@@ -5,11 +5,48 @@ import {
   type SceneInstance,
   type SceneMark,
   SceneThumb,
+  type SlotClassNames,
   useLabels,
   WRAPPED_FORMATS,
   type WrappedConfig,
 } from "@react-wrapped/core";
-import { ChevronLeft, ChevronRight, cn, PencilLine, Switch } from "@react-wrapped/core/internal";
+import { ChevronLeft, ChevronRight, PencilLine, Switch, useSlots } from "@react-wrapped/core/internal";
+
+/** Every part of the timeline a class can be given to, by its `data-wr-slot`. */
+export const TIMELINE_SLOTS = [
+  // The root: the row and the preview that opens over it.
+  "timeline",
+  // The row of segments, the part that is clicked and dragged.
+  "timeline-track",
+  // One scene's share of the row.
+  "timeline-segment",
+  // The bar drawn inside a segment.
+  "timeline-segment-bar",
+  // The played part of a bar.
+  "timeline-segment-fill",
+  // What holds the preview over its segment.
+  "timeline-popover",
+  // The preview card.
+  "timeline-preview",
+  // The still of the scene in the card.
+  "timeline-preview-thumb",
+  // The scene's name.
+  "timeline-preview-title",
+  // How long the scene plays, or that it is off.
+  "timeline-preview-length",
+  // How rare a found scene is.
+  "timeline-preview-rarity",
+  // The creator's row of controls in the card.
+  "timeline-controls",
+  "timeline-move-earlier",
+  "timeline-move-later",
+  "timeline-edit",
+  // The switch that takes a scene out of the video, and the dot that slides in it.
+  "timeline-toggle",
+  "timeline-toggle-thumb",
+] as const;
+
+export type TimelineSlot = (typeof TIMELINE_SLOTS)[number];
 
 /** What the creator can do to the cut from the timeline. Left out for anyone just watching. */
 export interface TimelineEditing {
@@ -25,6 +62,9 @@ export interface TimelineEditing {
  * row is about 60px wide, so the sliver is thinner there.
  */
 const offSegment = "wr:w-1.5 wr:flex-none wr:sm:w-3.5";
+/** The two arrows that move a scene along the cut. */
+const move =
+  "wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35";
 
 /**
  * The video's timeline, and the place the cut is managed from. Every scene is a segment as long as it plays. Hover one
@@ -40,6 +80,8 @@ export function Timeline({
   config,
   editing,
   onSeek,
+  className,
+  classNames,
 }: {
   /** The row of segments. The engine fills each segment's bar from here as the video plays. */
   trackRef: RefObject<HTMLDivElement | null>;
@@ -50,7 +92,11 @@ export function Timeline({
   config: WrappedConfig;
   editing?: TimelineEditing;
   onSeek: (seconds: number) => void;
+  className?: string;
+  /** A class per part, by slot name. Added after the library's own classes on that part. */
+  classNames?: SlotClassNames<TimelineSlot>;
 }) {
+  const slot = useSlots<TimelineSlot>(classNames);
   const wrapRef = useRef<HTMLDivElement>(null);
   const closing = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [open, setOpen] = useState<{ key: string; x: number } | null>(null);
@@ -148,13 +194,15 @@ export function Timeline({
   const half = thumbWidth / 2 + 10;
   const wrapWidth = wrapRef.current?.offsetWidth ?? 0;
   const left = open ? Math.min(Math.max(open.x, half), Math.max(half, wrapWidth - half)) : 0;
+  // The still's box has always carried a class attribute, empty while its scene is on. It keeps one.
+  const thumb = slot("timeline-preview-thumb", !shownSpan && "wr:opacity-45 wr:grayscale");
 
   return (
     <div
       ref={wrapRef}
       // min-w-0: in the transport row this is the part that gives way. Without it the row is as wide as its segments
       // want and pushes the clock and the full screen button out of the card on a phone.
-      className="wr-root wr:relative wr:min-w-0 wr:flex-1"
+      {...slot("timeline", "wr-root wr:relative wr:min-w-0 wr:flex-1", className)}
       onPointerLeave={(event) => {
         if (event.pointerType === "mouse") hideSoon();
       }}
@@ -165,7 +213,10 @@ export function Timeline({
       <div
         ref={trackRef}
         aria-hidden
-        className="wr:flex wr:h-11 wr:cursor-pointer wr:touch-none wr:items-center wr:gap-px wr:sm:gap-[3px]"
+        {...slot(
+          "timeline-track",
+          "wr:flex wr:h-11 wr:cursor-pointer wr:touch-none wr:items-center wr:gap-px wr:sm:gap-[3px]",
+        )}
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           seekFrom(event);
@@ -184,24 +235,25 @@ export function Timeline({
             <div
               key={scene.key}
               data-seg={scene.key}
-              className={cn("wr:relative wr:h-full wr:min-w-0 wr:sm:min-w-[8px]", !span && offSegment)}
+              {...slot("timeline-segment", "wr:relative wr:h-full wr:min-w-0 wr:sm:min-w-[8px]", !span && offSegment)}
               style={span ? { flex: `${Math.max(span.length, 0.4)} 1 0px` } : undefined}
             >
               <div
                 data-seg-bar
                 data-rarity={rarity ?? undefined}
-                className={cn(
+                {...slot(
+                  "timeline-segment-bar",
                   "wr:absolute wr:inset-x-0 wr:top-1/2 wr:h-2 wr:-translate-y-1/2 wr:overflow-hidden wr:rounded-full wr:bg-muted wr:transition-[height] wr:duration-150",
                   active && "wr:h-3",
                   // Off: a hollow sliver, still there to find and switch back on.
                   !span && "wr:bg-transparent wr:ring-1 wr:ring-inset wr:ring-muted-foreground/45",
                 )}
-                style={rarity && span ? { background: `color-mix(in oklch, ${rarity} 30%, var(--muted))` } : undefined}
+                style={rarity && span ? { background: `color-mix(in oklch, ${rarity} 30%, var(--wr-ui-muted))` } : undefined}
               >
                 {span ? (
                   <i
                     data-seg-fill={scene.key}
-                    className="wr:block wr:h-full wr:w-0 wr:rounded-full wr:bg-primary"
+                    {...slot("timeline-segment-fill", "wr:block wr:h-full wr:w-0 wr:rounded-full wr:bg-primary")}
                     style={rarity ? { background: rarity } : undefined}
                   />
                 ) : null}
@@ -212,15 +264,23 @@ export function Timeline({
       </div>
 
       {shown && open ? (
-        <div className="wr:absolute wr:bottom-full wr:z-30 wr:-translate-x-1/2 wr:pb-1.5" style={{ left }}>
-          <div className="wr:rounded-[18px] wr:bg-card wr:p-1.5 wr:shadow-[0_18px_40px_-12px_rgb(0_0_0/0.35)] wr:ring-1 wr:ring-border">
-            <div className={cn(!shownSpan && "wr:opacity-45 wr:grayscale")}>
+        <div
+          {...slot("timeline-popover", "wr:absolute wr:bottom-full wr:z-30 wr:-translate-x-1/2 wr:pb-1.5")}
+          style={{ left }}
+        >
+          <div
+            {...slot(
+              "timeline-preview",
+              "wr:rounded-[18px] wr:bg-card wr:p-1.5 wr:shadow-[0_18px_40px_-12px_rgb(0_0_0/0.35)] wr:ring-1 wr:ring-border",
+            )}
+          >
+            <div {...thumb} className={thumb.className ?? ""}>
               <SceneThumb scene={shown} config={config} width={thumbWidth} />
             </div>
             <div className="wr:px-1.5 wr:pt-2 wr:pb-1" style={{ width: thumbWidth }}>
               <p className="wr:flex wr:items-baseline wr:justify-between wr:gap-2 wr:text-[13px]">
-                <span className="wr:truncate wr:font-semibold">{shown.label}</span>
-                <span className="wr:shrink-0 wr:tabular-nums wr:text-muted-foreground">
+                <span {...slot("timeline-preview-title", "wr:truncate wr:font-semibold")}>{shown.label}</span>
+                <span {...slot("timeline-preview-length", "wr:shrink-0 wr:tabular-nums wr:text-muted-foreground")}>
                   {shownSpan
                     ? // Whole seconds: how the number is written (4s, 1:05) is the label's business.
                       labels.timeline.length(Math.max(0, Math.round(shownSpan.length / speed)))
@@ -228,12 +288,15 @@ export function Timeline({
                 </span>
               </p>
               {shown.drop ? (
-                <p className="wr:mt-0.5 wr:text-[12px] wr:font-semibold" style={{ color: rarityColors[shown.drop] }}>
+                <p
+                  {...slot("timeline-preview-rarity", "wr:mt-0.5 wr:text-[12px] wr:font-semibold")}
+                  style={{ color: rarityColors[shown.drop] }}
+                >
                   {labels.rarity[shown.drop]}
                 </p>
               ) : null}
               {editing ? (
-                <div className="wr:mt-2 wr:flex wr:items-center wr:justify-between wr:gap-1">
+                <div {...slot("timeline-controls", "wr:mt-2 wr:flex wr:items-center wr:justify-between wr:gap-1")}>
                   <span className="wr:flex wr:items-center wr:gap-0.5">
                     <button
                       type="button"
@@ -241,7 +304,7 @@ export function Timeline({
                       disabled={shownIndex <= 0}
                       aria-label={labels.timeline.moveEarlier(shown.label)}
                       title={labels.timeline.earlier}
-                      className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35"
+                      {...slot("timeline-move-earlier", move)}
                     >
                       <ChevronLeft className="wr:size-4" />
                     </button>
@@ -251,7 +314,7 @@ export function Timeline({
                       disabled={shownIndex >= scenes.length - 1}
                       aria-label={labels.timeline.moveLater(shown.label)}
                       title={labels.timeline.later}
-                      className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35"
+                      {...slot("timeline-move-later", move)}
                     >
                       <ChevronRight className="wr:size-4" />
                     </button>
@@ -262,7 +325,10 @@ export function Timeline({
                         onClick={() => editing.onEdit(shown.key)}
                         aria-label={labels.timeline.edit(shown.label)}
                         title={labels.timeline.editHint}
-                        className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground"
+                        {...slot(
+                          "timeline-edit",
+                          "wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground",
+                        )}
                       >
                         <PencilLine className="wr:size-4" />
                       </button>
@@ -274,6 +340,8 @@ export function Timeline({
                     disabled={Boolean(shownSpan) && onCount === 1}
                     onCheckedChange={(on) => editing.onToggle(shown.key, on)}
                     aria-label={labels.timeline.toggle(shown.label)}
+                    {...slot("timeline-toggle")}
+                    thumb={slot("timeline-toggle-thumb")}
                   />
                 </div>
               ) : null}
