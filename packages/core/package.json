@@ -35,6 +35,15 @@
     "typecheck": "pnpm --dir ../.. exec tsgo -p packages/core/tsconfig.json --noEmit",
     "lint": "pnpm --dir ../.. exec oxlint packages/core"
   },
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "clsx": "^2.1.1",
+    "html-to-image": "1.11.13",
+    "lucide-react": "^1.11.0",
+    "mediabunny": "1.55.6",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.4.3"
+  },
   "peerDependencies": {
     "gsap": "^3.13.0",
     "react": "^19.0.0",

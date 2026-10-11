@@ -3,6 +3,9 @@ import { useState } from "react";
 
 import { Chips } from "./chips";
 import { TRANSITION_LABELS } from "./cuts";
+import { cn } from "./internal/cn";
+import { Modal, ModalBody, ModalField, ModalFooter, modalInputClassName } from "./internal/modal";
+import { pill } from "./internal/pill";
 import { CutPreview } from "./stage";
 import {
   WRAPPED_FORMATS,
@@ -11,15 +14,6 @@ import {
   type WrappedConfig,
   type WrappedTransition,
 } from "./types";
-import { pillVariants } from "@/components/layouts/storefront/account-parts";
-import {
-  ModalBody,
-  ModalField,
-  ModalFooter,
-  ModalShell,
-  modalInputClassName,
-} from "@/components/layouts/storefront/modal-shell";
-import { cn } from "@/lib/utils";
 
 /** The way out of the scene being edited. */
 export interface SceneCut {
@@ -64,7 +58,7 @@ export function SceneEditor({
   onClose: () => void;
 }) {
   return (
-    <ModalShell
+    <Modal
       open={scene !== null}
       onOpenChange={(open) => {
         if (!open) onClose();
@@ -85,7 +79,7 @@ export function SceneEditor({
           onClose={onClose}
         />
       ) : null}
-    </ModalShell>
+    </Modal>
   );
 }
 
@@ -160,7 +154,7 @@ function SceneEditorForm({
       <ModalFooter>
         <button
           type="button"
-          className={pillVariants({ variant: "quiet" })}
+          className={pill.quiet}
           onClick={() => {
             setValues(defaults);
             setStyle(cut?.original ?? null);
@@ -171,7 +165,7 @@ function SceneEditorForm({
         </button>
         <button
           type="button"
-          className={pillVariants()}
+          className={pill.solid}
           onClick={() => {
             // Only what differs from the director's words is kept, so the link stays short.
             onSave(

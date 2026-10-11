@@ -1,9 +1,9 @@
 import { Check, Copy, Download, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { cn } from "./internal/cn";
+import { useCopied } from "./internal/use-copied";
 import type { WrappedPalette } from "./types";
-import { useCopied } from "@/hooks/use-copied";
-import { cn } from "@/lib/utils";
 
 /** One thing a Wrapped hands its owner to keep: a card, a badge, the trophy case. */
 export interface WrappedGraphic {

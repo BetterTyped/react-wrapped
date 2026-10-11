@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import type { PlatformMarkId } from "./platform-marks";
 import type { Rng } from "./rng";
 
 /** The video's fixed resolution. Every scene is laid out against a shorter side of 1080 px. */
@@ -43,7 +42,7 @@ export const WRAPPED_TRANSITIONS = [
 export type WrappedTransition = (typeof WRAPPED_TRANSITIONS)[number];
 
 /** A palette is the graph's five levels, the surfaces around them and what each rarity wears. Level 4 is the accent. */
-export type { WrappedPalette } from "@internal/enums";
+export type { WrappedPalette } from "./palette-data";
 
 /** Everything a viewer can change. It lives in the URL, so the link is the video. */
 export interface WrappedConfig {
@@ -101,6 +100,12 @@ export interface SceneInstance {
   animate: (context: SceneContext) => gsap.core.Timeline;
 }
 
+/**
+ * A mark to press into the corner of the frame: its outline as SVG path data in a 24 by 24 box. Several paths are
+ * pressed out one by one, so the shapes of a mark made of parts stay apart. Bring your own logo; none ship here.
+ */
+export type StageMark = string | readonly string[];
+
 /** Who the video is about, for the chrome at the top. */
 export interface WrappedSubject {
   handle: string;
@@ -110,8 +115,10 @@ export interface WrappedSubject {
   caption: string;
   /** The window the numbers cover, already formatted: "Oct 2025 to Oct 2026". */
   period: string;
-  /** The platform's mark, pressed into the corner of the frame. Left out, the corner keeps the plain discs. */
-  mark?: PlatformMarkId;
+  /** A mark pressed into the corner of the frame. Left out, the corner keeps the plain discs. */
+  mark?: StageMark;
+  /** A quiet line saying where the video is from: a site address, a product name. Left out, nothing is shown. */
+  brand?: string;
 }
 
 /**

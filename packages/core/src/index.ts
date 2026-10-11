@@ -38,7 +38,6 @@ export { Pixel } from "./scenes";
 export { type HiddenDrop, PixelGlyph, YearScan } from "./year-scan";
 export { useOpenedDrops } from "./use-opened-drops";
 export { cutDrops } from "./cut-drops";
-export { PLATFORM_MARK_LAYERS, PLATFORM_MARKS, type PlatformMarkId } from "./platform-marks";
 export { CutPreview, SceneThumb } from "./stage";
 export { TRANSITION_LABELS } from "./cuts";
 export { WRAPPED_PALETTES } from "./palettes";

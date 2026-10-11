@@ -20,6 +20,8 @@ export interface ShareCardSpec {
   stats: readonly { label: string; value: string }[];
   /** What this person pulled: the same tonal tokens as the last scene, at most two. */
   tokens?: readonly WrappedToken[];
+  /** A quiet line saying where the video is from: a site address, a product name. Left out, nothing is shown. */
+  brand?: string;
 }
 
 const WIDTH = 1200;
@@ -102,14 +104,16 @@ export async function renderShareCard(spec: ShareCardSpec, palette: WrappedPalet
   context.font = `500 21px ${FONT}`;
   context.fillText(`${spec.caption}, ${spec.period}`, PAD + 96, PAD + 66);
 
-  // Where it came from, quietly, top right.
-  context.globalAlpha = 0.6;
-  context.font = `600 18px ${FONT}`;
-  context.textAlign = "right";
-  context.fillStyle = palette.muted;
-  context.fillText("hype-stack.dev/wrapped", WIDTH - PAD, PAD + 30);
-  context.textAlign = "left";
-  context.globalAlpha = 1;
+  // Where it came from, quietly, top right. Only when the card says so.
+  if (spec.brand) {
+    context.globalAlpha = 0.6;
+    context.font = `600 18px ${FONT}`;
+    context.textAlign = "right";
+    context.fillStyle = palette.muted;
+    context.fillText(spec.brand, WIDTH - PAD, PAD + 30);
+    context.textAlign = "left";
+    context.globalAlpha = 1;
+  }
 
   // The year, as GitHub draws it.
   let y = PAD + 120;

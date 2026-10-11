@@ -1,11 +1,12 @@
 import { Check, Download, Link2, Square } from "lucide-react";
 import { type ReactNode, type RefObject, useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 
 import { arrangeScenes, editsFor } from "./config";
 import { luckyCut } from "./cuts";
 import { frameTimes, renderVideo, VIDEO_FPS } from "./export-video";
 import { GraphicsGallery, type WrappedGraphic } from "./graphics-gallery";
+import { cn } from "./internal/cn";
+import { useCopied } from "./internal/use-copied";
 import type { LoadingSubject } from "./loading-stage";
 import { resolvePalette } from "./palettes";
 import { type SceneCut, SceneEditor } from "./scene-editor";
@@ -20,8 +21,6 @@ import {
 import { WrappedConfigurator } from "./wrapped-configurator";
 import { WrappedPlayer, type WrappedPlayerHandle, WrappedPlayerLoading } from "./wrapped-player";
 import { type HiddenDrop, YearScan } from "./year-scan";
-import { useCopied } from "@/hooks/use-copied";
-import { cn } from "@/lib/utils";
 
 const panel = "rounded-[28px] bg-card p-4 ring-1 ring-border md:p-6";
 /** The player and the column beside it share one height on desktop, so their edges line up. */
@@ -44,14 +43,18 @@ function ShareActions({
   config,
   fileName,
   onRendering,
+  onError,
 }: {
   player: RefObject<WrappedPlayerHandle | null>;
   config: WrappedConfig;
   fileName: string;
   /** The stage is busy being filmed: the page keeps its hands off the video until this says false again. */
   onRendering: (rendering: boolean) => void;
+  /** Told why a video could not be made. Left out, the reason is shown under the buttons. */
+  onError?: (message: string) => void;
 }) {
   const [linkCopied, copyLink] = useCopied();
+  const [problem, setProblem] = useState<string | null>(null);
   // The file being made: how far it is in whole percents, how many frames it has, how long is left once that is
   // known. Null when none is being made.
   const [making, setMaking] = useState<{ percent: number; frames: number; left: number | null } | null>(null);
@@ -68,6 +71,7 @@ function ShareActions({
     const frames = frameTimes(take.seconds, VIDEO_FPS).length;
     const started = performance.now();
     setMaking({ percent: 0, frames, left: null });
+    setProblem(null);
     onRendering(true);
     try {
       const video = await renderVideo(take, WRAPPED_FORMATS[config.format], {
@@ -89,7 +93,9 @@ function ShareActions({
     } catch (error) {
       // Stopped on purpose is not a failure.
       if (!stop.signal.aborted) {
-        toast.error(error instanceof Error ? error.message : "The video did not come through. Try again.");
+        const message = error instanceof Error ? error.message : "The video did not come through. Try again.";
+        if (onError) onError(message);
+        else setProblem(message);
       }
     } finally {
       take.release();
@@ -133,6 +139,11 @@ function ShareActions({
           smooth on any machine{making.left === null ? "." : `. ${timeLeft(making.left).replace(/^a/, "A")}.`}
         </p>
       ) : null}
+      {problem ? (
+        <p role="alert" className="col-span-2 px-1 pt-1 text-[13px] leading-[1.45] text-muted-foreground">
+          {problem}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -150,6 +161,8 @@ interface LoadedProps {
     fileName: string;
     /** Everything the owner gets to keep: cards, the trophy case, a badge per achievement and egg. */
     graphics?: readonly WrappedGraphic[];
+    /** Told why the video file could not be made, to show it your own way. Left out, it is said under the buttons. */
+    onError?: (message: string) => void;
   };
   /** Generated scenes hidden in the year. Each joins `scenes` once the scan has found it and `onOpen` ran. */
   opening?: {
@@ -296,6 +309,7 @@ export function WrappedView(
                 config={config}
                 fileName={loaded.share.fileName}
                 onRendering={setRendering}
+                onError={loaded.share.onError}
               />
             ) : null}
             <div

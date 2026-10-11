@@ -93,7 +93,7 @@ function laidOut(parts: readonly { top: number; height: number; marginBottom?: n
 }
 
 /** How much a part was shrunk: 1 when it was left alone. */
-const shrunkTo = (part: HTMLElement) => Number(part.style.getPropertyValue("zoom") || 1);
+const shrunkTo = (part: HTMLElement) => Number(part.style.getPropertyValue("--wr-fit") || 1);
 
 describe("fitScene", () => {
   it("leaves a scene that fits exactly as it was drawn", () => {

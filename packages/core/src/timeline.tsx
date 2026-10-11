@@ -1,13 +1,13 @@
 import { ChevronLeft, ChevronRight, PencilLine } from "lucide-react";
 import { type PointerEvent, type RefObject, useEffect, useRef, useState } from "react";
 
+import { cn } from "./internal/cn";
+import { Switch } from "./internal/switch";
 import { resolvePalette } from "./palettes";
 import { RARITY_LABELS } from "./rarity";
 import { SceneThumb } from "./stage";
 import { WRAPPED_FORMATS, type SceneInstance, type WrappedConfig } from "./types";
 import type { SceneMark } from "./use-wrapped-timeline";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 
 /** What the creator can do to the cut from the timeline. Left out for anyone just watching. */
 export interface TimelineEditing {

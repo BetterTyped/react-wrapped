@@ -1,4 +1,4 @@
-import { WRAPPED_RARITY_LABELS, type WrappedRarity } from "@internal/enums";
+import { WRAPPED_RARITY_LABELS, type WrappedRarity } from "./palette-data";
 
 export type Rarity = WrappedRarity;
 

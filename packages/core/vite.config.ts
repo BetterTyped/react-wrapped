@@ -16,8 +16,9 @@ export default defineConfig({
       formats: ["es" as const],
     },
     rolldownOptions: {
-      // A library never bundles what its consumer already has: one React and one GSAP per page.
-      external: [/^react($|\/)/, /^react-dom($|\/)/, /^gsap($|\/)/, /^@react-wrapped\//],
+      // A library bundles nothing it did not write: every package it imports stays an import, so there is one
+      // React and one GSAP on the page and the consumer's bundler decides what ships.
+      external: (id) => !id.startsWith(".") && !path.isAbsolute(id),
     },
   },
   test: {

@@ -29,6 +29,8 @@ export interface InsightCardSpec {
   /** One line saying what the chart shows. */
   insight: string;
   chart: SceneChart;
+  /** A quiet line saying where the video is from: a site address, a product name. Left out, nothing is shown. */
+  brand?: string;
 }
 
 const WIDTH = 1200;
@@ -82,7 +84,7 @@ export function InsightCard({ spec, palette }: { spec: InsightCardSpec; palette:
             <Chart chart={spec.chart} />
           </div>
         </div>
-        <div className="wr-insight-source">hype-stack.dev/wrapped</div>
+        {spec.brand ? <div className="wr-insight-source">{spec.brand}</div> : null}
       </div>
     </div>
   );

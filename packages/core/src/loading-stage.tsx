@@ -2,9 +2,8 @@ import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react"
 
 import { beamFrames, LOOP_SECONDS, placeholderYear, weekFrames } from "./loading-sweep";
 import { paletteStyle, resolvePalette } from "./palettes";
-import type { PlatformMarkId } from "./platform-marks";
 import { initials, StageBackdrop } from "./stage";
-import { WRAPPED_FORMATS, type WrappedConfig } from "./types";
+import { WRAPPED_FORMATS, type StageMark, type WrappedConfig } from "./types";
 // oxlint-disable-next-line import/no-unassigned-import -- The stage's own stylesheet: the loader is drawn on the stage.
 import "./wrapped.css";
 
@@ -25,7 +24,9 @@ export interface LoadingSubject {
   caption: string;
   /** A picture that can be had before the year is. It fades in over the initials, and a failed one is dropped. */
   avatarUrl?: string;
-  mark?: PlatformMarkId;
+  mark?: StageMark;
+  /** A quiet line saying where the video is from: a site address, a product name. Left out, nothing is shown. */
+  brand?: string;
 }
 
 /**
@@ -155,7 +156,7 @@ export function LoadingStage({
             </div>
           </div>
         ) : null}
-        <div className="wr-brand">hype-stack.dev/wrapped</div>
+        {subject.brand ? <div className="wr-brand">{subject.brand}</div> : null}
       </div>
 
       {config.grain ? <div className="wr-grain" aria-hidden /> : null}

@@ -2,6 +2,7 @@ import { Maximize2, Minimize2, Pause, Play, RotateCcw } from "lucide-react";
 import { type Ref, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 
 import type { StageTake } from "./export-video";
+import { cn } from "./internal/cn";
 import { type LoadingSubject, LoadingStage } from "./loading-stage";
 import { WrappedStage } from "./stage";
 import { Timeline, type TimelineEditing } from "./timeline";
@@ -13,7 +14,6 @@ import {
   type WrappedSubject,
 } from "./types";
 import { useWrappedTimeline } from "./use-wrapped-timeline";
-import { cn } from "@/lib/utils";
 
 /** The tallest the frame may get on a phone, as a share of the viewport, so the controls stay on screen. */
 const PHONE_HEIGHT_SHARE = 0.72;

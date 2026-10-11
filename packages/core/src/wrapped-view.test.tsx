@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { gsap } from "gsap";
-import { toast } from "sonner";
 
 import { DEFAULT_WRAPPED_CONFIG } from "./config";
 import { renderVideo, type StageTake } from "./export-video";
@@ -11,7 +10,6 @@ vi.mock("./export-video", async (original) => ({
   ...(await original<typeof import("./export-video")>()),
   renderVideo: vi.fn<typeof renderVideo>(),
 }));
-vi.mock("sonner", () => ({ toast: { error: vi.fn<(message: string) => void>() } }));
 
 const rendering = vi.mocked(renderVideo);
 
@@ -140,7 +138,7 @@ describe("WrappedView download", () => {
     await held.fail(new DOMException("Stopped", "AbortError"));
 
     // Stopping on purpose is not a failure, and the page is handed back.
-    expect(toast.error).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(saved).toEqual([]);
     await waitFor(() => expect(player).not.toHaveAttribute("inert"));
     expect(screen.getByRole("button", { name: "Download" })).toBeInTheDocument();
@@ -153,7 +151,9 @@ describe("WrappedView download", () => {
     fireEvent.click(screen.getByRole("button", { name: "Download" }));
     await held.fail(new Error("This browser cannot make the video. Chrome, Edge and Safari can."));
 
-    expect(toast.error).toHaveBeenCalledWith("This browser cannot make the video. Chrome, Edge and Safari can.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "This browser cannot make the video. Chrome, Edge and Safari can.",
+    );
     expect(screen.getByRole("button", { name: "Download" })).toBeInTheDocument();
   });
 });

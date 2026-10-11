@@ -2,10 +2,10 @@ import { Dices } from "lucide-react";
 import { type ReactNode, useId } from "react";
 
 import { Chips } from "./chips";
+import { cn } from "./internal/cn";
+import { Switch } from "./internal/switch";
 import { CUSTOM_PALETTE, isPresetPalette, randomAccent, themePalette, WRAPPED_PALETTES } from "./palettes";
 import { WRAPPED_FORMATS, WRAPPED_SPEEDS, type CellShape, type WrappedConfig } from "./types";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 
 const RAINBOW = ["#ff4d6d", "#ffb703", "#3ddc84", "#3a86ff", "#b15cff"] as const;
 

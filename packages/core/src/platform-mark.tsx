@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { PLATFORM_MARK_LAYERS, PLATFORM_MARKS, type PlatformMarkId } from "./platform-marks";
+import type { StageMark } from "./types";
 // oxlint-disable-next-line import/no-unassigned-import -- The mark's own stylesheet.
 import "./platform-mark.css";
 
@@ -21,11 +21,11 @@ function edge(name: string, offset: number, colour: string) {
 }
 
 /**
- * The platform's mark, raised out of a pressed coin in the stage's corner. A flat logo would sit on the frame like a
+ * A mark, raised out of a pressed coin in the stage's corner. A flat logo would sit on the frame like a
  * sticker; this one is lit from the top left like the discs it replaces: a light edge where the light lands, a shaded
  * edge where it falls away, both cut to the mark's own outline.
  */
-export function PlatformMark({ mark }: { mark: PlatformMarkId }) {
+export function PlatformMark({ mark }: { mark: StageMark }) {
   const id = useId();
   const fill = `${id}-fill`;
   const emboss = `${id}-emboss`;
@@ -52,13 +52,10 @@ export function PlatformMark({ mark }: { mark: PlatformMarkId }) {
             </feMerge>
           </filter>
         </defs>
-        {/* A mark of several shapes is pressed out shape by shape, so each keeps its own edge. Overlap tints are a
-            matter of colour, and the relief has none, so those layers are left out. */}
-        {(PLATFORM_MARK_LAYERS[mark]?.filter((layer) => !layer.within) ?? [{ d: PLATFORM_MARKS[mark] }]).map(
-          (layer) => (
-            <path key={layer.d} d={layer.d} fill={`url(#${fill})`} filter={`url(#${emboss})`} />
-          ),
-        )}
+        {/* A mark of several shapes is pressed out shape by shape, so each keeps its own edge. */}
+        {(typeof mark === "string" ? [mark] : mark).map((path) => (
+          <path key={path} d={path} fill={`url(#${fill})`} filter={`url(#${emboss})`} />
+        ))}
       </svg>
     </div>
   );

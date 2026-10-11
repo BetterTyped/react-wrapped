@@ -6,13 +6,12 @@ import {
   WRAPPED_PALETTES as SHARED_PALETTES,
   type WrappedPalette,
   type WrappedPresetPaletteId,
-} from "@internal/enums";
-
+} from "./palette-data";
 import type { WrappedConfig } from "./types";
 
 /*
- * The palettes themselves live in `@internal/enums`: the backend draws the README card, the trophy case and the
- * badges from the same table, so an embedded image wears the theme of the video it came from.
+ * The palettes themselves are plain data in `palette-data.ts`, with no React in it, so a server can draw an image
+ * (a card for a README, a badge) from the same table and have it wear the theme of the video it came from.
  */
 export const WRAPPED_PALETTES = SHARED_PALETTES;
 export type PresetPaletteId = WrappedPresetPaletteId;

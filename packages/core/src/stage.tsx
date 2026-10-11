@@ -5,13 +5,13 @@ import { exitScene, HANDOVER, StageCover } from "./cuts";
 import { fitScene, setText } from "./motion";
 import { paletteStyle, resolvePalette } from "./palettes";
 import { PlatformMark } from "./platform-mark";
-import type { PlatformMarkId } from "./platform-marks";
 import { createRng } from "./rng";
 import {
   WRAPPED_FORMATS,
   type SceneInstance,
   type WrappedConfig,
   type WrappedSubject,
+  type StageMark,
   type WrappedTransition,
 } from "./types";
 // oxlint-disable-next-line import/no-unassigned-import -- The stage's own stylesheet: shapes, rings, scene type.
@@ -22,12 +22,12 @@ export function initials(handle: string) {
     handle
       .replace(/[^a-z0-9]/gi, "")
       .slice(0, 2)
-      .toUpperCase() || "HS"
+      .toUpperCase() || "??"
   );
 }
 
 /** What sits behind every scene: the one soft light, and the platform's mark (or the plain discs) in the corner. */
-export function StageBackdrop({ mark }: { mark?: PlatformMarkId }) {
+export function StageBackdrop({ mark }: { mark?: StageMark }) {
   return (
     <>
       <div className="wr-light" aria-hidden />
@@ -106,7 +106,7 @@ export function WrappedStage({
             <small>{subject.caption}</small>
           </div>
         </div>
-        <div className="wr-brand">hype-stack.dev/wrapped</div>
+        {subject.brand ? <div className="wr-brand">{subject.brand}</div> : null}
       </div>
 
       {config.grain ? <div className="wr-grain" aria-hidden /> : null}

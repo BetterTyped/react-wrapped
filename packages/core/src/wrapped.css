@@ -212,6 +212,13 @@
 .wr-scene[data-on] {
   display: flex;
 }
+/*
+ * A scene taller than the room between the header row and the footer is shrunk as a whole until it fits. `fitScene`
+ * measures it and sets the factor on each part; a scene that fits never gets one.
+ */
+.wr-scene > * {
+  zoom: var(--wr-fit, 1);
+}
 .wr-stage[data-format="square"] .wr-scene {
   padding: 170px 80px 120px;
 }

@@ -1,6 +1,6 @@
-import { currentWrappedPalette } from "@internal/enums";
 import { z } from "zod";
 
+import { currentWrappedPalette } from "./palette-data";
 import { CUSTOM_PALETTE, isPresetPalette } from "./palettes";
 import {
   WRAPPED_FORMATS,

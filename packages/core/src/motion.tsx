@@ -148,7 +148,7 @@ export function fitScene(root: HTMLElement) {
   const parts = [...root.children].filter(
     (part): part is HTMLElement => part instanceof HTMLElement && getComputedStyle(part).position !== "absolute",
   );
-  for (const part of parts) part.style.removeProperty("zoom");
+  for (const part of parts) part.style.removeProperty("--wr-fit");
   if (parts.length === 0) return;
   const style = getComputedStyle(root);
   const room = root.clientHeight - Number.parseFloat(style.paddingTop) - Number.parseFloat(style.paddingBottom);
@@ -164,7 +164,8 @@ export function fitScene(root: HTMLElement) {
   const tall = Math.max(...edges.map((edge) => edge.bottom)) - Math.min(...edges.map((edge) => edge.top));
   if (room <= 0 || tall <= room + 1) return;
   const fit = Math.max(SMALLEST_FIT, room / tall);
-  for (const part of parts) part.style.setProperty("zoom", fit.toFixed(3));
+  // The size itself is the stylesheet's business (`zoom: var(--wr-fit)` on a scene's parts); this only says how much.
+  for (const part of parts) part.style.setProperty("--wr-fit", fit.toFixed(3));
 }
 
 function textsIn(root: HTMLElement): string[] {
