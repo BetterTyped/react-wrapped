@@ -1,3 +1,4 @@
+/* oxlint-disable no-console -- a command line tool says what it did */
 // Puts the library's prefix on every Tailwind class in its source, so its stylesheet can be compiled once and
 // shipped: `flex` becomes `wr:flex`. The library's own classes (`wr-stage`) are left alone.
 //   node prefix-classes.mjs <src dir> [--write]
@@ -19,7 +20,7 @@ const prefixed = (text, file) =>
     if (keep(token)) return token;
     // "Dark here, whatever the page is": a class of the library's own, not a utility.
     if (token === "dark") return "wr-dark";
-    if (!/^[a-z!\-\[@*]/.test(token) || /[{}$"'=;]/.test(token)) odd.push(`${file}: ${token}`);
+    if (!/^[a-z!\-[@*]/.test(token) || /[{}$"'=;]/.test(token)) odd.push(`${file}: ${token}`);
     seen.set(token, (seen.get(token) ?? 0) + 1);
     return PREFIX + token;
   });
@@ -97,7 +98,7 @@ for (const name of readdirSync(dir, { recursive: true })) {
   if (wholeFile) for (const initializer of declared.values()) take(initializer);
   if (spans.size === 0) continue;
   let next = source;
-  for (const [start, end] of [...spans].sort((a, b) => b[0] - a[0])) {
+  for (const [start, end] of [...spans].toSorted((a, b) => b[0] - a[0])) {
     next = next.slice(0, start) + prefixed(next.slice(start, end), name) + next.slice(end);
   }
   if (next !== source) {
@@ -107,4 +108,4 @@ for (const name of readdirSync(dir, { recursive: true })) {
 }
 console.log(`\n${seen.size} distinct classes, ${[...seen.values()].reduce((a, b) => a + b, 0)} uses`);
 if (odd.length) console.log("ODD TOKENS:\n" + [...new Set(odd)].join("\n"));
-if (!write) console.log([...seen.keys()].sort().join(" "));
+if (!write) console.log([...seen.keys()].toSorted().join(" "));
