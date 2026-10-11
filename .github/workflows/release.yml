@@ -248,9 +248,10 @@ jobs:
           done 3< <(node .github/scripts/packages.mjs list)
           echo "Published ${PUBLISHED} packages at ${VERSION}."
           # A publish command that exits 0 is a claim. The registry is asked for every package before the release
-          # is announced; it can take a moment to show a new version, so each one gets a minute.
+          # is announced. npm holds a new version back for two to three minutes before it shows it (1.0.1 took
+          # that long), so each package gets six minutes.
           while IFS=$'\t' read -r _ NAME _ <&3; do
-            for ATTEMPT in 1 2 3 4 5 6; do
+            for ATTEMPT in $(seq 1 36); do
               if [ "$(on_npm "$NAME" 2>/dev/null)" = "yes" ]; then
                 echo "confirmed ${NAME}@${VERSION}"
                 continue 2
