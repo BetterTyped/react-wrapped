@@ -2,9 +2,9 @@ import { gsap } from "gsap";
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { exitScene, HANDOVER, luckyCut } from "./cuts";
-import type { StageTake } from "./export-video";
 import { EASE_OUT, setText } from "./motion";
 import { createRng } from "./rng";
+import type { StageTake } from "./types";
 import type { SceneInstance, WrappedConfig } from "./types";
 
 /** Seconds as a video player shows them: 0:38. */

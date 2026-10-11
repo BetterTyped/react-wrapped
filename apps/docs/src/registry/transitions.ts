@@ -1,4 +1,4 @@
-import { TRANSITION_LABELS, WRAPPED_TRANSITIONS } from "@react-wrapped/core";
+import { TRANSITION_LABELS, WRAPPED_TRANSITIONS } from "@react-wrapped/kit";
 
 /*
  * What the docs say about each transition. Keyed by the library's own list, so a transition added there without a

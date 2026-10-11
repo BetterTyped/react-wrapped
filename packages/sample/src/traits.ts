@@ -1,6 +1,6 @@
 import { SAMPLE_CATALOG, type SampleAchievementEntry, type SampleEggEntry, type SampleTypeEntry } from "./catalog";
 import type { SampleYear } from "./year";
-import { createRng, type PixelArt, type Rarity } from "@react-wrapped/core";
+import { createRng, type PixelArt, type Rarity } from "@react-wrapped/kit";
 
 /*
  * The roll: what one year was handed out of the catalog. On a real product this happens on a server, once, and is

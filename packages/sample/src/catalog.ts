@@ -1,5 +1,5 @@
 import { formatShort, languagesInUse, nightShare, type SampleYear } from "./year";
-import { PIXEL_ART, type PixelArt, type Rarity } from "@react-wrapped/core";
+import { PIXEL_ART, type PixelArt, type Rarity } from "@react-wrapped/kit";
 
 /*
  * Everything a year on Orbit can turn out to be: the types a person can be given, the achievements a year can earn,

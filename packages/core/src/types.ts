@@ -129,3 +129,17 @@ export interface WrappedCut {
   subject: WrappedSubject;
   scenes: readonly SceneInstance[];
 }
+
+/**
+ * The player's stage and playhead, on loan to a render. While it is out the video does not play: `show` puts any
+ * moment on the stage, and `release` gives everything back the way it was.
+ */
+export interface StageTake {
+  stage: HTMLElement;
+  /** How long the video plays at the speed it is set to. */
+  seconds: number;
+  show: (seconds: number) => void;
+  /** False once the video was rebuilt under the render (a setting changed, a scene joined). */
+  intact: () => boolean;
+  release: () => void;
+}

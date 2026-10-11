@@ -161,7 +161,7 @@ const transitionPages: DocPage[] = TRANSITIONS.map((transition, index) => {
         kind: "code",
         language: "tsx",
         code: [
-          `import { DEFAULT_WRAPPED_CONFIG, type WrappedConfig } from "@react-wrapped/core";`,
+          `import { DEFAULT_WRAPPED_CONFIG, type WrappedConfig } from "@react-wrapped/kit";`,
           ``,
           `const config: WrappedConfig = {`,
           `  ...DEFAULT_WRAPPED_CONFIG,`,
@@ -321,7 +321,7 @@ const theming: DocPage = {
       kind: "code",
       language: "tsx",
       code: [
-        `import { DEFAULT_WRAPPED_CONFIG, type WrappedConfig } from "@react-wrapped/core";`,
+        `import { DEFAULT_WRAPPED_CONFIG, type WrappedConfig } from "@react-wrapped/kit";`,
         ``,
         `const config: WrappedConfig = { ...DEFAULT_WRAPPED_CONFIG, palette: "grape", mode: "light" };`,
       ].join("\n"),

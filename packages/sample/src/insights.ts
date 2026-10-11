@@ -19,7 +19,7 @@ import {
   type SampleYear,
   weeklyTotals,
 } from "./year";
-import { hourName, type InsightCardSpec } from "@react-wrapped/core";
+import { hourName, type InsightCardSpec } from "@react-wrapped/kit";
 
 /*
  * The cards a year hands its owner to keep, besides the share card: a number, the chart that shows it, and the line

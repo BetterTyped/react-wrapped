@@ -121,6 +121,9 @@ importers:
       '@nx/workspace':
         specifier: 23.1.2
         version: 23.1.2
+      '@tailwindcss/vite':
+        specifier: ^4.1.0
+        version: 4.3.3(vite@8.0.10(@types/node@25.9.9)(jiti@2.7.0)(yaml@2.9.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.10.0(@testing-library/dom@10.4.2)
@@ -163,12 +166,18 @@ importers:
       oxlint:
         specifier: 1.61.0
         version: 1.61.0
+      postcss:
+        specifier: ^8.5.0
+        version: 8.5.29
       react:
         specifier: ^19.2.5
         version: 19.3.0
       react-dom:
         specifier: ^19.2.5
         version: 19.3.0(react@19.3.0)
+      tailwindcss:
+        specifier: ^4.1.0
+        version: 4.3.3
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -187,12 +196,33 @@ importers:
       '@fontsource-variable/inter':
         specifier: ^5.2.5
         version: 5.3.0
+      '@react-wrapped/charts':
+        specifier: workspace:*
+        version: link:../../packages/charts
       '@react-wrapped/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@react-wrapped/graphics':
+        specifier: workspace:*
+        version: link:../../packages/graphics
+      '@react-wrapped/kit':
+        specifier: workspace:*
+        version: link:../../packages/kit
+      '@react-wrapped/marks':
+        specifier: workspace:*
+        version: link:../../packages/marks
+      '@react-wrapped/player':
+        specifier: workspace:*
+        version: link:../../packages/player
       '@react-wrapped/sample':
         specifier: workspace:*
         version: link:../../packages/sample
+      '@react-wrapped/scan':
+        specifier: workspace:*
+        version: link:../../packages/scan
+      '@react-wrapped/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
       '@tanstack/react-router':
         specifier: ^1.170.17
         version: 1.170.42(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -213,26 +243,30 @@ importers:
         specifier: ^5.0.0
         version: 5.0.3(@types/node@25.9.9)(@vitest/coverage-v8@5.0.0)(jsdom@30.1.2)(vite@8.0.10(@types/node@25.9.9)(jiti@2.7.0)(yaml@2.9.0))
 
+  packages/charts:
+    dependencies:
+      gsap:
+        specifier: ^3.13.0
+        version: 3.15.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.0(react@19.3.0)
+    devDependencies:
+      '@react-wrapped/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/core:
     dependencies:
-      '@gsap/react':
-        specifier: ^2.1.2
-        version: 2.1.2(gsap@3.15.0)(react@19.3.0)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
       gsap:
         specifier: ^3.13.0
         version: 3.15.0
-      html-to-image:
-        specifier: 1.11.13
-        version: 1.11.13
-      lucide-react:
-        specifier: ^1.11.0
-        version: 1.55.0(@types/react@19.2.14)(react@19.3.0)
-      mediabunny:
-        specifier: 1.55.6
-        version: 1.55.6
       react:
         specifier: ^19.0.0
         version: 19.3.0
@@ -245,22 +279,101 @@ importers:
       zod:
         specifier: ^4.4.3
         version: 4.6.5
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.1.0
-        version: 4.3.3(vite@8.0.10(@types/node@25.9.9)(jiti@2.7.0)(yaml@2.9.0))
-      postcss:
-        specifier: ^8.5.0
-        version: 8.5.29
-      tailwindcss:
-        specifier: ^4.1.0
-        version: 4.3.3
 
-  packages/sample:
+  packages/graphics:
     dependencies:
+      '@react-wrapped/charts':
+        specifier: workspace:*
+        version: link:../charts
+      gsap:
+        specifier: ^3.13.0
+        version: 3.15.0
+      html-to-image:
+        specifier: 1.11.13
+        version: 1.11.13
+      lucide-react:
+        specifier: ^1.11.0
+        version: 1.55.0(@types/react@19.2.14)(react@19.3.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.0(react@19.3.0)
+    devDependencies:
       '@react-wrapped/core':
         specifier: workspace:*
         version: link:../core
+
+  packages/kit:
+    dependencies:
+      '@react-wrapped/charts':
+        specifier: workspace:*
+        version: link:../charts
+      '@react-wrapped/core':
+        specifier: workspace:*
+        version: link:../core
+      '@react-wrapped/graphics':
+        specifier: workspace:*
+        version: link:../graphics
+      '@react-wrapped/marks':
+        specifier: workspace:*
+        version: link:../marks
+      '@react-wrapped/player':
+        specifier: workspace:*
+        version: link:../player
+      '@react-wrapped/scan':
+        specifier: workspace:*
+        version: link:../scan
+      '@react-wrapped/scenes':
+        specifier: workspace:*
+        version: link:../scenes
+      gsap:
+        specifier: ^3.13.0
+        version: 3.15.0
+      lucide-react:
+        specifier: ^1.11.0
+        version: 1.55.0(@types/react@19.2.14)(react@19.3.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.0(react@19.3.0)
+
+  packages/marks:
+    devDependencies:
+      '@react-wrapped/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/player:
+    dependencies:
+      gsap:
+        specifier: ^3.13.0
+        version: 3.15.0
+      lucide-react:
+        specifier: ^1.11.0
+        version: 1.55.0(@types/react@19.2.14)(react@19.3.0)
+      mediabunny:
+        specifier: 1.55.6
+        version: 1.55.6
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.0(react@19.3.0)
+    devDependencies:
+      '@react-wrapped/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/sample:
+    dependencies:
+      '@react-wrapped/kit':
+        specifier: workspace:*
+        version: link:../kit
       gsap:
         specifier: ^3.13.0
         version: 3.15.0
@@ -270,6 +383,47 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.3.0(react@19.3.0)
+
+  packages/scan:
+    dependencies:
+      '@gsap/react':
+        specifier: ^2.1.2
+        version: 2.1.2(gsap@3.15.0)(react@19.3.0)
+      gsap:
+        specifier: ^3.13.0
+        version: 3.15.0
+      lucide-react:
+        specifier: ^1.11.0
+        version: 1.55.0(@types/react@19.2.14)(react@19.3.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.0(react@19.3.0)
+    devDependencies:
+      '@react-wrapped/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/scenes:
+    dependencies:
+      '@react-wrapped/charts':
+        specifier: workspace:*
+        version: link:../charts
+      gsap:
+        specifier: ^3.13.0
+        version: 3.15.0
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.3.0(react@19.3.0)
+    devDependencies:
+      '@react-wrapped/core':
+        specifier: workspace:*
+        version: link:../core
 
 packages:
 

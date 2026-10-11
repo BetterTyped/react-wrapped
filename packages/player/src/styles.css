@@ -1,0 +1,3 @@
+/* This package's own classes, compiled with the library's prefix. Load it after @react-wrapped/core/styles.css. */
+@import "../../core/src/chrome-theme.css";
+@source "./";

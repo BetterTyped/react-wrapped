@@ -1,0 +1,29 @@
+/*
+ * How the chrome's utility classes are compiled, shared by every package that has any. A package's stylesheet
+ * imports this and names its own sources; the result is plain CSS under the prefix `wr:`.
+ */
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(wr);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(wr);
+/* Dark where the page is dark (`.dark` on any ancestor), or where the library says so itself (full screen). */
+@custom-variant dark (&:where(.dark, .dark *, .wr-dark, .wr-dark *));
+
+/*
+ * What the chrome is painted with. Each one reads a `--wr-ui-*` variable, so a host recolours the whole chrome by
+ * setting those on any ancestor. They are separate from the video's palette (`--wr-bg`, `--wr-l4`, ...), which
+ * belongs to the stage and changes with the viewer's pick.
+ */
+@theme inline {
+  --color-background: var(--wr-ui-bg);
+  --color-foreground: var(--wr-ui-fg);
+  --color-card: var(--wr-ui-card);
+  --color-muted: var(--wr-ui-muted);
+  --color-muted-foreground: var(--wr-ui-muted-fg);
+  --color-primary: var(--wr-ui-primary);
+  --color-primary-foreground: var(--wr-ui-primary-fg);
+  --color-border: var(--wr-ui-border);
+  --color-input: var(--wr-ui-border);
+  --color-ring: var(--wr-ui-ring);
+  --radius-lg: var(--wr-ui-radius);
+  --radius-xl: calc(var(--wr-ui-radius) + 4px);
+}

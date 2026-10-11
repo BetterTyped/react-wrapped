@@ -1,4 +1,4 @@
-import type { SceneChart } from "@react-wrapped/core";
+import type { SceneChart } from "@react-wrapped/kit";
 
 /*
  * Every chart the library draws, on numbers made up to show it off. The docs give each one a page from this list,

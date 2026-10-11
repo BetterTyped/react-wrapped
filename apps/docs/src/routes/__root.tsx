@@ -8,7 +8,7 @@ import { seoHead } from "../seo/head";
 import { SITE } from "../site";
 import docsCss from "../styles/docs.css?url";
 // oxlint-disable-next-line import/no-unassigned-import -- The library's own stylesheet.
-import libraryCss from "@react-wrapped/core/styles.css?url";
+import libraryCss from "@react-wrapped/kit/styles.css?url";
 
 export const Route = createRootRoute({
   head: () => ({

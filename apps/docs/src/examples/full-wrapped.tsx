@@ -9,7 +9,7 @@ import {
   type WrappedConfig,
   type WrappedGraphic,
   WrappedView,
-} from "@react-wrapped/core";
+} from "@react-wrapped/kit";
 import { directSample, formatShort, sampleInsights, sampleTraits, sampleYear } from "@react-wrapped/sample";
 
 /**

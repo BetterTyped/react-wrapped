@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 
-import { createRng, type SceneInstance, WRAPPED_FORMATS } from "@react-wrapped/core";
+import { createRng, type SceneInstance, WRAPPED_FORMATS } from "@react-wrapped/kit";
 
 export type Format = keyof typeof WRAPPED_FORMATS;
 export const FORMATS = Object.keys(WRAPPED_FORMATS) as Format[];

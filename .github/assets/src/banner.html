@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>react-wrapped README graphics</title>
+<!--
+  The source of two images in the parent folder, one section each:
+
+    #banner  ->  banner.png          the README header, 1600 x 520, rendered at 2x
+    #social  ->  social-preview.png  the repository's social preview, 1280 x 640, rendered at 1x
+
+  To re-render after an edit, open this file in Playwright's Chromium and screenshot each section with
+  locator("#banner").screenshot() at deviceScaleFactor 2 and locator("#social").screenshot() at 1.
+  Inter and JetBrains Mono load from Google Fonts at render time, so wait for document.fonts.ready first.
+
+  The colours are the library's default dark palette: the stage (#0d1117) and the five levels of the year grid.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #0d1117; --fg: #f0f6fc; --muted: #9198a1; --line: #262d36;
+    --l0: #161b22; --l1: #0e4429; --l2: #006d32; --l3: #26a641; --l4: #39d353;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #050608; display: flex; flex-direction: column; gap: 40px; padding: 40px; font-family: "Inter", sans-serif; }
+  .slide { position: relative; overflow: hidden; background: var(--bg); color: var(--fg); flex: none; }
+  /* The stage's own light: green from the top left, a second, fainter one from the bottom right, and the dot grid of
+     the house slides over both. */
+  .slide::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(rgba(240,246,252,0.045) 1px, transparent 1.3px),
+      radial-gradient(760px 520px at 6% -18%, rgba(38,166,65,0.42), transparent 68%),
+      radial-gradient(900px 560px at 104% 128%, rgba(0,109,50,0.5), transparent 64%);
+    background-size: 30px 30px, auto, auto; }
+  .slide > * { position: relative; }
+
+  .mark { display: grid; grid-template-columns: repeat(2, 1fr); width: var(--s); height: var(--s); flex: none;
+    gap: calc(var(--s) * 0.1); padding: calc(var(--s) * 0.18); border-radius: calc(var(--s) * 0.26);
+    background: #10161d; box-shadow: inset 0 0 0 1.5px rgba(240,246,252,0.08), 0 18px 50px rgba(0,0,0,0.5), 0 0 70px -10px rgba(57,211,83,0.45); }
+  .mark i { border-radius: 27%; }
+  .mark i:nth-child(1) { background: var(--l1); } .mark i:nth-child(2) { background: var(--l2); }
+  .mark i:nth-child(3) { background: var(--l3); } .mark i:nth-child(4) { background: var(--l4); box-shadow: 0 0 22px rgba(57,211,83,0.65); }
+
+  .word { margin: 0; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+  .word .dash { color: var(--l4); }
+  .tag { margin: 0; font-weight: 600; letter-spacing: -0.022em; color: #c9d1d9; }
+  .tag b { font-weight: 700; color: var(--l4); }
+  .chips { display: flex; gap: 10px; }
+  .chip { white-space: nowrap; display: inline-flex; align-items: center; height: 38px; padding: 0 15px; border-radius: 10px;
+    font: 500 15px/1 "JetBrains Mono", monospace; color: #aab3bd; border: 1px solid rgba(240,246,252,0.1); background: rgba(240,246,252,0.035); }
+  .chip b { color: var(--fg); font-weight: 600; margin-right: 7px; }
+
+  .graph { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, var(--cell)); grid-auto-columns: var(--cell); gap: var(--gap); }
+  .graph i { border-radius: calc(var(--cell) * 0.26); background: var(--l0); }
+  .graph i[data-l="1"] { background: var(--l1); } .graph i[data-l="2"] { background: var(--l2); }
+  .graph i[data-l="3"] { background: var(--l3); } .graph i[data-l="4"] { background: var(--l4); box-shadow: 0 0 calc(var(--cell) * 0.7) rgba(57,211,83,0.32); }
+  .graph i[data-streak] { background: #c5e85b; box-shadow: 0 0 calc(var(--cell) * 0.8) rgba(197,232,91,0.5); }
+  .pill { position: absolute; white-space: nowrap; display: inline-flex; align-items: center; border-radius: 999px; background: #c5e85b; color: #10161d; font-weight: 800; letter-spacing: -0.01em; }
+  .pill::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; background: #c5e85b; opacity: 0.85; }
+
+  /* ---------- README header: 1600 x 520 ---------- */
+  #banner { width: 1600px; height: 520px; }
+  #banner .copy { position: absolute; left: 88px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+  #banner .lockup { display: flex; align-items: center; gap: 24px; }
+  #banner .mark { --s: 92px; }
+  #banner .word { font-size: 90px; }
+  #banner .tag { font-size: 38px; margin-top: 28px; }
+  #banner .chips { margin-top: 34px; }
+  #banner .live { position: absolute; right: 88px; bottom: 54px; font: 500 16px/1 "JetBrains Mono", monospace; color: #7d8792; }
+  #banner .live b { color: #c9d1d9; font-weight: 600; }
+  #banner .year { position: absolute; right: -46px; top: 47%; transform: translateY(-50%); --cell: 30px; --gap: 8px; }
+  #banner .graph { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 30%, #000 84%, rgba(0,0,0,0.3) 100%); mask-image: linear-gradient(90deg, transparent 0, #000 30%, #000 84%, rgba(0,0,0,0.3) 100%); }
+  #banner .pill { height: 40px; padding: 0 17px; font-size: 17px; }
+  #banner .pill::after { height: 16px; }
+
+  /* ---------- social preview: 1280 x 640 ---------- */
+  #social { width: 1280px; height: 640px; }
+  #social .copy { position: absolute; left: 0; right: 0; top: 84px; display: flex; flex-direction: column; align-items: center; }
+  #social .lockup { display: flex; align-items: center; gap: 26px; }
+  #social .mark { --s: 108px; }
+  #social .word { font-size: 112px; }
+  #social .tag { font-size: 42px; margin-top: 30px; }
+  #social .year { position: absolute; left: 50%; bottom: 74px; transform: translateX(-50%); --cell: 20px; --gap: 5.5px; }
+  #social .graph { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%); }
+  #social .pill { height: 34px; padding: 0 14px; font-size: 15px; }
+  #social .pill::after { height: 12px; }
+</style>
+</head>
+<body>
+
+<section class="slide" id="banner">
+  <div class="year"><div class="graph" data-columns="20" data-seed="7" data-streak="10"></div></div>
+  <div class="copy">
+    <div class="lockup">
+      <div class="mark"><i></i><i></i><i></i><i></i></div>
+      <h1 class="word">react<span class="dash">-</span>wrapped</h1>
+    </div>
+    <p class="tag">Year in review videos, <b>in React</b></p>
+    <div class="chips">
+      <span class="chip"><b>21</b>charts</span>
+      <span class="chip"><b>19</b>transitions</span>
+      <span class="chip">player</span>
+      <span class="chip">year scan</span>
+      <span class="chip">share cards</span>
+    </div>
+  </div>
+  <div class="live">playing live at <b>hype-stack.dev/wrapped</b></div>
+</section>
+
+<section class="slide" id="social">
+  <div class="copy">
+    <div class="lockup">
+      <div class="mark"><i></i><i></i><i></i><i></i></div>
+      <h1 class="word">react<span class="dash">-</span>wrapped</h1>
+    </div>
+    <p class="tag">Year in review videos, <b>in React</b></p>
+  </div>
+  <div class="year"><div class="graph" data-columns="53" data-seed="11" data-streak="30"></div></div>
+</section>
+
+<script>
+  // A year that looks lived in: a seeded generator, busier in two seasons, quieter at weekends, with one streak
+  // lit and labelled the way the library's charts label their point.
+  function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  for (const graph of document.querySelectorAll(".graph")) {
+    const columns = Number(graph.dataset.columns);
+    const streakAt = Number(graph.dataset.streak);
+    const random = rng(Number(graph.dataset.seed));
+    let streakCell = null;
+    for (let column = 0; column < columns; column++) {
+      const season = 0.5 + 0.34 * Math.sin((column / columns) * Math.PI * 2.4 + 0.6) + 0.16 * Math.sin(column * 0.9);
+      for (let row = 0; row < 7; row++) {
+        const weekend = row === 0 || row === 6 ? 0.45 : 1;
+        const value = (season * 0.75 + random() * 0.6) * weekend;
+        const level = value < 0.28 ? 0 : value < 0.5 ? 1 : value < 0.72 ? 2 : value < 0.95 ? 3 : 4;
+        const cell = document.createElement("i");
+        cell.dataset.l = String(level);
+        const inStreak = (column === streakAt && row >= 2) || (column === streakAt + 1) || (column === streakAt + 2 && row <= 3);
+        if (inStreak) { cell.dataset.streak = ""; if (column === streakAt + 1 && row === 0) streakCell = cell; }
+        graph.append(cell);
+      }
+    }
+    if (streakCell) {
+      const pill = document.createElement("span");
+      pill.className = "pill";
+      pill.textContent = "16 days in a row";
+      graph.parentElement.append(pill);
+      const box = streakCell.getBoundingClientRect();
+      const host = graph.parentElement.getBoundingClientRect();
+      const stem = parseFloat(getComputedStyle(pill, "::after").height);
+      pill.style.left = `${box.left - host.left + box.width / 2 - pill.offsetWidth / 2}px`;
+      pill.style.top = `${box.top - host.top - pill.offsetHeight - stem}px`;
+    }
+  }
+</script>
+</body>
+</html>

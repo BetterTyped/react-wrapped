@@ -3,7 +3,7 @@ import { fullYear, thinYear } from "../testing/years";
 import { directSample, playSampleTraits } from "./director";
 import { sampleTraits } from "./traits";
 import { sampleYear } from "./year";
-import { cutDrops, RARITY_LABELS, type SceneInstance } from "@react-wrapped/core";
+import { cutDrops, RARITY_LABELS, type SceneInstance } from "@react-wrapped/kit";
 
 const STORY = [
   "opening",

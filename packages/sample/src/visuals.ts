@@ -10,7 +10,7 @@ import {
   type SampleYear,
   weeklyTotals,
 } from "./year";
-import type { InsightCardSpec, SceneChart } from "@react-wrapped/core";
+import type { InsightCardSpec, SceneChart } from "@react-wrapped/kit";
 
 /*
  * The pictures. Every achievement tells its story with a chart of its own numbers: a streak lights up a stretch of

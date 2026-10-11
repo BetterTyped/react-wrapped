@@ -1,0 +1,31 @@
+/*
+ * The whole library's stylesheet in one file: what `@react-wrapped/kit/styles.css` is. Compiled over every package's
+ * sources at once, so a class used by three packages is written once.
+ */
+@import "../../core/src/reset.css";
+@import "../../core/src/wrapped.css";
+@import "../../core/src/platform-mark.css";
+@import "../../graphics/src/insight-card.css";
+@import "../../core/src/chrome-theme.css";
+@import "../../core/src/chrome-tokens.css";
+@source "./";
+@source "../../core/src";
+@source "../../player/src";
+@source "../../scan/src";
+@source "../../graphics/src";
+
+/* The video taking the page after the first scan: it rises into the place the scan held. */
+.wr-view-enter {
+  animation: wr-view-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes wr-view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wr-view-enter {
+    animation: none;
+  }
+}

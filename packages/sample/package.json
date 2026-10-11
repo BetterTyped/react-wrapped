@@ -1,7 +1,7 @@
 {
   "name": "@react-wrapped/sample",
   "version": "0.0.0",
-  "description": "A made-up developer year on a made-up platform, directed into a full Wrapped with nothing but the public API of @react-wrapped/core.",
+  "description": "A made-up developer year on a made-up platform, directed into a full Wrapped with nothing but the public API of @react-wrapped/kit.",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "lint": "pnpm --dir ../.. exec oxlint packages/sample"
   },
   "dependencies": {
-    "@react-wrapped/core": "workspace:*"
+    "@react-wrapped/kit": "workspace:*"
   },
   "peerDependencies": {
     "gsap": "^3.13.0",

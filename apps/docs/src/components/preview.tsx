@@ -21,7 +21,7 @@ import {
   WRAPPED_FORMATS,
   WRAPPED_PALETTES,
   type WrappedConfig,
-} from "@react-wrapped/core";
+} from "@react-wrapped/kit";
 
 /*
  * The live previews. Every one of them is the library's own stage playing a real scene, in whatever palette, mode

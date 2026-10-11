@@ -1,4 +1,4 @@
-import { createRng, type Rng } from "@react-wrapped/core";
+import { createRng, type Rng } from "@react-wrapped/kit";
 
 /*
  * A made-up year on Orbit, a code platform that does not exist. Everything a Wrapped says about it is worked out

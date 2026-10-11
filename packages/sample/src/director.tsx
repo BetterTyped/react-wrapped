@@ -24,7 +24,7 @@ import {
   trophiesScene,
   type WrappedSubject,
   type WrappedToken,
-} from "@react-wrapped/core";
+} from "@react-wrapped/kit";
 
 /*
  * The director: the one place that decides what the video says. It takes the year and the roll and returns scenes

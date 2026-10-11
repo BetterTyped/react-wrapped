@@ -34,7 +34,7 @@ export const absoluteUrl = (path: string) => `${SITE.origin}${SITE.base}${path.r
 
 /** The packages, in the order they depend on each other. */
 export const PACKAGES = [
-  { name: "@react-wrapped/core", holds: "The stage, the motion kit, palettes, formats and transitions." },
+  { name: "@react-wrapped/kit", holds: "The stage, the motion kit, palettes, formats and transitions." },
   { name: "@react-wrapped/charts", holds: "Twenty-one charts and their entrances." },
   { name: "@react-wrapped/scenes", holds: "Eleven ready-made scenes and the pixel art set." },
   { name: "@react-wrapped/player", holds: "The player, the timeline, the scene editor and the settings panel." },

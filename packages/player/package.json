@@ -1,0 +1,68 @@
+{
+  "name": "@react-wrapped/player",
+  "version": "0.0.1",
+  "description": "The player for a react-wrapped video: controls, a timeline that is also the editor, the scene editor, the settings panel and MP4 export.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "react",
+    "wrapped",
+    "year in review",
+    "gsap",
+    "animation",
+    "charts",
+    "video",
+    "recap"
+  ],
+  "homepage": "https://bettertyped.github.io/react-wrapped/",
+  "bugs": {
+    "url": "https://github.com/BetterTyped/react-wrapped/issues"
+  },
+  "author": "Maciej Pyrc (https://github.com/prc5)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BetterTyped/react-wrapped.git",
+    "directory": "packages/player"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "format": "pnpm --dir ../.. exec oxfmt --write packages/player",
+    "typecheck": "pnpm --dir ../.. exec tsgo -p packages/player/tsconfig.json --noEmit",
+    "lint": "pnpm --dir ../.. exec oxlint packages/player"
+  },
+  "dependencies": {
+    "lucide-react": "^1.11.0",
+    "mediabunny": "1.55.6"
+  },
+  "peerDependencies": {
+    "@react-wrapped/core": "workspace:*",
+    "gsap": "^3.13.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@react-wrapped/core": "workspace:*"
+  }
+}

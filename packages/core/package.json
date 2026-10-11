@@ -1,14 +1,14 @@
 {
   "name": "@react-wrapped/core",
   "version": "0.0.1",
-  "description": "The stage, scenes, motion kit and transitions behind a Wrapped: a year in review played as a video, in React.",
+  "description": "The stage, the motion kit, palettes, formats and transitions behind a Wrapped: a year in review played as a video, in React.",
   "license": "MIT",
-  "private": true,
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -16,14 +16,35 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./styles.css": "./dist/index.css"
+    "./internal": {
+      "types": "./dist/internal/index.d.ts",
+      "import": "./dist/internal.js",
+      "default": "./dist/internal.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
   ],
+  "keywords": [
+    "react",
+    "wrapped",
+    "year in review",
+    "gsap",
+    "animation",
+    "charts",
+    "video",
+    "recap"
+  ],
+  "homepage": "https://bettertyped.github.io/react-wrapped/",
+  "bugs": {
+    "url": "https://github.com/BetterTyped/react-wrapped/issues"
+  },
+  "author": "Maciej Pyrc (https://github.com/prc5)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/BetterTyped/react-wrapped.git",
+    "url": "git+https://github.com/BetterTyped/react-wrapped.git",
     "directory": "packages/core"
   },
   "publishConfig": {
@@ -37,11 +58,7 @@
     "lint": "pnpm --dir ../.. exec oxlint packages/core"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
     "clsx": "^2.1.1",
-    "html-to-image": "1.11.13",
-    "lucide-react": "^1.11.0",
-    "mediabunny": "1.55.6",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.4.3"
   },
@@ -49,10 +66,5 @@
     "gsap": "^3.13.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.1.0",
-    "postcss": "^8.5.0",
-    "tailwindcss": "^4.1.0"
   }
 }

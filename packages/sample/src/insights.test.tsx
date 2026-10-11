@@ -4,7 +4,7 @@ import { directSample } from "./director";
 import { MIN_INSIGHTS, type SampleInsight, sampleInsights } from "./insights";
 import { sampleTraits } from "./traits";
 import { sampleYear, type SampleYear } from "./year";
-import { chartScene } from "@react-wrapped/core";
+import { chartScene } from "@react-wrapped/kit";
 
 const insightsOf = (year: SampleYear) => sampleInsights(year, sampleTraits(year));
 const chartTypes = (insights: readonly SampleInsight[]) => new Set(insights.map((insight) => insight.chart.type));
