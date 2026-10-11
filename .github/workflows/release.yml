@@ -101,9 +101,8 @@ jobs:
       #
       # Version runs before the build, so anything a build reads from package.json gets the new number.
       #
-      # Before the first v* tag exists nx has nothing to count from and makes no bump, so the first release goes
-      # out at the version already in the package.json files. Set that number by hand, in all of them, if the
-      # first release should be something other than what is on disk.
+      # nx needs a v* tag to count from. With none it still bumps, from whatever is on disk (1.0.0 became 1.1.0 in
+      # a dry run), so a first release is published by hand at the version on disk and tagged before this runs.
       - name: Version
         run: pnpm nx release version
       # nx only writes package.json when the commits since the last tag call for a bump. On a run with nothing to
