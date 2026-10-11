@@ -1,6 +1,6 @@
 {
   "name": "@react-wrapped/scan",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The year scan for react-wrapped: a beam sweeps the year and finds the scenes hidden in it.",
   "license": "MIT",
   "type": "module",

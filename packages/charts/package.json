@@ -1,6 +1,6 @@
 {
   "name": "@react-wrapped/charts",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Twenty-one animated charts for year in review videos in React, each with its own GSAP entrance.",
   "license": "MIT",
   "type": "module",

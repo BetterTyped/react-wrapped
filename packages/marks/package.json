@@ -1,6 +1,6 @@
 {
   "name": "@react-wrapped/marks",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The marks react-wrapped presses into the bottom right corner of the stage, as single paths.",
   "license": "MIT",
   "type": "module",

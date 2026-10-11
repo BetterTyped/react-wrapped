@@ -1,6 +1,6 @@
 {
   "name": "@react-wrapped/graphics",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Graphics to keep from a react-wrapped video: the share card, insight cards and the gallery under the player.",
   "license": "MIT",
   "type": "module",

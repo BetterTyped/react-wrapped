@@ -1,6 +1,6 @@
 {
   "name": "@react-wrapped/core",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The stage, the motion kit, palettes, formats and transitions behind a Wrapped: a year in review played as a video, in React.",
   "license": "MIT",
   "type": "module",

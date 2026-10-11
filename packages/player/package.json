@@ -1,6 +1,6 @@
 {
   "name": "@react-wrapped/player",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The player for a react-wrapped video: controls, a timeline that is also the editor, the scene editor, the settings panel and MP4 export.",
   "license": "MIT",
   "type": "module",
