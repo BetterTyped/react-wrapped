@@ -24,6 +24,11 @@ are separate from here on: nothing is shared at build time, and changes are carr
   are the library's own, in `src/internal/`.
 - A video that cannot be made is reported inline or through `onError`, not through a toast library.
 
+## Changes carried across since the snapshot
+
+- 2026-10-11: the chart entrances (`chart-entrances.ts`, `charts.tsx`): each chart now plays in the order its
+  picture reads, with labels landing as the line or bar reaches them.
+
 ## Carrying a later change across
 
 File names and the `wr-` class names are kept the same on purpose, so a change made on either side can be read as a diff

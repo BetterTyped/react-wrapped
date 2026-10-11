@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { CHART_ENTRANCES, restIn } from "./chart-entrances";
+import { CHART_ENTRANCES, notesIn, restIn } from "./chart-entrances";
 import { EASE_OUT } from "./motion";
 
 /*
@@ -2337,9 +2337,13 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power2.inOut" },
     at,
   );
-  for (const ring of all("[data-chart-ring]")) {
+  for (const [index, ring] of [...all("[data-chart-ring]")].entries()) {
     const length = Number(ring.dataset.length ?? 0);
-    tl.from(ring, { strokeDasharray: `0 ${length}`, duration: 1.2, ease: "power2.inOut" }, at);
+    const start = at + index * 0.14;
+    // Out of sight until it is drawn: a stroke of no length with round ends is still a dot, and it sat there from
+    // the scene's first frame.
+    tl.from(ring, { autoAlpha: 0, duration: 0.1, ease: "none" }, start);
+    tl.from(ring, { strokeDasharray: `0 ${length}`, duration: 1.2, ease: "power2.inOut" }, start);
   }
   tl.from(all(".wr-chart-day"), { y: 30, autoAlpha: 0, duration: 0.5, ease: "back.out(2)", stagger: 0.05 }, at);
   tl.to(
@@ -2353,6 +2357,6 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     },
     at + 1.1,
   );
-  tl.from(all("[data-chart-note]"), { y: 16, autoAlpha: 0, duration: 0.5, ease: EASE_OUT, stagger: 0.08 }, at + 1);
+  notesIn(tl, figure, at);
   restIn(tl, figure, at);
 }

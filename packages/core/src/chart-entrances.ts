@@ -35,14 +35,18 @@ function movesOn(tl: gsap.core.Timeline) {
   return {
     from,
 
-    /** The one thing the chart is about lands: it swells once and settles, like something set down. */
+    /**
+     * The one thing the chart is about lands: it swells once and settles, like something set down. Only for a thing
+     * with room around it. A cell in a grid or a wedge in a ring grows into its neighbours, so those arrive last
+     * instead.
+     */
     land(target: Piece | null, at: number, origin?: string) {
       if (!target) return;
       tl.to(
         target,
         {
           keyframes: [
-            { scale: 1.22, duration: 0.16, ease: "power2.out" },
+            { scale: 1.2, duration: 0.16, ease: "power2.out" },
             { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.45)" },
           ],
           ...(origin ? { svgOrigin: origin } : { transformOrigin: "50% 50%" }),
@@ -90,6 +94,41 @@ function movesOn(tl: gsap.core.Timeline) {
 }
 
 /**
+ * The notes of a chart that has no choreography of its own, brought in the way the others bring theirs: the words on
+ * its axis rise, a rule is drawn from where it starts, a hairline grows up from its point, and the pill pops on the
+ * end of it.
+ */
+export function notesIn(tl: gsap.core.Timeline, figure: HTMLElement, at: number) {
+  const m = movesOn(tl);
+  const notes = (selector: string) => all(figure, selector);
+  m.labelsIn(
+    notes("text[data-chart-note]").filter((note) => !note.parentElement?.closest("[data-chart-note]")),
+    at + 0.5,
+  );
+  for (const [index, key] of notes("li[data-chart-note]").entries()) {
+    m.from(key, { x: -26, autoAlpha: 0, duration: 0.5, ease: "back.out(1.8)" }, at + 0.9 + index * 0.1);
+  }
+  for (const line of notes("line[data-chart-note]")) {
+    const start = `${line.getAttribute("x1") ?? 0} ${line.getAttribute("y1") ?? 0}`;
+    m.from(line, { scale: 0, svgOrigin: line.dataset.origin ?? start, duration: 0.5, ease: "power2.out" }, at + 0.9);
+  }
+  m.from(
+    notes("circle[data-chart-note]"),
+    { scale: 0, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.5, ease: "back.out(3)" },
+    at + 1.05,
+  );
+  // A group that holds a pill of its own (a funnel's stage) only fades: the pill inside does the popping.
+  const groups = notes("g[data-chart-note]");
+  const holders = groups.filter((group) => group.querySelector("[data-chart-note]"));
+  m.from(holders, { autoAlpha: 0, duration: 0.45, ease: "power1.out", stagger: 0.1 }, at + 0.9);
+  m.from(
+    groups.filter((group) => !holders.includes(group)),
+    { scale: 0.3, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.55, ease: "back.out(2.6)", stagger: 0.1 },
+    at + 1.12,
+  );
+}
+
+/**
  * Fades in whatever is drawn in the chart and that nothing has moved: a stray axis, a slot, a caption. A chart is
  * never half animated, with its numbers arriving over furniture that was already standing there.
  */
@@ -110,6 +149,76 @@ export function restIn(tl: gsap.core.Timeline, figure: HTMLElement, at: number) 
     tl.from(still, { autoAlpha: 0, duration: 0.6, ease: "power1.out", stagger: { amount: 0.3 } }, at);
   }
 }
+
+/* ---------- spark ---------- */
+
+/** A number written on a piece of a chart as an attribute: where along the chart it sits. */
+const xOf = (piece: Piece, attribute: string) => Number(piece.getAttribute(attribute) ?? 0);
+
+/**
+ * The year is drawn left to right, and everything said about it turns up as the line gets there: the rule to cross
+ * is laid first, the lit stretch stands up when the line reaches it, the dot lands where the line crosses, and each
+ * pill pops as the line passes under it.
+ */
+const spark: Entrance = (tl, figure, at) => {
+  const m = movesOn(tl);
+  const draw = 1.5;
+  const width = figure.querySelector("svg")?.viewBox.baseVal.width || 1000;
+  /** When the line being drawn gets to `x`: the wipe eases in and out, so this is that ease run backwards. */
+  const reaches = (x: number) => {
+    const share = Math.min(1, Math.max(0, x / width));
+    return at + draw * (share < 0.5 ? Math.sqrt(share / 2) : 1 - Math.sqrt((1 - share) / 2));
+  };
+
+  const line = one(figure, "[data-chart-wipe]");
+  if (line) {
+    tl.fromTo(
+      line,
+      { clipPath: "inset(0% 100% 0% 0%)" },
+      { clipPath: "inset(0% 0% 0% 0%)", duration: draw, ease: "power2.inOut" },
+      at,
+    );
+  }
+  // The rule to cross is level, so it has no height of its own to clip by: the clip reaches above and below it.
+  const rule = one(figure, "line[data-chart-note]:not([data-origin])");
+  if (rule) {
+    tl.fromTo(
+      rule,
+      { clipPath: "inset(-20px 100% -20px 0%)" },
+      { clipPath: "inset(-20px 0% -20px 0%)", duration: 0.9, ease: "power2.out" },
+      at,
+    );
+  }
+  const band = one(figure, "[data-chart-band]");
+  if (band) {
+    m.from(
+      band,
+      { scaleY: 0, autoAlpha: 0, transformOrigin: "50% 100%", duration: 0.7, ease: "back.out(1.4)" },
+      reaches(xOf(band, "x")),
+    );
+  }
+  for (const dot of all(figure, "circle[data-chart-note]")) {
+    m.from(
+      dot,
+      { scale: 0, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.5, ease: "back.out(3.4)" },
+      reaches(xOf(dot, "cx")),
+    );
+  }
+  const stems = all(figure, "line[data-chart-note][data-origin]");
+  for (const stem of stems) {
+    m.from(
+      stem,
+      { scale: 0, svgOrigin: stem.dataset.origin, duration: 0.35, ease: "power2.out" },
+      reaches(xOf(stem, "x1")) + 0.1,
+    );
+  }
+  const last = Math.max(at + 0.6, ...stems.map((stem) => reaches(xOf(stem, "x1")) + 0.1));
+  m.from(
+    all(figure, "g[data-chart-note]"),
+    { scale: 0.3, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.55, ease: "back.out(2.6)", stagger: 0.12 },
+    last + 0.2,
+  );
+};
 
 /* ---------- bars ---------- */
 
@@ -156,7 +265,10 @@ const bars: Entrance = (tl, figure, at) => {
 
 /* ---------- dial ---------- */
 
-/** The dark dial fans open from the left, then the share charges up it segment by segment, faster as it goes. */
+/**
+ * The dark dial fans open from the left, then the share charges up it segment by segment, faster as it goes. A lit
+ * segment comes up inside its own slot and never past the rim: thrown outwards, it left the dial.
+ */
 const gauge: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   const slots = all(figure, "[data-chart-slot]");
@@ -164,68 +276,45 @@ const gauge: Entrance = (tl, figure, at) => {
   const origin = slots[0]?.dataset.origin;
   m.from(
     slots,
-    { scale: 0.7, autoAlpha: 0, svgOrigin: origin, duration: 0.55, ease: "back.out(1.8)", stagger: { amount: 0.5 } },
+    { scale: 0.88, autoAlpha: 0, svgOrigin: origin, duration: 0.5, ease: "power3.out", stagger: { amount: 0.5 } },
     at,
   );
   const charge = 0.35 + lit.length * 0.06;
   m.from(
     lit,
     {
-      scale: 0.72,
+      scale: 0.9,
       autoAlpha: 0,
       svgOrigin: origin,
       duration: 0.4,
-      ease: "back.out(2.6)",
+      ease: "power3.out",
       stagger: { amount: charge, ease: "power1.in" },
     },
     at + 0.55,
   );
-  m.land(one(figure, "[data-chart-point]"), at + 0.55 + charge + 0.3, origin);
 };
 
 /* ---------- days ---------- */
 
-/** Dealt like cards: each day's tile tips down into its place, its name follows, and the days that count swell. */
+/** One after another along the row: a day's tile comes up into its place, then its name and what day it was. */
 const days: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   const tiles = all(figure, ".wr-chart-day");
-  const step = Math.min(0.09, 0.6 / Math.max(1, tiles.length));
+  const step = Math.min(0.1, 0.7 / Math.max(1, tiles.length));
   for (const [index, tile] of tiles.entries()) {
     const start = at + index * step;
-    m.from(
-      one(tile, "i"),
-      {
-        rotationX: -95,
-        y: -28,
-        autoAlpha: 0,
-        transformPerspective: 700,
-        transformOrigin: "50% 0%",
-        duration: 0.75,
-        ease: "back.out(1.6)",
-      },
-      start,
-    );
-    m.from(all(tile, "b, small"), { y: 18, autoAlpha: 0, duration: 0.45, ease: EASE_OUT, stagger: 0.07 }, start + 0.32);
-  }
-  const marked = all(figure, ".wr-chart-day[data-marked] i");
-  if (marked.length > 0) {
-    tl.to(
-      marked,
-      {
-        keyframes: [
-          { scale: 1.14, duration: 0.18, ease: "power2.out" },
-          { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.45)" },
-        ],
-        stagger: 0.14,
-      },
-      at + tiles.length * step + 0.75,
-    );
+    // Never past its own size: the tiles sit close, and one that grows touches the next.
+    m.from(one(tile, "i"), { y: 46, scale: 0.82, autoAlpha: 0, duration: 0.65, ease: "power3.out" }, start);
+    m.from(all(tile, "b, small"), { y: 18, autoAlpha: 0, duration: 0.45, ease: EASE_OUT, stagger: 0.07 }, start + 0.28);
   }
 };
 
 /* ---------- pixel area ---------- */
 
-/** The empty grid rolls in from the left, then every column stacks its lit cells up from the floor, as one wave. */
+/**
+ * The empty grid rolls in from the left, then every column stacks its lit cells up from the floor, as one wave. A
+ * cell grows to its size and no further (past it, cells touch), and the one the chart is about arrives last.
+ */
 const pixels: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   m.from(
@@ -233,19 +322,17 @@ const pixels: Entrance = (tl, figure, at) => {
     { y: 22, autoAlpha: 0, duration: 0.5, ease: EASE_OUT, stagger: { amount: 0.55 } },
     at,
   );
-  let last = at;
+  const point = one(figure, "[data-chart-point]");
+  const cell = { scale: 0.3, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.4, ease: "power3.out" };
+  let last = at + 0.35;
   for (const column of all(figure, "[data-chart-col]")) {
     const start = at + 0.35 + Number(column.dataset.column ?? 0) * 0.04;
-    const cells = [...column.children] as Piece[];
-    m.from(
-      cells,
-      { scale: 0, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.42, ease: "back.out(2.8)", stagger: 0.035 },
-      start,
-    );
-    if (one(column, "[data-chart-point]")) last = start + cells.length * 0.035 + 0.3;
+    const cells = ([...column.children] as Piece[]).filter((piece) => piece !== point);
+    m.from(cells, { ...cell, stagger: 0.035 }, start);
+    last = Math.max(last, start + cells.length * 0.035 + 0.3);
   }
-  m.land(one(figure, "[data-chart-point]"), last);
-  m.pillIn(figure, last);
+  m.from(point, { ...cell, duration: 0.5 }, last);
+  m.pillIn(figure, last + 0.15);
 };
 
 /* ---------- wheel ---------- */
@@ -293,7 +380,10 @@ const wheel: Entrance = (tl, figure, at) => {
 
 /* ---------- day clock ---------- */
 
-/** The empty face goes round from midnight, then each hour grows out of the hub in the same order, like a hand. */
+/**
+ * The empty face goes round from midnight, then each hour grows out of the hub in the same order, like a hand. An
+ * hour grows to its own length and stops there: thrown past it, the busiest one left the face.
+ */
 const clock: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   const hub = one(figure, "[data-chart-hub]");
@@ -301,50 +391,51 @@ const clock: Entrance = (tl, figure, at) => {
   m.from(hub, { scale: 0, autoAlpha: 0, svgOrigin: origin, duration: 0.6, ease: "back.out(2.2)" }, at);
   m.from(
     all(figure, "[data-chart-slot]"),
-    { scale: 0.5, autoAlpha: 0, svgOrigin: origin, duration: 0.5, ease: "back.out(1.6)", stagger: { amount: 0.6 } },
+    { scale: 0.6, autoAlpha: 0, svgOrigin: origin, duration: 0.5, ease: "power3.out", stagger: { amount: 0.6 } },
     at + 0.05,
   );
   m.labelsIn(all(figure, "[data-chart-tick-label]"), at + 0.3);
-  let last = at;
+  const point = one(figure, "[data-chart-point]");
+  let last = at + 0.45;
   for (const hour of all(figure, "[data-chart-hour]")) {
+    if (hour === point) continue;
     const start = at + 0.45 + Number(hour.dataset.chartHour ?? 0) * 0.045;
-    m.from(hour, { scale: 0.45, svgOrigin: origin, duration: 0.65, ease: "back.out(2)" }, start);
+    m.from(hour, { scale: 0.45, svgOrigin: origin, duration: 0.6, ease: "power3.out" }, start);
     m.from(hour, { autoAlpha: 0, duration: 0.18, ease: "none" }, start);
-    last = Math.max(last, start + 0.5);
+    last = Math.max(last, start + 0.4);
   }
-  m.land(one(figure, "[data-chart-point]"), last, origin);
-  m.pillIn(figure, last + 0.05);
+  // The busiest hour comes last, on its own, once the hand has gone all the way round.
+  m.from(point, { scale: 0.45, svgOrigin: origin, duration: 0.7, ease: "expo.out" }, last);
+  m.from(point, { autoAlpha: 0, duration: 0.18, ease: "none" }, last);
+  m.pillIn(figure, last + 0.35);
 };
 
 /* ---------- river ---------- */
 
 /**
- * The year flows in from the left as thin threads that swell into their bands as they arrive. The months come up
- * under it as it passes, the names line up below, and each share counts up to where the year ended.
+ * The streams are pulled in from the left one after another, like ribbons, each to its full length. The months come
+ * up under them as they pass, the names line up below, and each share counts up to where the year ended.
  */
 const river: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
-  const flow = one(figure, "[data-chart-flow]");
-  if (flow) {
-    tl.fromTo(
-      flow,
-      { clipPath: "inset(0% 100% 0% 0%)" },
-      { clipPath: "inset(0% 0% 0% 0%)", duration: 1.5, ease: "power2.inOut" },
-      at,
-    );
-  }
+  // The clip reaches past the band above, below and behind, so the lit stream keeps its glow once it is in.
+  // Percent on the side that moves, at both ends: a tween cannot cross from percent to pixels, it jumps.
+  const shut = "inset(-60px 100% -60px -60px)";
+  const open = "inset(-60px -10% -60px -60px)";
   const streams = all(figure, "[data-chart-stream]");
+  for (const [index, stream] of streams.entries()) {
+    tl.fromTo(stream, { clipPath: shut }, { clipPath: open, duration: 1.35, ease: "power3.inOut" }, at + index * 0.14);
+  }
+  const drawn = at + (streams.length - 1) * 0.14 + 1.35;
+  m.labelsIn(all(figure, "[data-chart-tick-label]"), at + 0.3, 1);
   m.from(
-    streams,
-    { scaleY: 0.08, svgOrigin: streams[0]?.dataset.origin, duration: 1.4, ease: "elastic.out(1, 0.7)", stagger: 0.09 },
-    at + 0.35,
+    one(figure, "[data-chart-point]"),
+    { scale: 0, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.5, ease: "back.out(3)" },
+    drawn - 0.1,
   );
-  m.labelsIn(all(figure, "[data-chart-tick-label]"), at + 0.25, 1.1);
-  const point = one(figure, "[data-chart-point]");
-  m.from(point, { scale: 0, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.5, ease: "back.out(3)" }, at + 1.5);
-  m.pillIn(figure, at + 1.6);
+  m.pillIn(figure, drawn);
   for (const [index, key] of all(figure, "[data-chart-key]").entries()) {
-    const start = at + 1.2 + index * 0.12;
+    const start = at + 0.9 + index * 0.14;
     m.from(key, { x: -26, autoAlpha: 0, duration: 0.5, ease: "back.out(1.8)" }, start);
     m.shareUp(one(key, "[data-share]"), start, 0.9);
   }
@@ -375,7 +466,7 @@ const dots: Entrance = (tl, figure, at) => {
       scale: 0,
       transformOrigin: "50% 50%",
       duration: 0.5,
-      ease: "back.out(3.4)",
+      ease: "back.out(1.6)",
       stagger: { amount: fill, ease: "power1.in" },
     },
     at + 0.6,
@@ -415,7 +506,10 @@ const bubbles: Entrance = (tl, figure, at) => {
 
 /* ---------- month up close ---------- */
 
-/** The weekdays drop in along the top, then the month is dealt out from its first corner as one diagonal wave. */
+/**
+ * The weekdays drop in along the top, then the month is dealt out from its first corner as one diagonal wave. A cell
+ * grows to its size and no further (past it, cells touch), and the biggest day arrives last.
+ */
 const month: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   m.from(
@@ -424,21 +518,14 @@ const month: Entrance = (tl, figure, at) => {
     at,
   );
   const cells = all(figure, "[data-chart-cell]");
-  const rows = Math.max(1, Math.round(cells.length / 7));
-  m.from(
-    cells,
-    {
-      scale: 0.2,
-      autoAlpha: 0,
-      rotation: -8,
-      transformOrigin: "50% 50%",
-      duration: 0.6,
-      ease: "back.out(2.2)",
-      stagger: { grid: [rows, 7], from: "start", amount: 0.9 },
-    },
-    at + 0.2,
-  );
-  m.land(one(figure, "[data-chart-point]"), at + 0.2 + 0.9 + 0.45);
+  const point = one(figure, "[data-chart-point]");
+  const cell = { scale: 0.4, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.55, ease: "power3.out" };
+  for (const [index, piece] of cells.entries()) {
+    if (piece === point) continue;
+    m.from(piece, cell, at + 0.2 + ((index % 7) + Math.floor(index / 7)) * 0.075);
+  }
+  const dealt = at + 0.2 + (6 + Math.floor((cells.length - 1) / 7)) * 0.075 + 0.35;
+  m.from(point, { ...cell, duration: 0.65 }, dealt);
 };
 
 /* ---------- radar ---------- */
@@ -484,7 +571,10 @@ const radar: Entrance = (tl, figure, at) => {
 
 /* ---------- week by hour ---------- */
 
-/** The weekdays step in down the side, the empty week settles row by row, then the hours light up as a wave across the day. */
+/**
+ * The weekdays step in down the side, the empty week settles row by row, then the hours light up as a wave across
+ * the day. A cell grows to its size and no further (past it, cells touch), and the busiest hour arrives last.
+ */
 const hours: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   m.from(
@@ -501,14 +591,17 @@ const hours: Entrance = (tl, figure, at) => {
     );
   }
   m.labelsIn(all(figure, "[data-chart-tick-label]"), at + 0.3, 0.6);
-  let last = at;
-  for (const cell of all(figure, "[data-chart-cell]")) {
-    const start = at + 0.4 + Number(cell.dataset.hour ?? 0) * 0.038 + Number(cell.dataset.day ?? 0) * 0.022;
-    m.from(cell, { scale: 0, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.45, ease: "back.out(2.8)" }, start);
-    last = Math.max(last, start + 0.35);
+  const point = one(figure, "[data-chart-point]");
+  const cell = { scale: 0.3, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.42, ease: "power3.out" };
+  let last = at + 0.4;
+  for (const piece of all(figure, "[data-chart-cell]")) {
+    if (piece === point) continue;
+    const start = at + 0.4 + Number(piece.dataset.hour ?? 0) * 0.038 + Number(piece.dataset.day ?? 0) * 0.022;
+    m.from(piece, cell, start);
+    last = Math.max(last, start + 0.3);
   }
-  m.land(one(figure, "[data-chart-point]"), last);
-  m.pillIn(figure, last);
+  m.from(point, { ...cell, duration: 0.55 }, last);
+  m.pillIn(figure, last + 0.15);
 };
 
 /* ---------- then and now ---------- */
@@ -572,6 +665,7 @@ const dumbbell: Entrance = (tl, figure, at) => {
 };
 
 export const CHART_ENTRANCES: Partial<Record<string, Entrance>> = {
+  spark,
   bars,
   gauge,
   days,
