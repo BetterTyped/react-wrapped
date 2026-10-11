@@ -1,0 +1,1448 @@
+/*
+ * The Wrapped stage: a fixed-resolution video frame (1080 on its short side),
+ * scaled to fit. Colours come from the palette the viewer picked, set as
+ * --wr-* custom properties on the stage, never from the site theme: the
+ * exported video has to look the same on any page.
+ *
+ * The look is the storefront hero's: one soft light source, the pressed
+ * rings, Inter set big and tight, and nothing else on the frame.
+ */
+
+.wr-stage {
+  --wr-cell: 12.4px;
+  --wr-gap: 3.6px;
+  --wr-radius: calc(var(--wr-cell) * 0.24);
+  /* The width a scene's content has: the frame less the scene's side padding. */
+  --wr-column: 920px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+  background: var(--wr-bg);
+  color: var(--wr-fg);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+.wr-stage[data-format="landscape"] {
+  --wr-cell: 23px;
+  --wr-gap: 6.4px;
+  --wr-column: 1680px;
+}
+.wr-stage[data-shape="square"] {
+  --wr-radius: 1.5px;
+}
+.wr-stage[data-shape="circle"] {
+  --wr-radius: 50%;
+}
+
+/* ---------- light and rings ---------- */
+
+.wr-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wr-light::before,
+.wr-light::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.wr-light::before {
+  left: -30%;
+  top: -22%;
+  width: 110%;
+  height: 70%;
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--wr-l4) 34%, transparent), transparent);
+}
+.wr-light::after {
+  right: -40%;
+  bottom: -30%;
+  width: 100%;
+  height: 70%;
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--wr-l2) 30%, transparent), transparent);
+}
+
+/* The pressed discs of the storefront hero, in the palette's own ramp. */
+.wr-rings,
+.wr-rings i {
+  position: absolute;
+  border-radius: 50%;
+}
+.wr-rings {
+  right: -340px;
+  bottom: -420px;
+  width: 980px;
+  aspect-ratio: 1;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.wr-stage[data-format="landscape"] .wr-rings {
+  right: -260px;
+  bottom: -520px;
+}
+.wr-rings i {
+  inset: 12.5%;
+}
+.wr-rings,
+.wr-rings > i > i,
+.wr-rings > i > i > i > i {
+  background: linear-gradient(145deg, var(--wr-l2), var(--wr-l1));
+  box-shadow:
+    inset 12px 12px 30px color-mix(in oklch, var(--wr-l3) 55%, transparent),
+    inset -18px -18px 40px color-mix(in oklch, var(--wr-bg) 70%, transparent);
+}
+.wr-rings > i,
+.wr-rings > i > i > i {
+  background: linear-gradient(145deg, color-mix(in oklch, var(--wr-l1) 70%, var(--wr-bg)), var(--wr-l2));
+  box-shadow:
+    inset 18px 18px 40px color-mix(in oklch, var(--wr-bg) 65%, transparent),
+    inset -10px -10px 26px color-mix(in oklch, var(--wr-l3) 45%, transparent);
+}
+
+.wr-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* ---------- chrome: progress, who, brand ---------- */
+
+.wr-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+.wr-segments {
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  top: 48px;
+  display: flex;
+  gap: 10px;
+}
+.wr-segments i {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: color-mix(in oklch, var(--wr-fg) 20%, transparent);
+}
+.wr-segments b {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  border-radius: 99px;
+  background: var(--wr-fg);
+}
+.wr-who {
+  position: absolute;
+  left: 56px;
+  top: 80px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 30px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.wr-who small {
+  display: block;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--wr-muted);
+}
+.wr-avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(140deg, var(--wr-l4), var(--wr-l2));
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--wr-fg) 14%, transparent);
+  color: var(--wr-bg);
+  font-size: 26px;
+  font-weight: 800;
+}
+.wr-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Where it came from, said quietly: the address, half strength. No logo on the video. */
+.wr-brand {
+  position: absolute;
+  left: 56px;
+  bottom: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: color-mix(in oklch, var(--wr-fg) 52%, transparent);
+}
+
+/* ---------- scenes ---------- */
+
+/* Off screen, a scene is out of layout altogether. The engine marks the ones the playhead is in. */
+.wr-scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 190px 80px 140px;
+}
+.wr-scene[data-on] {
+  display: flex;
+}
+.wr-stage[data-format="square"] .wr-scene {
+  padding: 170px 80px 120px;
+}
+.wr-stage[data-format="landscape"] .wr-scene {
+  padding: 170px 120px 130px;
+}
+.wr-scene[data-align="center"] {
+  align-items: center;
+  text-align: center;
+}
+
+.wr-eyebrow {
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--wr-muted);
+}
+/*
+ * The big counter. Its ink starts where the lines around it start: the first digit's blank side (a tabular "1" has a
+ * wide one) is taken back out of the left. A count wider than the column is set smaller until its ink fits. Both come
+ * from `number-ink.ts`, as numbers in em.
+ */
+.wr-mega {
+  --wr-mega-size: 300px;
+  margin: 18px 0 10px calc(var(--wr-ink-inset, 0) * -1em);
+  font-size: min(var(--wr-mega-size), calc(var(--wr-column) / var(--wr-ink-width, 1)));
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.07em;
+  color: var(--wr-l4);
+}
+.wr-stage[data-format="square"] .wr-mega {
+  --wr-mega-size: 240px;
+}
+.wr-title {
+  font-size: 128px;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+.wr-stage[data-format="square"] .wr-title {
+  font-size: 108px;
+}
+.wr-title em {
+  font-style: normal;
+  color: var(--wr-l4);
+}
+.wr-lede {
+  max-width: 880px;
+  font-size: 44px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--wr-muted);
+  text-wrap: pretty;
+}
+.wr-stage[data-format="landscape"] .wr-lede {
+  max-width: 1240px;
+}
+.wr-lede b {
+  font-weight: 650;
+  color: var(--wr-fg);
+}
+
+/*
+ * A line of a split heading: the mask that words rise out of. The mask is a clip-path reaching past the line's own
+ * box, never overflow: hidden on it. Tight tracking pushes the first and last letters over the sides of the box, and
+ * accents and descenders reach over its top and bottom, so a clip at the box shaves the type.
+ */
+.wr-line {
+  display: block;
+  /* The padding and its margin are layout the scenes were set against: the last line pulls what follows up a little. */
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+  clip-path: inset(-0.16em -0.1em -0.04em);
+}
+.wr-line > span {
+  display: inline-block;
+}
+
+/* ---------- the contribution graph ---------- */
+
+.wr-frame {
+  width: fit-content;
+  max-width: 100%;
+  padding: 28px;
+  border-radius: 34px;
+  background: var(--wr-card);
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--wr-fg) 7%, transparent);
+}
+.wr-graph {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--wr-cell));
+  grid-auto-columns: var(--wr-cell);
+  gap: var(--wr-gap);
+}
+.wr-cell {
+  width: var(--wr-cell);
+  height: var(--wr-cell);
+  border-radius: var(--wr-radius);
+  background: var(--wr-l0);
+}
+.wr-cell[data-l="1"] {
+  background: var(--wr-l1);
+}
+.wr-cell[data-l="2"] {
+  background: var(--wr-l2);
+}
+.wr-cell[data-l="3"] {
+  background: var(--wr-l3);
+}
+.wr-cell[data-l="4"] {
+  background: var(--wr-l4);
+}
+/* The days before the year starts still get a tile, so the graph is a full rectangle. */
+.wr-cell[data-l="-1"] {
+  background: var(--wr-l0);
+}
+/*
+ * An empty day is a tile too. The level-zero colour is made to sit on the stage's background; the panel a calendar
+ * stands on in a scene is the card colour, which in most palettes is the same grey, so every empty day vanished and
+ * the year read as a handful of loose squares. On the panel an empty tile is a step of ink over the panel itself.
+ * The share card's own calendar sits on the background colour again, where level zero already shows.
+ */
+.wr-frame .wr-cell:not([data-l]),
+.wr-frame .wr-cell[data-l="0"],
+.wr-frame .wr-cell[data-l="-1"] {
+  /* Mixed in srgb: in oklch two near-greys have no hue to meet on, and the tile came out a muddy pink. */
+  background: color-mix(in srgb, var(--wr-fg) 8%, var(--wr-card));
+}
+.wr-card .wr-frame .wr-cell:not([data-l]),
+.wr-card .wr-frame .wr-cell[data-l="0"],
+.wr-card .wr-frame .wr-cell[data-l="-1"] {
+  background: var(--wr-l0);
+}
+.wr-months {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--wr-muted);
+}
+
+/* ---------- big cell (one day, one number) ---------- */
+
+.wr-big-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 380px;
+  height: 380px;
+  margin: 40px 0 70px;
+  border-radius: 76px;
+  background: var(--wr-l4);
+  color: var(--wr-bg);
+  box-shadow: 0 40px 120px -20px color-mix(in oklch, var(--wr-l4) 70%, transparent);
+}
+.wr-stage[data-shape="circle"] .wr-big-cell {
+  border-radius: 50%;
+}
+.wr-stage[data-shape="square"] .wr-big-cell {
+  border-radius: 18px;
+}
+.wr-stage[data-format="square"] .wr-big-cell {
+  width: 300px;
+  height: 300px;
+  margin: 30px 0 46px;
+}
+.wr-big-cell strong {
+  font-size: 200px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.07em;
+  /* Centred by its ink, not its box: sideways by what `number-ink.ts` worked out, and up by the hair the figures
+     sit low in their line. */
+  translate: calc(var(--wr-ink-nudge, 0) * 1em) -0.024em;
+}
+.wr-stage[data-format="square"] .wr-big-cell strong {
+  font-size: 160px;
+}
+/* The tile fits three characters at full size. A longer count steps down so it never runs past the tile's edge. */
+.wr-big-cell strong[data-chars="4"] {
+  font-size: 138px;
+}
+.wr-big-cell strong[data-chars="5"] {
+  font-size: 122px;
+}
+.wr-big-cell strong[data-chars="6"] {
+  font-size: 102px;
+}
+.wr-stage[data-format="square"] .wr-big-cell strong[data-chars="4"] {
+  font-size: 108px;
+}
+.wr-stage[data-format="square"] .wr-big-cell strong[data-chars="5"] {
+  font-size: 96px;
+}
+.wr-stage[data-format="square"] .wr-big-cell strong[data-chars="6"] {
+  font-size: 80px;
+}
+.wr-big-cell small {
+  position: absolute;
+  bottom: 38px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+.wr-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+.wr-burst i {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px;
+  border-radius: var(--wr-radius);
+  background: var(--wr-l3);
+  /* Hidden until the burst throws them: stacked in the middle they are one stray dot on the number, which is what a
+     still of the scene showed. */
+  opacity: 0;
+}
+
+/* ---------- a row of cells (streaks, counts) ---------- */
+
+.wr-cell-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 920px;
+  margin: 46px 0 50px;
+}
+.wr-stage[data-format="landscape"] .wr-cell-row {
+  max-width: 1680px;
+}
+.wr-cell-row .wr-cell {
+  --wr-cell: 34px;
+}
+.wr-stage[data-format="square"] .wr-cell-row .wr-cell {
+  --wr-cell: 28px;
+}
+
+/* ---------- bars ---------- */
+
+.wr-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 22px;
+  width: 100%;
+  max-width: 920px;
+  height: 520px;
+  margin: 50px 0 24px;
+}
+.wr-stage[data-format="square"] .wr-bars {
+  height: 360px;
+}
+.wr-stage[data-format="landscape"] .wr-bars {
+  max-width: 1300px;
+  height: 420px;
+}
+.wr-bar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 18px;
+  height: 100%;
+}
+.wr-bar i {
+  display: block;
+  width: 100%;
+  border-radius: 26px;
+  background: var(--wr-l2);
+  transform-origin: bottom;
+}
+.wr-bar[data-peak] i {
+  background: var(--wr-l4);
+  box-shadow: 0 30px 80px -20px color-mix(in oklch, var(--wr-l4) 70%, transparent);
+}
+.wr-bar span {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--wr-muted);
+}
+.wr-bar[data-peak] span {
+  color: var(--wr-fg);
+}
+
+/* ---------- ranked list ---------- */
+
+.wr-list {
+  display: grid;
+  gap: 22px;
+  width: 100%;
+  max-width: 920px;
+  margin-top: 54px;
+}
+.wr-stage[data-format="landscape"] .wr-list {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 1680px;
+}
+.wr-stage[data-format="square"] .wr-list {
+  gap: 14px;
+  margin-top: 34px;
+}
+.wr-item {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 38px;
+  border-radius: 36px;
+  background: var(--wr-card);
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--wr-fg) 8%, transparent);
+}
+.wr-stage[data-format="square"] .wr-item {
+  padding: 22px 30px;
+}
+.wr-item-rank {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--wr-l4);
+}
+.wr-item-name {
+  /* Room inside the clip for the letters tight tracking pushes over the sides, taken back by the margin. */
+  margin: 10px -0.06em 0;
+  padding: 0 0.06em;
+  overflow: hidden;
+  font-size: 46px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.wr-stage[data-format="square"] .wr-item-name {
+  margin-top: 4px;
+  font-size: 38px;
+}
+.wr-meter {
+  height: 12px;
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: color-mix(in oklch, var(--wr-fg) 8%, transparent);
+}
+.wr-stage[data-format="square"] .wr-meter {
+  margin-top: 14px;
+}
+.wr-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--wr-l2), var(--wr-l4));
+  transform-origin: left;
+}
+.wr-item-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 22px;
+  font-size: 30px;
+  color: var(--wr-muted);
+}
+.wr-stage[data-format="square"] .wr-item-meta {
+  margin-top: 12px;
+  font-size: 26px;
+}
+.wr-item-meta b {
+  font-weight: 700;
+  color: var(--wr-fg);
+}
+.wr-dot {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  margin-right: 12px;
+  border-radius: 50%;
+  vertical-align: -3px;
+}
+
+/* ---------- split bar ---------- */
+
+.wr-split {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  max-width: 920px;
+  height: 76px;
+  margin: 60px 0 54px;
+  padding: 6px;
+  border-radius: 26px;
+  background: color-mix(in oklch, var(--wr-fg) 6%, transparent);
+}
+.wr-stage[data-format="landscape"] .wr-split {
+  max-width: 1680px;
+}
+.wr-stage[data-format="square"] .wr-split {
+  height: 64px;
+  margin: 40px 0 36px;
+}
+.wr-split i {
+  display: block;
+  flex-basis: 0;
+  min-width: 14px;
+  height: 100%;
+  border-radius: 7px;
+  /* A soft top light, so the bar reads as one solid object rather than flat paint. */
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 55%, rgb(0 0 0 / 0.12));
+}
+.wr-split i:first-child {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+.wr-split i:last-child {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+.wr-legend {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+  max-width: 920px;
+}
+.wr-stage[data-format="landscape"] .wr-legend {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1680px;
+}
+.wr-legend div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 42px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+.wr-legend div span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.wr-key {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+.wr-legend div span:last-child {
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--wr-muted);
+}
+
+/* ---------- pixel badge (personas, facts) ---------- */
+
+.wr-pixel {
+  display: grid;
+  grid-template-columns: repeat(9, 40px);
+  gap: 8px;
+  margin: 40px 0 70px;
+}
+/*
+ * Only the big badge shrinks for the square frame. A token on the share card is the same pixel art at its own small
+ * size (.wr-pixel-token, further down), and these rules outrank that one: without the :not, a square card drew
+ * every token's art four times too big, and the card grew past the top and bottom of the frame.
+ */
+.wr-stage[data-format="square"] .wr-pixel:not(.wr-pixel-token) {
+  grid-template-columns: repeat(9, 28px);
+  gap: 6px;
+  margin: 24px 0 40px;
+}
+.wr-pixel i {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--wr-radius);
+  background: color-mix(in oklch, var(--wr-fg) 6%, transparent);
+}
+.wr-stage[data-format="square"] .wr-pixel:not(.wr-pixel-token) i {
+  width: 28px;
+  height: 28px;
+}
+.wr-pixel i[data-on="2"] {
+  background: var(--wr-l4);
+  box-shadow: 0 0 30px -4px color-mix(in oklch, var(--wr-l4) 80%, transparent);
+}
+.wr-pixel i[data-on="1"] {
+  background: var(--wr-l2);
+}
+
+/* ---------- fact stamp ---------- */
+
+.wr-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  height: 64px;
+  margin-bottom: 40px;
+  padding: 0 28px;
+  border-radius: 99px;
+  background: color-mix(in oklch, var(--wr-l4) 16%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--wr-l4) 45%, transparent);
+  color: var(--wr-l4);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* ---------- share card ---------- */
+
+.wr-card {
+  width: 100%;
+  max-width: 940px;
+  padding: 56px;
+  border-radius: 56px;
+  /* The scene centres the card; what is on the card reads from the left, like a profile. */
+  text-align: left;
+  background: var(--wr-card);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in oklch, var(--wr-fg) 9%, transparent),
+    0 60px 140px -50px color-mix(in oklch, var(--wr-l4) 45%, transparent);
+}
+.wr-stage[data-format="landscape"] .wr-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 60px;
+  align-items: start;
+  max-width: 1560px;
+}
+.wr-stage[data-format="square"] .wr-card {
+  padding: 40px;
+}
+.wr-card-head {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.wr-card-head .wr-avatar {
+  width: 92px;
+  height: 92px;
+  font-size: 38px;
+}
+.wr-card-head h3 {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+.wr-card-head p {
+  margin-top: 4px;
+  font-size: 26px;
+  color: var(--wr-muted);
+}
+.wr-card .wr-frame {
+  margin: 40px 0;
+  padding: 22px;
+  border-radius: 26px;
+  background: var(--wr-bg);
+}
+.wr-stage[data-format="square"] .wr-card .wr-frame {
+  margin: 26px 0;
+}
+.wr-card .wr-graph {
+  --wr-cell: 10.8px;
+  --wr-gap: 3.2px;
+}
+.wr-stage[data-format="square"] .wr-card .wr-graph {
+  --wr-cell: 10px;
+  --wr-gap: 3px;
+}
+.wr-stage[data-format="landscape"] .wr-card .wr-graph {
+  --wr-cell: 9.2px;
+  --wr-gap: 2.6px;
+}
+.wr-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px 30px;
+}
+.wr-stat small {
+  display: block;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--wr-muted);
+}
+.wr-stat strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 62px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+.wr-stage[data-format="square"] .wr-stat strong {
+  font-size: 50px;
+}
+/* ---------- transitions ---------- */
+
+/*
+ * What the cover cuts draw with (cuts.tsx): a group per cut, each a few big shapes in the palette's own levels, out of
+ * sight until its cut shows it. Three layers deep, lightest on top, so a cover's edge is a band of the theme's colors.
+ */
+.wr-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+}
+.wr-cover > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+}
+.wr-cover > * > :nth-child(1) {
+  --wr-ink: var(--wr-l2);
+}
+.wr-cover > * > :nth-child(2) {
+  --wr-ink: var(--wr-l3);
+}
+.wr-cover > * > :nth-child(3) {
+  --wr-ink: var(--wr-l4);
+}
+.wr-cover i {
+  position: absolute;
+  inset: 0;
+  background: var(--wr-ink);
+}
+/* Bands that cross the frame are wider than it by their own slant, so at rest the frame sits inside the solid part. */
+[data-cut="slash"] i {
+  inset: 0 -40%;
+  clip-path: polygon(22.22% 0, 100% 0, 77.78% 100%, 0 100%);
+}
+[data-cut="arrow"] i {
+  inset: 0 -30%;
+  clip-path: polygon(0 0, 81.25% 0, 100% 50%, 81.25% 100%, 0 100%, 18.75% 50%);
+}
+/* Taller than the frame by the room their edges need. The edges themselves are set on each layer (cuts.tsx). */
+[data-cut="wave"] i {
+  inset: -12% -6%;
+}
+[data-cut="drip"] i {
+  inset: -24% 0;
+}
+[data-cut="pulse"] i {
+  --wr-hole: -1%;
+  mask-image: radial-gradient(
+    circle farthest-corner at 50% 50%,
+    transparent var(--wr-hole),
+    #000 calc(var(--wr-hole) + 0.2%)
+  );
+}
+[data-cut="blink"] i {
+  --wr-lid: 66%;
+  mask-image: radial-gradient(ellipse 85% var(--wr-lid) at 50% 50%, transparent 99.4%, #000 100%);
+}
+[data-cut="spin"] i,
+[data-cut="fan"] i {
+  --wr-from: 0deg;
+  --wr-to: 0deg;
+  mask-image: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0 var(--wr-from),
+    #000 var(--wr-from) var(--wr-to),
+    transparent var(--wr-to)
+  );
+}
+[data-cut="fan"] i {
+  mask-image: conic-gradient(
+    from 270deg at 50% 100%,
+    transparent 0 var(--wr-from),
+    #000 var(--wr-from) var(--wr-to),
+    transparent var(--wr-to)
+  );
+}
+[data-cut="brush"] path {
+  fill: none;
+  stroke: var(--wr-ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+/* A blank frame with the beam on its edge, and the beam's light falling back across it. */
+[data-cut="scan"] i {
+  background: linear-gradient(to left, color-mix(in oklch, var(--wr-l4) 30%, var(--wr-bg)), var(--wr-bg) 46%);
+}
+[data-cut="scan"] i::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  background: var(--wr-l4);
+  box-shadow: 0 0 80px 16px color-mix(in oklch, var(--wr-l4) 70%, transparent);
+}
+/* A solid core with a wide soft rim. The cut moves the core's edge from behind the middle out past the corners. */
+[data-cut="flash"] i {
+  --wr-core: -50%;
+  background: radial-gradient(
+    circle farthest-corner at 50% 50%,
+    var(--wr-l4) var(--wr-core),
+    transparent calc(var(--wr-core) + 50%)
+  );
+}
+
+/* ---------- rarity ---------- */
+
+/* The four rarity colors (--wr-common ... --wr-legendary) come from the palette, set on the stage with the rest. */
+[data-rarity="common"] {
+  --wr-rarity: var(--wr-common);
+}
+[data-rarity="rare"] {
+  --wr-rarity: var(--wr-rare);
+}
+[data-rarity="epic"] {
+  --wr-rarity: var(--wr-epic);
+}
+[data-rarity="legendary"] {
+  --wr-rarity: var(--wr-legendary);
+}
+
+/* What a person pulled, on the share card: one tonal plate each, tinted by rarity, never a loud pill. */
+.wr-tokens {
+  display: grid;
+  gap: 14px;
+  margin-top: 38px;
+}
+.wr-stage[data-format="square"] .wr-tokens {
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 26px;
+}
+.wr-token {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 18px 26px 18px 18px;
+  border-radius: 24px;
+  background: linear-gradient(120deg, color-mix(in oklch, var(--wr-rarity) 16%, var(--wr-bg)), var(--wr-bg) 70%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--wr-rarity) 38%, transparent);
+}
+/* Rarity sits under the name, in normal case: no overlines, no capitals. */
+.wr-token small {
+  display: block;
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 650;
+  color: var(--wr-rarity);
+}
+.wr-token b {
+  display: block;
+  font-size: 34px;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+.wr-stage[data-format="square"] .wr-token b {
+  font-size: 26px;
+}
+.wr-pixel-token {
+  flex: none;
+  grid-template-columns: repeat(9, 7px);
+  gap: 2px;
+  margin: 0;
+  padding: 10px;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--wr-rarity) 10%, var(--wr-bg));
+}
+.wr-pixel-token i {
+  width: 7px;
+  height: 7px;
+  border-radius: 1.5px;
+}
+.wr-pixel-token i[data-on="2"] {
+  background: var(--wr-rarity);
+  box-shadow: none;
+}
+.wr-pixel-token i[data-on="1"] {
+  background: color-mix(in oklch, var(--wr-rarity) 50%, transparent);
+}
+
+/* An achievement's or a drop's stamp wears its rarity instead of the accent. */
+/* A drop's rarity reads the way it does on every badge and token: the word, in its colour, no plate. */
+.wr-stamp[data-rarity] {
+  height: auto;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  margin: 22px 0 0;
+  color: var(--wr-rarity);
+  font-size: 34px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+/* The trophy case: every achievement and egg as a small tonal tile, hidden ones as a quiet "?". */
+.wr-trophies {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin-top: 40px;
+  text-align: left;
+}
+.wr-stage[data-format="square"] .wr-trophies {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 26px;
+}
+.wr-stage[data-format="landscape"] .wr-trophies {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 28px;
+}
+.wr-trophy {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 12px 18px 12px 12px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, color-mix(in oklch, var(--wr-rarity) 16%, var(--wr-bg)), var(--wr-bg) 70%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--wr-rarity) 38%, transparent);
+}
+.wr-trophy[data-hidden] {
+  --wr-rarity: color-mix(in oklch, var(--wr-fg) 40%, transparent);
+  background: color-mix(in oklch, var(--wr-fg) 4%, var(--wr-bg));
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--wr-fg) 14%, transparent);
+}
+.wr-trophy > div {
+  min-width: 0;
+}
+.wr-trophy small {
+  display: block;
+  margin-top: 3px;
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--wr-rarity);
+}
+.wr-trophy b {
+  display: block;
+  /* Room inside the clip for tight tracking at the sides and for descenders, taken back by the margin. */
+  margin: -0.08em -0.05em;
+  padding: 0.08em 0.05em;
+  overflow: hidden;
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wr-stage[data-format="square"] .wr-trophy b {
+  font-size: 20px;
+}
+.wr-trophy .wr-pixel-token {
+  padding: 8px;
+}
+.wr-trophy .wr-pixel-token {
+  grid-template-columns: repeat(9, 5px);
+}
+.wr-trophy .wr-pixel-token i {
+  width: 5px;
+  height: 5px;
+}
+
+/* ---------- charts on generated scenes ---------- */
+
+/* A chart's highlight is the find's rarity. Common is grey, which reads as "disabled" on a bar: it lights up white. */
+.wr-chart-tone[data-rarity="common"] {
+  --wr-rarity: var(--wr-fg);
+}
+.wr-chart {
+  width: 100%;
+  max-width: 920px;
+  margin: 46px 0 40px;
+}
+.wr-stage[data-format="square"] .wr-chart,
+.wr-stage[data-format="landscape"] .wr-chart {
+  max-width: 720px;
+  margin: 26px 0 24px;
+}
+.wr-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.wr-chart-label {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.wr-chart-centre {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/* The number a bar stands for, above it. */
+.wr-chart-value {
+  font-size: 24px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A number or a note in a pill on a marker line. */
+.wr-chart-pill {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The number inside a funnel stage. */
+.wr-chart-figure {
+  font-size: 32px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The figure inside a disc, and the name under it. Their sizes follow the disc, so they are set on the node. */
+.wr-chart-bubble {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.wr-chart-bubble-name {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* A legend under a chart that has nothing written on it: a swatch, the name, the number it ended on. */
+.wr-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 44px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.wr-chart-legend li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.wr-chart-legend li i {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+.wr-chart-legend li b {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--wr-muted);
+}
+.wr-chart-legend li[data-point] b {
+  color: var(--wr-rarity);
+}
+
+.wr-chart-rings {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.wr-chart-rings svg {
+  flex: none;
+  /* The lit arc reaches the edge of its box and its glow goes past it. Clipped, the glow ends in four straight cuts. */
+  overflow: visible;
+}
+.wr-chart-rings ul {
+  display: grid;
+  flex: 1;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wr-chart-rings li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 32px;
+  font-weight: 650;
+}
+.wr-chart-rings li i {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+.wr-chart-rings li b {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--wr-muted);
+}
+
+/*
+ * A run of dates in the graph's own language: one big cell per day, lit by how much happened, the
+ * date under it. Nothing lifts out of the row: the days that are the point get a ring, not a jump.
+ */
+.wr-chart-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  /* Wide enough that two ringed neighbours keep air between their rings. */
+  gap: 24px;
+  padding-top: 12px;
+}
+.wr-chart-day {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.wr-chart-day i {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 14px;
+  border-radius: 24px;
+  background: var(--wr-l0);
+  font-size: 34px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--wr-fg);
+}
+.wr-stage[data-shape="square"] .wr-chart-day i {
+  border-radius: 8px;
+}
+.wr-stage[data-shape="circle"] .wr-chart-day i {
+  border-radius: 50%;
+}
+.wr-chart-day i[data-l="1"] {
+  background: var(--wr-l1);
+}
+.wr-chart-day i[data-l="2"] {
+  background: var(--wr-l2);
+}
+/* The two brightest levels are light enough that the count reads better in the frame's own dark. */
+.wr-chart-day i[data-l="3"] {
+  background: var(--wr-l3);
+  color: var(--wr-bg);
+}
+.wr-chart-day i[data-l="4"] {
+  background: var(--wr-l4);
+  color: var(--wr-bg);
+}
+.wr-chart-day b {
+  font-size: 38px;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: color-mix(in oklch, var(--wr-fg) 46%, transparent);
+}
+.wr-chart-day small {
+  font-size: 19px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--wr-muted);
+}
+/*
+ * The days that are the point: ringed, on the same line as the rest. The ring is the frame's own
+ * ink and the glow the palette's accent, so it belongs to whatever colours the viewer picked; the
+ * rarity already has its word above the chart.
+ */
+.wr-chart-day[data-marked] i {
+  outline: 3px solid color-mix(in oklch, var(--wr-fg) 92%, transparent);
+  outline-offset: 4px;
+  box-shadow: 0 22px 56px -16px var(--wr-l4);
+}
+.wr-chart-day[data-marked] b,
+.wr-chart-day[data-marked] small {
+  color: var(--wr-fg);
+}
+
+/* Found tiles in the year scan keep breathing in their rarity. Box-shadow only, on a handful of cells. */
+@keyframes wr-found-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px var(--found),
+      0 0 8px 1px var(--found);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px var(--found),
+      0 0 22px 6px var(--found);
+  }
+}
+[data-found] {
+  animation: wr-found-pulse 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-found] {
+    animation: none;
+  }
+}
+
+/* The scrubber's hover still: the scene shown as it ends up, without the timeline that normally reveals it. */
+.wr-thumb .wr-scene {
+  display: flex;
+}
+
+/* ---------- the wait: a blank year under the scan's beam ---------- */
+
+.wr-loading .wr-scene {
+  animation: wr-load-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes wr-load-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+/* The year in columns, a week each, so a whole week lights as one layer. Same cells and gaps as the graph. */
+.wr-load-year {
+  position: relative;
+  display: flex;
+  gap: var(--wr-gap);
+}
+.wr-load-week,
+.wr-load-lit {
+  display: grid;
+  grid-template-rows: repeat(7, var(--wr-cell));
+  gap: var(--wr-gap);
+}
+.wr-load-week {
+  position: relative;
+}
+.wr-load-lit {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+/* A blank day is the surface's own colour in some palettes. Here the empty year has to read as a year. */
+.wr-load-week > .wr-cell {
+  /* Mixed in sRGB: through oklch a near-white into a near-black picks up a red cast on the way. */
+  background: color-mix(in srgb, var(--wr-fg) 6%, var(--wr-l0));
+}
+.wr-load-lit .wr-cell[data-l="0"] {
+  background: transparent;
+}
+/* The beam's box spans first week's middle to the last one's, so moving it by its own width is the whole crossing. */
+.wr-load-beam {
+  position: absolute;
+  top: -16px;
+  bottom: -16px;
+  left: calc(var(--wr-cell) / 2);
+  right: calc(var(--wr-cell) / 2);
+  pointer-events: none;
+}
+.wr-load-beam i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.wr-load-beam i:first-child {
+  left: -56px;
+  width: 112px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--wr-l4) 26%, transparent) 50%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent);
+}
+.wr-load-beam i:last-child {
+  left: -2px;
+  width: 4px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, transparent, var(--wr-fg) 16%, var(--wr-fg) 84%, transparent);
+  filter: drop-shadow(0 0 10px var(--wr-l4));
+}
+
+/* The lines take turns in one place: the next rises from below as the last leaves upward. Two lines of room, so a
+   long one never moves the year. */
+.wr-load-lines {
+  display: grid;
+  width: 100%;
+  min-height: 2.5em;
+  margin-top: 70px;
+  justify-items: center;
+  align-items: start;
+}
+.wr-load-lines p {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(0.5em);
+}
+.wr-load-lines p[data-on] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s ease-out 0.16s,
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.16s;
+}
+.wr-load-lines p[data-past] {
+  transform: translateY(-0.5em);
+  transition:
+    opacity 0.28s ease-in,
+    transform 0.4s ease-in;
+}
+
+/* A picture that arrives before the year fades in over the initials. */
+.wr-loading .wr-avatar > * {
+  grid-area: 1 / 1;
+}
+.wr-loading .wr-avatar img {
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+.wr-loading .wr-avatar img[data-shown] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-loading .wr-scene {
+    animation: none;
+  }
+  .wr-load-lit {
+    opacity: 0.5;
+  }
+  .wr-load-beam {
+    display: none;
+  }
+  .wr-load-lines p {
+    transform: none !important;
+  }
+}

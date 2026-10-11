@@ -1,0 +1,51 @@
+/*
+ * The platform a Wrapped is about, pressed into the corner like a coin: a raised disc, a pressed
+ * well, and the platform's mark raised out of it. It is made of the frame's own surface, with only
+ * a third of the palette in it, so it reads as a relief in the background and does not compete with
+ * the scene: the shape comes from light (top left) and shade more than from colour.
+ */
+.wr-mark,
+.wr-mark-well {
+  position: absolute;
+  border-radius: 50%;
+}
+.wr-mark {
+  /* The surface with a third of the palette mixed in: clearly there, still part of the background. */
+  --wr-mark-high: color-mix(in oklch, var(--wr-l2) 40%, var(--wr-bg));
+  --wr-mark-low: color-mix(in oklch, var(--wr-l1) 26%, var(--wr-bg));
+  /* The mark itself sits one step up the ramp, so it reads against the well it rises from. */
+  --wr-mark-glyph-high: color-mix(in oklch, var(--wr-l3) 52%, var(--wr-bg));
+  --wr-mark-glyph-low: color-mix(in oklch, var(--wr-l2) 40%, var(--wr-bg));
+  --wr-mark-light: color-mix(in oklch, var(--wr-fg) 11%, transparent);
+  --wr-mark-shade: oklch(0 0 0 / 0.34);
+
+  right: -170px;
+  bottom: -180px;
+  width: 660px;
+  aspect-ratio: 1;
+  pointer-events: none;
+  /* Its own layer: the scenes animate on top of it every frame, and the emboss filter must not be redrawn with them. */
+  will-change: transform;
+  background: linear-gradient(145deg, var(--wr-mark-high), var(--wr-mark-low));
+  box-shadow:
+    inset 10px 10px 24px var(--wr-mark-light),
+    inset -14px -14px 32px var(--wr-mark-shade);
+}
+.wr-stage[data-format="landscape"] .wr-mark {
+  right: -150px;
+  bottom: -230px;
+}
+.wr-mark-well {
+  inset: 11%;
+  background: linear-gradient(145deg, var(--wr-mark-low), var(--wr-mark-high));
+  box-shadow:
+    inset 14px 14px 30px var(--wr-mark-shade),
+    inset -8px -8px 20px var(--wr-mark-light);
+}
+.wr-mark svg {
+  position: absolute;
+  inset: 27%;
+  width: 46%;
+  height: 46%;
+  overflow: visible;
+}

@@ -1,0 +1,124 @@
+/*
+ * An insight card: one number from someone's year, the chart that shows it, and the line that says what it means.
+ * 1200x630, the size X, LinkedIn and Slack show uncropped, drawn as real DOM so it carries the same charts as the
+ * video and then captured as a PNG. Colors come only from the --wr-* properties set on the card.
+ */
+.wr-insight {
+  position: relative;
+  display: grid;
+  grid-template-columns: 372px 660px;
+  column-gap: 40px;
+  box-sizing: border-box;
+  width: 1200px;
+  height: 630px;
+  padding: 58px 64px 54px;
+  overflow: hidden;
+  background: var(--wr-bg);
+  color: var(--wr-fg);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The one light, top left, as on the video and the share card. */
+.wr-insight-light {
+  position: absolute;
+  left: -300px;
+  top: -340px;
+  width: 980px;
+  height: 980px;
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--wr-l4) 22%, transparent), transparent);
+  pointer-events: none;
+}
+
+.wr-insight-copy,
+.wr-insight-side {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+/*
+ * A chart's light is allowed out of its column (a funnel's glow reaches well to the left of it). It passes behind the
+ * words, the way a light would: painted over them, it washed out the last digit of the number.
+ */
+.wr-insight-copy {
+  z-index: 1;
+}
+
+/* What earned it, and under it how rare: the name is the label, never an overline in capitals. */
+.wr-insight-name {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.wr-insight-name span {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--wr-rarity);
+}
+
+/* The number is the headline. What it counts reads as the rest of the sentence. */
+.wr-insight-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+}
+.wr-insight-stat strong {
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.86;
+}
+.wr-insight-stat span {
+  max-width: 340px;
+  font-size: 29px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+}
+.wr-insight-copy p {
+  max-width: 356px;
+  margin: 22px 0 0;
+  font-size: 18.5px;
+  line-height: 1.45;
+  color: var(--wr-muted);
+}
+
+.wr-insight-who,
+.wr-insight-source {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: right;
+  color: var(--wr-muted);
+}
+.wr-insight-who b {
+  font-weight: 650;
+  color: var(--wr-fg);
+}
+.wr-insight-source {
+  opacity: 0.6;
+}
+
+/* The video's chart, drawn at its own width and scaled to the column (the card sets both), so it is the same picture. */
+.wr-insight-plot {
+  position: relative;
+  flex: 1;
+}
+.wr-insight-plot > div {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform-origin: 0 50%;
+}
+.wr-insight .wr-chart {
+  max-width: none;
+  margin: 0;
+}
