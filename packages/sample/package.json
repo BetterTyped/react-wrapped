@@ -1,0 +1,25 @@
+{
+  "name": "@react-wrapped/sample",
+  "version": "0.0.0",
+  "description": "A made-up developer year on a made-up platform, directed into a full Wrapped with nothing but the public API of @react-wrapped/core.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "format": "pnpm --dir ../.. exec oxfmt --write packages/sample",
+    "typecheck": "pnpm --dir ../.. exec tsgo -p packages/sample/tsconfig.json --noEmit",
+    "lint": "pnpm --dir ../.. exec oxlint packages/sample"
+  },
+  "dependencies": {
+    "@react-wrapped/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "gsap": "^3.13.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
