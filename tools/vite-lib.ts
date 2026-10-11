@@ -48,13 +48,19 @@ const selfContained = (): PostcssPlugin => ({
  */
 function withExtensions(dir: string, filePath: string, content: string): string {
   const from = path.join(dir, "src", path.relative(path.join(dir, "dist"), path.dirname(filePath)));
-  return content.replaceAll(/(\bfrom\s+|\bimport\(\s*)(["'])(\.{1,2}\/[^"']*)\2/g, (...match: string[]) => {
+  const resolved = content.replaceAll(/(\bfrom\s+|\bimport\(\s*)(["'])(\.{1,2}\/[^"']*)\2/g, (...match: string[]) => {
     const [whole, lead, quote, spec] = match;
     if (/\.(js|mjs|cjs|json|css)$/.test(spec)) return whole;
     const target = path.join(from, spec);
     const folder = existsSync(target) && statSync(target).isDirectory();
     return `${lead}${quote}${spec}${folder ? "/index.js" : ".js"}${quote}`;
   });
+  // The sources write GSAP's types by their global name (`gsap.core.Timeline`). That name only exists in a project
+  // whose own code imports GSAP somewhere. A declaration that uses it asks for GSAP's types itself, so the
+  // library's types hold in a project that never touches GSAP directly.
+  return /\bgsap\.[a-zA-Z]/.test(resolved) && !resolved.includes('reference types="gsap"')
+    ? `/// <reference types="gsap" />\n${resolved}`
+    : resolved;
 }
 
 /**

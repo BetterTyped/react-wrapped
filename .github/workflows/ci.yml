@@ -55,6 +55,9 @@ jobs:
       # Each package as it would arrive from npm: packed, linted, its types resolved the way Node resolves them.
       - name: Packages are well formed
         run: pnpm check:packages
+      # The packed packages in a project outside this repository: types under Node's own rules, a server render.
+      - name: Packages work when installed
+        run: pnpm check:consumer
       # The built docs site in a real browser: SEO on every page, the frame overflow audit in all three formats, a
       # hostile host stylesheet, and the full example.
       - name: Install the browser

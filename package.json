@@ -14,7 +14,8 @@
     "format": "nx run-many --target=format --parallel=3 --skip-nx-cache",
     "typecheck": "nx run-many --target=typecheck --parallel=2 --skip-nx-cache",
     "check:packages": "node .github/scripts/check-packages.mjs",
-    "e2e": "pnpm --filter @react-wrapped/docs-e2e e2e"
+    "e2e": "pnpm --filter @react-wrapped/docs-e2e e2e",
+    "check:consumer": "node .github/scripts/check-consumer.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
