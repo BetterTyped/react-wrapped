@@ -4,3 +4,4 @@ import "./styles.css";
 export * from "./cut-drops";
 export * from "./use-opened-drops";
 export * from "./year-scan";
+export * from "./use-scan-gate";

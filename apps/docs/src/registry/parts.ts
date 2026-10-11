@@ -22,6 +22,8 @@ export const PART_IDS = [
   "own-colour",
   "own-chrome",
   "config-url",
+  "labels",
+  "share-actions",
 ] as const;
 
 export type PartId = (typeof PART_IDS)[number];

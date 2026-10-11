@@ -15,6 +15,7 @@ import { LinkIsTheVideo } from "./config-url";
 import { FirstWrapped } from "./first-wrapped";
 import { ThingsToKeep } from "./gallery";
 import { InsightCardOnThePage } from "./insight-card";
+import { ScanInPolish } from "./labels";
 import { WaitingForTheYear } from "./loading";
 import { MarkPicker } from "./marks";
 import { OwnChrome } from "./own-chrome";
@@ -25,6 +26,7 @@ import { Rarities } from "./rarities";
 import { ScanFirst } from "./scan-first";
 import { EditOneScene } from "./scene-editing";
 import { Settings } from "./settings";
+import { VideoWithShare } from "./share-actions";
 import { ShareCard } from "./share-card";
 import { EditableCut } from "./timeline-editing";
 import { DownloadVideo } from "./video-export";
@@ -114,6 +116,21 @@ function YearScanPart() {
   );
 }
 
+function LabelsPart() {
+  return (
+    <ScanInPolish
+      calendar={SAMPLE.calendar}
+      drops={SAMPLE.drops}
+      describeDay={describeSampleDay}
+      config={useLookConfig()}
+    />
+  );
+}
+
+function ShareActionsPart() {
+  return <VideoWithShare subject={subject} seed={seed} scenes={SHORT_SCENES} config={useLookConfig()} />;
+}
+
 function RaritiesPart() {
   return <Rarities drops={SAMPLE.drops} config={useLookConfig()} />;
 }
@@ -167,6 +184,8 @@ export const PARTS: Record<PartId, { render: () => ReactNode; look: boolean }> =
   "video-export": { render: () => <VideoExportPart />, look: true },
   "year-scan": { render: () => <YearScanPart />, look: true },
   rarities: { render: () => <RaritiesPart />, look: true },
+  labels: { render: () => <LabelsPart />, look: true },
+  "share-actions": { render: () => <ShareActionsPart />, look: true },
   "share-card": { render: () => <ShareCardPart />, look: true },
   "insight-card": { render: () => <InsightCardPart />, look: true },
   gallery: { render: () => <GalleryPart />, look: true },

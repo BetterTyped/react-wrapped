@@ -829,9 +829,9 @@ const fromParts: DocPage = {
     { kind: "h2", text: "The scan, first or under the video" },
     {
       kind: "p",
-      text: "`YearScan` adds scenes by calling `onOpen`, which here is the `open` of `useOpenedDrops`: the list changes, the director runs again, and the new scene is in `cut.scenes`. Give a drop's scene the key `drop-` followed by the drop's id: the found card flies to the timeline segment with that key. For the scan first flow, keep `gate` on until a run has come to rest with something found.",
+      text: "`YearScan` adds scenes by calling `onOpen`, which here is the `open` of `useOpenedDrops`: the list changes, the director runs again, and the new scene is in `cut.scenes`. Give a drop's scene the key `drop-` followed by the drop's id: the found card flies to the timeline segment with that key. For the scan first flow, `useScanGate` says when the scan is the page: until one run has come to rest with something found, and never again after that. Render the scan alone while `gated` is true, and hand `onRunChange` to `YearScan`.",
     },
-    code("tsx", [excerpt(sourceOf("examples/from-parts.tsx"), "const [running, setRunning]")]),
+    code("tsx", [excerpt(sourceOf("examples/from-parts.tsx"), "const { gated, onRunChange } = useScanGate")]),
     { kind: "h2", text: "The graphics" },
     {
       kind: "p",
@@ -841,7 +841,7 @@ const fromParts: DocPage = {
     { kind: "h2", text: "The layout is yours" },
     {
       kind: "p",
-      text: "The parts bring no page layout. The example lays them out with inline styles on the [chrome tokens](/docs/guides/palette-and-chrome/), so its panels follow the same light and dark as the parts inside them. Two things to know: the player needs a box with a height, and the scan as the page needs one too.",
+      text: "The parts bring no page layout. The example lays them out with inline styles on the [chrome tokens](/docs/guides/palette-and-chrome/), so its panels follow the same light and dark as the parts inside them. Two things to know. Give the player's box a height when its edges should line up with a column beside it; with no height it takes its size from its width. And the scan, while it is the page, wants a box about as tall as the video will be, so the page does not jump when the video arrives.",
     },
     { kind: "h2", text: "The whole file" },
     {
@@ -853,10 +853,9 @@ const fromParts: DocPage = {
     {
       kind: "list",
       items: [
-        "The download button, with its progress and its stop. Build it from [video export](/docs/player/video-export/).",
         "The loading state in the same layout. Render [`WrappedPlayerLoading`](/docs/player/loading/) where the player will be.",
         "A viewer mode: with `editable` off there is no scan, no settings and no editing, only the video and what you pass as `viewer`.",
-        "A short pause after the last find before the video takes the scan's place, and the settings column sliding open.",
+        "The settings column sliding open instead of appearing, and the video rising into the place the scan held.",
       ],
     },
   ],

@@ -3,6 +3,7 @@ import { sourceOf } from "../content/sources";
 import type { Block, DocPage, Section } from "../content/types";
 import { PACKAGES } from "../site";
 import { CHART_DOCS, CHART_TYPES, type ChartType, examplesOf } from "./charts";
+import { extraPages } from "./extra-pages";
 import { graphicsPages, marksPages } from "./graphics-pages";
 import { guidePages } from "./guide-pages";
 import { playerPages } from "./player-pages";
@@ -598,11 +599,11 @@ export const SECTIONS: readonly Section[] = [
   { id: "scenes", title: "Scenes", pages: scenePages },
   { id: "charts", title: "Charts", pages: [chartsOverview, ...CHART_TYPES.map(chartPage)] },
   { id: "transitions", title: "Transitions", pages: [transitionsOverview, ...transitionPages] },
-  { id: "player", title: "Player", pages: playerPages },
-  { id: "scanner", title: "Scanner", pages: scannerPages },
+  { id: "player", title: "Player", pages: [...playerPages, extraPages.shareActions] },
+  { id: "scanner", title: "Scanner", pages: [...scannerPages, extraPages.scanGate] },
   { id: "graphics", title: "Graphics", pages: graphicsPages },
   { id: "marks", title: "Marks", pages: marksPages },
-  { id: "guides", title: "Guides", pages: guidePages },
+  { id: "guides", title: "Guides", pages: [...guidePages, extraPages.labels] },
 ];
 
 export const PAGES: readonly DocPage[] = SECTIONS.flatMap((section) => section.pages);

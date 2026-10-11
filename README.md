@@ -315,6 +315,68 @@ const [config, setConfig] = useState<WrappedConfig>({ ...DEFAULT_WRAPPED_CONFIG,
 const config: WrappedConfig = { ...DEFAULT_WRAPPED_CONFIG, cuts: { total: "drip", launch: "iris" } };
 ```
 
+### Add a transition of your own
+
+`defineTransition` puts yours next to the nineteen built-in ones, in the config and in the scene editor's list. A cover
+is three layers and three states; `coverCut` plays them the way every built-in cover plays.
+
+```tsx
+import { coverCut, defineTransition } from "@react-wrapped/core";
+
+// Once, where your app starts, before a player is on the page.
+defineTransition({
+  id: "curtain",
+  label: "Curtain",
+  cover: (
+    <>
+      <i />
+      <i />
+      <i />
+    </>
+  ),
+  play: (tl, { root, group }) => {
+    if (group)
+      coverCut(
+        tl,
+        { root, group },
+        { hidden: { yPercent: -101 }, covering: { yPercent: 0 }, cleared: { yPercent: 101 } },
+      );
+  },
+});
+```
+
+### Translate it, or make it sound like you
+
+Every word the library shows on its own is a label. Wrap your page in `WrappedProvider` and replace the ones you want. A
+sentence with a number in it is a function, so a language with three plural forms can have all three.
+
+```tsx
+import { WrappedProvider } from "@react-wrapped/core";
+
+<WrappedProvider
+  locale="pl-PL"
+  labels={{
+    player: { play: "Odtwórz", pause: "Pauza" },
+    scan: { start: "Skanuj mój rok", findAll: "Znajdź wszystkie" },
+  }}
+>
+  <MyWrapped />
+</WrappedProvider>;
+```
+
+### Recolour the controls
+
+The video's palette belongs to the viewer. The controls around it read a few variables of their own, which you can set
+on any element above them. Dark values apply under a `.dark` class.
+
+```css
+body {
+  --wr-ui-primary: #7c3aed;
+  --wr-ui-radius: 0.5rem;
+  --wr-font: "Space Grotesk", sans-serif;
+}
+```
+
 <p align="center">
 	<a href="https://github.com/sponsors/prc5?tier=Silver">
 		<picture>

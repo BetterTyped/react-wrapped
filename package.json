@@ -12,9 +12,12 @@
     "test": "nx run-many --target=test --parallel=1 --skip-nx-cache",
     "lint": "nx run-many --target=lint --parallel=3 --skip-nx-cache",
     "format": "nx run-many --target=format --parallel=3 --skip-nx-cache",
-    "typecheck": "nx run-many --target=typecheck --parallel=2 --skip-nx-cache"
+    "typecheck": "nx run-many --target=typecheck --parallel=2 --skip-nx-cache",
+    "check:packages": "node .github/scripts/check-packages.mjs",
+    "e2e": "pnpm --filter @react-wrapped/docs-e2e e2e"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@nx/devkit": "23.1.2",
     "@nx/js": "23.1.2",
     "@nx/vite": "23.1.2",
@@ -35,6 +38,7 @@
     "oxfmt": "^0.46.0",
     "oxlint": "1.61.0",
     "postcss": "^8.5.0",
+    "publint": "^0.3.25",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "tailwindcss": "^4.1.0",

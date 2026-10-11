@@ -21,7 +21,7 @@ env:
 
 jobs:
   checks:
-    name: Build, lint, typecheck, test
+    name: Build, lint, typecheck, test, browser tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -52,3 +52,19 @@ jobs:
         run: pnpm typecheck
       - name: Test
         run: pnpm test
+      # Each package as it would arrive from npm: packed, linted, its types resolved the way Node resolves them.
+      - name: Packages are well formed
+        run: pnpm check:packages
+      # The built docs site in a real browser: SEO on every page, the frame overflow audit in all three formats, a
+      # hostile host stylesheet, and the full example.
+      - name: Install the browser
+        run: pnpm --filter @react-wrapped/docs-e2e exec playwright install --with-deps chromium
+      - name: Browser tests
+        run: pnpm e2e
+      - name: Keep the browser report when a test fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          path: apps/docs-e2e/test-results
+          retention-days: 7

@@ -12,9 +12,16 @@ import {
   type WrappedTransition,
 } from "@react-wrapped/core";
 import { GraphicsGallery, renderInsightCard, renderShareCard, type WrappedGraphic } from "@react-wrapped/graphics";
-import { type SceneCut, SceneEditor, WrappedConfigurator, WrappedPlayer } from "@react-wrapped/player";
+import {
+  type SceneCut,
+  SceneEditor,
+  ShareActions,
+  WrappedConfigurator,
+  WrappedPlayer,
+  type WrappedPlayerHandle,
+} from "@react-wrapped/player";
 import { directSample, formatShort, hoursOfDay, sampleInsights, sampleTraits, sampleYear } from "@react-wrapped/sample";
-import { useOpenedDrops, YearScan } from "@react-wrapped/scan";
+import { useOpenedDrops, useScanGate, YearScan } from "@react-wrapped/scan";
 import { chartScene } from "@react-wrapped/scenes";
 
 /*
@@ -39,18 +46,6 @@ const PLAYER_PANEL: CSSProperties = { ...PANEL, flex: "999 1 420px", display: "g
 const SIDE: CSSProperties = { flex: "1 1 320px", display: "grid", gap: 12, alignContent: "start", minWidth: 0 };
 // As the page, the scan takes the box the video is about to take.
 const GATE_BOX: CSSProperties = { display: "grid", height: "min(780px, 92vh)", minHeight: 420 };
-const BUTTON: CSSProperties = {
-  width: "100%",
-  height: 44,
-  border: 0,
-  borderRadius: 999,
-  background: "var(--wr-ui-fg)",
-  color: "var(--wr-ui-bg)",
-  font: "inherit",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
 /** A scene this page adds to the director's own: the hours of the day on a clock, right after the week. */
 function withDayScene(scenes: readonly SceneInstance[], hours: readonly number[]): SceneInstance[] {
   const chart: SceneChart = { type: "clock", hours };
@@ -140,14 +135,8 @@ export function FromParts({ gate = false }: { gate?: boolean }) {
 
   /* ---------- the scan first ---------- */
 
-  const [running, setRunning] = useState(false);
-  const [passed, setPassed] = useState(false);
   // With `gate`, the scan is the page until one run has come to rest with something found.
-  const gated = gate && !passed && (opened.length === 0 || running);
-  const onRunChange = (now: boolean) => {
-    setRunning(now);
-    if (!now && opened.length > 0) setPassed(true);
-  };
+  const { gated, onRunChange } = useScanGate({ enabled: gate, found: opened.length, id: cut.seed });
   // The video takes the scan's place at the top, so that is where the page should be looking.
   const rootRef = useRef<HTMLDivElement>(null);
   const wasGated = useRef(gated);
@@ -185,16 +174,10 @@ export function FromParts({ gate = false }: { gate?: boolean }) {
     ];
   }, [cut.card, cut.pending, insights, palette, sample.year.handle]);
 
-  const [copied, setCopied] = useState(false);
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // The clipboard is blocked here. The address bar still has the link.
-    }
-  };
+  // The player's handle: the share row borrows the stage from it to make the video file.
+  const player = useRef<WrappedPlayerHandle>(null);
+  // While the file is being made the stage is being filmed frame by frame: nothing else may move it.
+  const [rendering, setRendering] = useState(false);
 
   return (
     <div ref={rootRef} style={PAGE}>
@@ -202,15 +185,25 @@ export function FromParts({ gate = false }: { gate?: boolean }) {
       {gated ? null : (
         <div style={TOP}>
           <div style={PLAYER_PANEL}>
-            <WrappedPlayer subject={cut.subject} seed={cut.seed} scenes={playing} config={config} editing={editing} />
+            <WrappedPlayer
+              ref={player}
+              subject={cut.subject}
+              seed={cut.seed}
+              scenes={playing}
+              config={config}
+              editing={editing}
+            />
           </div>
           <div style={SIDE}>
             <div style={PANEL}>
-              <button type="button" style={BUTTON} onClick={() => void copyLink()}>
-                {copied ? "Copied" : "Copy link"}
-              </button>
+              <ShareActions
+                player={player}
+                config={config}
+                fileName={`${sample.year.handle}-wrapped.mp4`}
+                onRendering={setRendering}
+              />
             </div>
-            <div style={PANEL}>
+            <div style={PANEL} inert={rendering}>
               <WrappedConfigurator config={config} onChange={setConfig} />
             </div>
           </div>

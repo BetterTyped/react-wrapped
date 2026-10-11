@@ -7,3 +7,4 @@ export * from "./stage-frame";
 export * from "./timeline";
 export * from "./wrapped-configurator";
 export * from "./wrapped-player";
+export * from "./share-actions";
