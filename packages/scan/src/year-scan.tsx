@@ -9,10 +9,11 @@ import {
   type PixelArt,
   type Rarity,
   readingSeconds,
+  type SlotClassNames,
   useLabels,
   type WrappedPalette,
 } from "@react-wrapped/core";
-import { cn, FastForward, RotateCcw, ScanLine } from "@react-wrapped/core/internal";
+import { FastForward, RotateCcw, ScanLine, useSlots } from "@react-wrapped/core/internal";
 
 gsap.registerPlugin(useGSAP);
 
@@ -26,6 +27,56 @@ export interface HiddenDrop {
   line: string;
   art: PixelArt;
 }
+
+/**
+ * Every part of the year scan a class can be given to, by its `data-wr-slot`. What only exists to be animated (the
+ * beam, the flash, the sparks) has none: the scan moves those itself and paints them in the video's palette.
+ */
+export const YEAR_SCAN_SLOTS = [
+  // The root: the panel.
+  "scan",
+  // The top of the panel: the words on one side, the buttons on the other.
+  "scan-header",
+  "scan-headline",
+  "scan-about",
+  "scan-actions",
+  // The button that starts the scan, or picks it up again.
+  "scan-start",
+  // While a scan runs: sends it straight to its end.
+  "scan-find-all",
+  // Once everything is found: runs the scan again.
+  "scan-again",
+  // The year: a cell per day.
+  "scan-grid",
+  "scan-cell",
+  // The button over a cell something was found in.
+  "scan-tile",
+  // The list under the year, a badge per hidden scene.
+  "scan-finds",
+  // A found scene's badge, and one still hidden.
+  "scan-find",
+  "scan-find-hidden",
+  // A badge's little picture, its name and the day it was found on.
+  "scan-find-art",
+  "scan-find-name",
+  "scan-find-day",
+  // What a found card flies in: it covers the page, outside the panel.
+  "scan-flight",
+  "scan-backdrop",
+  // The card's face, and what is written on it.
+  "scan-card",
+  "scan-card-art",
+  "scan-card-name",
+  "scan-card-rarity",
+  "scan-card-line",
+  "scan-card-day",
+  // The card's back, shown before it turns over.
+  "scan-card-back",
+  // The button that covers the card: it turns it over, adds it, or closes it.
+  "scan-card-button",
+] as const;
+
+export type YearScanSlot = (typeof YEAR_SCAN_SLOTS)[number];
 
 const BURST = 22;
 const SPARKLES = 16;
@@ -156,6 +207,8 @@ export function YearScan({
   sessionKey = null,
   gate = false,
   onRunChange,
+  className,
+  classNames,
 }: {
   calendar: CalendarLevels;
   /** The video's palette, so the year looks the way it does in the video. */
@@ -177,8 +230,17 @@ export function YearScan({
   gate?: boolean;
   /** A scan started or came to rest: finished, stopped or sent straight to its end. */
   onRunChange?: (running: boolean) => void;
+  /** A class for the panel. */
+  className?: string;
+  /**
+   * A class per part, by slot name (`"scan-start"`). Added after the library's own classes on that part. The panel
+   * and the tiles are painted in the video's palette with inline styles: a class of yours changes their colours only
+   * with `!important`, and everything else freely.
+   */
+  classNames?: SlotClassNames<YearScanSlot>;
 }) {
   const labels = useLabels();
+  const slot = useSlots<YearScanSlot>(classNames);
   const rootRef = useRef<HTMLDivElement>(null);
   const flightRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -376,9 +438,9 @@ export function YearScan({
             .filter(([id]) => id !== current.id)
             .map(([, taken]) => taken),
         );
-      const slot = calendar.lead + day;
-      const hit = cells[slot];
-      const target = Math.floor(slot / 7);
+      const place = calendar.lead + day;
+      const hit = cells[place];
+      const target = Math.floor(place / 7);
 
       // Geometry, in the grid's own pixels: where a (fractional) column sits.
       const columnLeft = (column: number) => cells[Math.min(cells.length - 1, column * 7)]?.offsetLeft ?? 0;
@@ -925,7 +987,10 @@ export function YearScan({
         )
       }
       disabled={peek !== null}
-      className="wr:inline-flex wr:h-11 wr:shrink-0 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-6 wr:text-[15px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px"
+      {...slot(
+        "scan-start",
+        "wr:inline-flex wr:h-11 wr:shrink-0 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-6 wr:text-[15px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px",
+      )}
       style={{ background: palette.levels[4], color: palette.bg }}
     >
       <ScanLine className="wr:size-4" />
@@ -938,7 +1003,10 @@ export function YearScan({
         <button
           type="button"
           onClick={findAll}
-          className="wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-4 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25"
+          {...slot(
+            "scan-find-all",
+            "wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-4 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25",
+          )}
         >
           <FastForward className="wr:size-4" />
           {labels.scan.findAll}
@@ -955,7 +1023,10 @@ export function YearScan({
           )
         }
         disabled={peek !== null}
-        className="wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-5 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25 wr:transition-transform wr:hover:-translate-y-px"
+        {...slot(
+          "scan-again",
+          "wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-5 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25 wr:transition-transform wr:hover:-translate-y-px",
+        )}
       >
         <RotateCcw className="wr:size-4" />
         {labels.scan.again}
@@ -974,9 +1045,11 @@ export function YearScan({
       ref={rootRef}
       data-scan-gate={gate ? "" : undefined}
       // As the page, the panel fills the box the video is about to take and sets its year in the middle of it.
-      className={cn(
+      {...slot(
+        "scan",
         "wr-root wr:relative wr:overflow-hidden wr:rounded-[28px] wr:p-4 wr:md:p-6",
         gate && "wr:flex wr:h-full wr:flex-col wr:justify-center wr:md:p-10",
+        className,
       )}
       style={{ background: palette.bg, color: palette.fg } as CSSProperties}
     >
@@ -986,10 +1059,16 @@ export function YearScan({
         className="wr:pointer-events-none wr:absolute wr:inset-0 wr:opacity-0"
         style={{ background: `radial-gradient(circle at 50% 60%, ${tone}, transparent 70%)` }}
       />
-      <div className="wr:relative wr:z-10 wr:mb-5 wr:flex wr:flex-wrap wr:items-center wr:justify-between wr:gap-4">
+      <div
+        {...slot(
+          "scan-header",
+          "wr:relative wr:z-10 wr:mb-5 wr:flex wr:flex-wrap wr:items-center wr:justify-between wr:gap-4",
+        )}
+      >
         <div className="wr:min-w-0">
           <p
-            className={cn(
+            {...slot(
+              "scan-headline",
               "wr:font-semibold wr:leading-tight wr:tracking-[-0.03em]",
               gate
                 ? "wr:text-[clamp(1.75rem,3vw,2.75rem)] wr:tracking-[-0.04em]"
@@ -999,13 +1078,17 @@ export function YearScan({
             {headline}
           </p>
           <p
-            className={cn("wr:mt-1", gate ? "wr:text-[16px] wr:md:mt-2 wr:md:text-[17px]" : "wr:text-[14.5px]")}
+            {...slot(
+              "scan-about",
+              "wr:mt-1",
+              gate ? "wr:text-[16px] wr:md:mt-2 wr:md:text-[17px]" : "wr:text-[14.5px]",
+            )}
             style={{ color: palette.muted }}
           >
             {subline}
           </p>
         </div>
-        <div className="wr:flex wr:flex-wrap wr:items-center wr:gap-2">
+        <div {...slot("scan-actions", "wr:flex wr:flex-wrap wr:items-center wr:gap-2")}>
           {gate ? null : actions}
           {button}
         </div>
@@ -1015,7 +1098,7 @@ export function YearScan({
         <div
           data-scan-grid
           data-veiled={veiled ? "" : undefined}
-          className="wr:relative wr:grid wr:grid-flow-col wr:gap-[3px]"
+          {...slot("scan-grid", "wr:relative wr:grid wr:grid-flow-col wr:gap-[3px]")}
           style={
             {
               gridTemplateRows: "repeat(7, auto)",
@@ -1024,15 +1107,15 @@ export function YearScan({
             } as CSSProperties
           }
         >
-          {Array.from({ length: total }, (_unused, slot) => {
-            const day = slot - calendar.lead;
+          {Array.from({ length: total }, (_unused, place) => {
+            const day = place - calendar.lead;
             if (day < 0) {
               // oxlint-disable-next-line react/no-array-index-key -- one cell per slot, positional
               return (
                 <i
-                  key={slot}
+                  key={place}
                   data-cell
-                  className="wr:aspect-square wr:rounded-[22%]"
+                  {...slot("scan-cell", "wr:aspect-square wr:rounded-[22%]")}
                   style={{ background: palette.levels[0] }}
                 />
               );
@@ -1041,10 +1124,13 @@ export function YearScan({
             return (
               <i
                 // oxlint-disable-next-line react/no-array-index-key -- one cell per day, positional
-                key={slot}
+                key={place}
                 data-cell
                 data-day={day}
-                className="wr:relative wr:aspect-square wr:rounded-[22%] wr:transition-[background-color] wr:duration-200 wr:in-data-veiled:not-data-lit:bg-(--blank)! wr:data-hit:z-10 wr:data-hit:shadow-[0_0_0_2px_var(--hit),0_0_18px_3px_var(--hit)]"
+                {...slot(
+                  "scan-cell",
+                  "wr:relative wr:aspect-square wr:rounded-[22%] wr:transition-[background-color] wr:duration-200 wr:in-data-veiled:not-data-lit:bg-(--blank)! wr:data-hit:z-10 wr:data-hit:shadow-[0_0_0_2px_var(--hit),0_0_18px_3px_var(--hit)]",
+                )}
                 data-found={marker ? "" : undefined}
                 style={
                   {
@@ -1066,7 +1152,10 @@ export function YearScan({
                     onClick={() => setPeek({ id: Date.now(), drop: marker.id, from: "tile" })}
                     aria-label={labels.scan.open(marker.name)}
                     title={marker.name}
-                    className="wr:absolute wr:inset-0 wr:cursor-pointer wr:rounded-[inherit] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70 wr:disabled:cursor-default"
+                    {...slot(
+                      "scan-tile",
+                      "wr:absolute wr:inset-0 wr:cursor-pointer wr:rounded-[inherit] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70 wr:disabled:cursor-default",
+                    )}
                   />
                 ) : null}
               </i>
@@ -1120,7 +1209,7 @@ export function YearScan({
         </span>
       </div>
 
-      <ul className="wr:mt-5 wr:flex wr:flex-wrap wr:gap-2" aria-label={labels.scan.finds}>
+      <ul {...slot("scan-finds", "wr:mt-5 wr:flex wr:flex-wrap wr:gap-2")} aria-label={labels.scan.finds}>
         {drops.map((drop) => {
           const spot = found.includes(drop.id) && !veiled ? spots[drop.id] : undefined;
           const colour = palette.rarity[drop.rarity];
@@ -1128,13 +1217,16 @@ export function YearScan({
             <li key={drop.id}>
               {spot === undefined ? (
                 <span
-                  className="wr:flex wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5"
+                  {...slot(
+                    "scan-find-hidden",
+                    "wr:flex wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5",
+                  )}
                   style={{ background: palette.card, color: palette.muted }}
                 >
-                  <span className="wr:rounded-[9px] wr:p-1.5" style={{ background: palette.bg }}>
+                  <span {...slot("scan-find-art", "wr:rounded-[9px] wr:p-1.5")} style={{ background: palette.bg }}>
                     <PixelGlyph art={PIXEL_ART.question} colour={palette.muted} cell={3} />
                   </span>
-                  <span className="wr:text-[13px] wr:font-semibold">{labels.scan.stillHidden}</span>
+                  <span {...slot("scan-find-name", "wr:text-[13px] wr:font-semibold")}>{labels.scan.stillHidden}</span>
                 </span>
               ) : (
                 <button
@@ -1143,21 +1235,26 @@ export function YearScan({
                   disabled={run !== null}
                   onClick={() => setPeek({ id: Date.now(), drop: drop.id, from: "badge" })}
                   title={labels.scan.openCard}
-                  className="wr:flex wr:cursor-pointer wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5 wr:text-left wr:transition-transform wr:hover:-translate-y-px wr:disabled:cursor-default"
+                  {...slot(
+                    "scan-find",
+                    "wr:flex wr:cursor-pointer wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5 wr:text-left wr:transition-transform wr:hover:-translate-y-px wr:disabled:cursor-default",
+                  )}
                   style={{
                     background: `color-mix(in oklch, ${colour} 14%, ${palette.card})`,
                     boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${colour} 40%, transparent)`,
                   }}
                 >
                   <span
-                    className="wr:rounded-[9px] wr:p-1.5"
+                    {...slot("scan-find-art", "wr:rounded-[9px] wr:p-1.5")}
                     style={{ background: `color-mix(in oklch, ${colour} 10%, ${palette.bg})` }}
                   >
                     <PixelGlyph art={drop.art} colour={colour} cell={3} />
                   </span>
                   <span className="wr:min-w-0">
-                    <span className="wr:block wr:text-[13px] wr:font-semibold wr:leading-tight">{drop.name}</span>
-                    <span className="wr:block wr:text-[11.5px]" style={{ color: palette.muted }}>
+                    <span {...slot("scan-find-name", "wr:block wr:text-[13px] wr:font-semibold wr:leading-tight")}>
+                      {drop.name}
+                    </span>
+                    <span {...slot("scan-find-day", "wr:block wr:text-[11.5px]")} style={{ color: palette.muted }}>
                       {describeDay(spot)}
                     </span>
                   </span>
@@ -1172,14 +1269,14 @@ export function YearScan({
         ? createPortal(
             <div
               ref={flightRef}
-              className="wr-root wr:pointer-events-none wr:fixed wr:inset-0 wr:z-[80]"
+              {...slot("scan-flight", "wr-root wr:pointer-events-none wr:fixed wr:inset-0 wr:z-[80]")}
               aria-live="polite"
             >
               <div
                 data-flight-backdrop
                 aria-hidden
                 onClick={() => stopRef.current?.()}
-                className="wr:absolute wr:inset-0 wr:opacity-0"
+                {...slot("scan-backdrop", "wr:absolute wr:inset-0 wr:opacity-0")}
                 style={{
                   background: `radial-gradient(circle at 50% 50%, color-mix(in oklch, ${tone} 28%, transparent), transparent 55%), rgb(8 8 10 / 0.62)`,
                   backdropFilter: "blur(3px)",
@@ -1281,11 +1378,17 @@ export function YearScan({
                   aria-label={peek ? labels.scan.closeCard : labels.scan.turnCard}
                   title={peek ? labels.scan.closeCardHint : labels.scan.turnCardHint}
                   onClick={() => cardRef.current?.()}
-                  className="wr:pointer-events-auto wr:absolute wr:inset-0 wr:z-10 wr:cursor-pointer wr:rounded-[28px] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70"
+                  {...slot(
+                    "scan-card-button",
+                    "wr:pointer-events-auto wr:absolute wr:inset-0 wr:z-10 wr:cursor-pointer wr:rounded-[28px] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70",
+                  )}
                 />
                 <div data-flyer-inner className="wr:relative wr:size-full wr:[transform-style:preserve-3d]">
                   <div
-                    className="wr:absolute wr:inset-0 wr:flex wr:flex-col wr:overflow-hidden wr:rounded-[28px] wr:p-6 wr:[backface-visibility:hidden]"
+                    {...slot(
+                      "scan-card",
+                      "wr:absolute wr:inset-0 wr:flex wr:flex-col wr:overflow-hidden wr:rounded-[28px] wr:p-6 wr:[backface-visibility:hidden]",
+                    )}
                     style={{
                       background: `linear-gradient(165deg, color-mix(in oklch, ${tone} 26%, ${palette.card}), ${palette.card} 62%)`,
                       boxShadow: `inset 0 0 0 2px ${tone}, 0 40px 90px -20px black`,
@@ -1307,32 +1410,35 @@ export function YearScan({
                     ) : null}
                     {current ? (
                       <>
-                        <div data-flyer-line className="wr:grid wr:flex-1 wr:place-items-center">
+                        <div data-flyer-line {...slot("scan-card-art", "wr:grid wr:flex-1 wr:place-items-center")}>
                           <PixelGlyph art={current.art} colour={tone} cell={14} />
                         </div>
                         <p
                           data-flyer-line
-                          className="wr:text-[25px] wr:font-semibold wr:leading-[1.05] wr:tracking-[-0.035em]"
+                          {...slot(
+                            "scan-card-name",
+                            "wr:text-[25px] wr:font-semibold wr:leading-[1.05] wr:tracking-[-0.035em]",
+                          )}
                         >
                           {current.name}
                         </p>
                         <p
                           data-flyer-line
-                          className="wr:mt-1.5 wr:text-[14px] wr:font-semibold"
+                          {...slot("scan-card-rarity", "wr:mt-1.5 wr:text-[14px] wr:font-semibold")}
                           style={{ color: tone }}
                         >
                           {labels.rarity[current.rarity]}
                         </p>
                         <p
                           data-flyer-line
-                          className="wr:mt-2 wr:line-clamp-3 wr:text-[14px] wr:leading-[1.4]"
+                          {...slot("scan-card-line", "wr:mt-2 wr:line-clamp-3 wr:text-[14px] wr:leading-[1.4]")}
                           style={{ color: palette.muted }}
                         >
                           {current.line}
                         </p>
                         <p
                           data-flyer-line
-                          className="wr:mt-3 wr:text-[12.5px] wr:font-semibold"
+                          {...slot("scan-card-day", "wr:mt-3 wr:text-[12.5px] wr:font-semibold")}
                           style={{ color: palette.muted }}
                         >
                           {shownDay === undefined ? " " : labels.scan.foundOn(describeDay(shownDay))}
@@ -1342,7 +1448,10 @@ export function YearScan({
                   </div>
                   <div
                     data-flyer-back
-                    className="wr:absolute wr:inset-0 wr:grid wr:place-items-center wr:rounded-[28px] wr:[backface-visibility:hidden] wr:[transform:rotateY(180deg)]"
+                    {...slot(
+                      "scan-card-back",
+                      "wr:absolute wr:inset-0 wr:grid wr:place-items-center wr:rounded-[28px] wr:[backface-visibility:hidden] wr:[transform:rotateY(180deg)]",
+                    )}
                     style={{
                       background: `radial-gradient(circle at 50% 40%, color-mix(in oklch, ${palette.levels[4]} 18%, ${palette.card}), ${palette.bg} 75%)`,
                     }}

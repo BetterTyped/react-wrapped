@@ -8,22 +8,61 @@ import {
   luckyCut,
   resolvePalette,
   type SceneInstance,
+  type SlotClassNames,
   type WrappedConfig,
   type WrappedSubject,
   type WrappedTransition,
 } from "@react-wrapped/core";
-import { cn } from "@react-wrapped/core/internal";
-import { GraphicsGallery, type WrappedGraphic } from "@react-wrapped/graphics";
+import { cn, useSlots } from "@react-wrapped/core/internal";
+import { GraphicsGallery, type GraphicsGallerySlot, type WrappedGraphic } from "@react-wrapped/graphics";
 import {
+  type ConfiguratorSlot,
   type SceneCut,
   SceneEditor,
+  type SceneEditorSlot,
   ShareActions,
+  type ShareActionsSlot,
+  type TimelineSlot,
   WrappedConfigurator,
   WrappedPlayer,
   type WrappedPlayerHandle,
   WrappedPlayerLoading,
+  type WrappedPlayerSlot,
 } from "@react-wrapped/player";
-import { type HiddenDrop, useScanGate, YearScan } from "@react-wrapped/scan";
+import { type HiddenDrop, useScanGate, YearScan, type YearScanSlot } from "@react-wrapped/scan";
+
+/**
+ * Every part of the page's own layout a class can be given to, by its `data-wr-slot`. The parts it lays out (the
+ * player, the settings, the scan, the gallery) have their own lists.
+ */
+export const WRAPPED_VIEW_SLOTS = [
+  // The root: the grid the whole page is laid out on.
+  "view",
+  // The card the player stands in.
+  "view-player-panel",
+  // The creator's column beside the video: the share row over the settings.
+  "view-side",
+  // The card the settings stand in. The share row above it is a card by itself: its slot is `share`.
+  "view-settings-panel",
+  // What a viewer who is not the creator sees under the video.
+  "view-viewer",
+  // What holds the year scan, and what holds the gallery.
+  "view-scan",
+  "view-gallery",
+] as const;
+
+export type WrappedViewSlot = (typeof WRAPPED_VIEW_SLOTS)[number];
+
+/** Every slot there is: the page's own, and those of every part it lays out. What `WrappedView` takes classes for. */
+export type WrappedSlot =
+  | WrappedViewSlot
+  | WrappedPlayerSlot
+  | TimelineSlot
+  | ShareActionsSlot
+  | ConfiguratorSlot
+  | YearScanSlot
+  | GraphicsGallerySlot
+  | SceneEditorSlot;
 
 const panel = "wr:rounded-[28px] wr:bg-card wr:p-4 wr:ring-1 wr:ring-border wr:md:p-6";
 /** The player and the column beside it share one height on desktop, so their edges line up. */
@@ -92,9 +131,18 @@ export function WrappedView(
     editable?: boolean;
     /** The player's handle: play, pause, seek, and where each scene starts. Null while there is no video. */
     playerRef?: Ref<WrappedPlayerHandle | null>;
+    /** A class for the page's root. */
+    className?: string;
+    /**
+     * A class per part, by slot name, for the page and for everything on it: `"view-player-panel"`, `"player-play"`,
+     * `"settings-chip"`, `"scan-start"`. Added after the library's own classes on that part. The names say which
+     * component they belong to, so they all go in this one object.
+     */
+    classNames?: SlotClassNames<WrappedSlot>;
   },
 ) {
-  const { config, onConfigChange, editable = true } = props;
+  const { config, onConfigChange, editable = true, className, classNames } = props;
+  const slot = useSlots<WrappedViewSlot>(classNames);
   const loading = props.loading ?? null;
   const loaded = props.loading ? null : props;
   const scenes = loaded?.scenes ?? NO_SCENES;
@@ -187,7 +235,8 @@ export function WrappedView(
       ref={rootRef}
       // What the scan looks inside for a timeline segment to land a found card on.
       data-wr-view=""
-      className={cn(
+      {...slot(
+        "view",
         // Under the page's bar when the view is scrolled back to after the first scan.
         "wr-root wr:scroll-mt-24",
         // The creator's column is a track that opens: who the page belongs to is often known a beat after the page
@@ -199,6 +248,7 @@ export function WrappedView(
         editable && !gated
           ? "wr:lg:grid-cols-[minmax(0,1fr)_380px] wr:lg:gap-x-3"
           : "wr:lg:grid-cols-[minmax(0,1fr)_0px] wr:lg:gap-x-0",
+        className,
       )}
     >
       {/* While the scan is the page there is no video to show. The scan below keeps its place in the tree, so it is
@@ -206,7 +256,8 @@ export function WrappedView(
       {gated ? null : (
         <div
           inert={rendering}
-          className={cn(
+          {...slot(
+            "view-player-panel",
             panel,
             "wr:flex wr:min-h-[560px] wr:flex-col",
             rowHeight,
@@ -223,6 +274,7 @@ export function WrappedView(
               autoplay={loaded.autoplay ?? true}
               editing={editable ? editing : undefined}
               className="wr:flex-1"
+              classNames={classNames}
             />
           ) : loading ? (
             <>
@@ -234,6 +286,7 @@ export function WrappedView(
                 lines={loading.lines}
                 config={config}
                 className="wr:flex-1"
+                classNames={classNames}
               />
             </>
           ) : null}
@@ -242,7 +295,7 @@ export function WrappedView(
       {/* One pixel of room all round, so the clip that hides the opening column does not shave the panels' rings. */}
       <div className={cn("wr:-m-px wr:overflow-hidden wr:p-px", (!editable || gated) && "wr:max-lg:hidden")}>
         {editable && !gated ? (
-          <div className={`wr:flex wr:min-h-0 wr:flex-col wr:gap-3 wr:lg:w-[380px] ${rowHeight}`}>
+          <div {...slot("view-side", "wr:flex wr:min-h-0 wr:flex-col wr:gap-3 wr:lg:w-[380px]", rowHeight)}>
             {loaded?.share ? (
               <ShareActions
                 className={panel}
@@ -251,28 +304,33 @@ export function WrappedView(
                 fileName={loaded.share.fileName}
                 onRendering={setRendering}
                 onError={loaded.share.onError}
+                classNames={classNames}
               />
             ) : null}
             <div
               inert={rendering}
-              className={cn(
+              {...slot(
+                "view-settings-panel",
                 panel,
                 "wr:min-h-0 wr:flex-1 wr:overflow-y-auto wr:overscroll-contain wr:transition-opacity",
                 rendering && "wr:opacity-50",
               )}
             >
-              <WrappedConfigurator config={config} onChange={onConfigChange} />
+              <WrappedConfigurator config={config} onChange={onConfigChange} classNames={classNames} />
             </div>
           </div>
         ) : null}
       </div>
-      {loaded && !editable && loaded.viewer ? <div className="wr:lg:col-span-2">{loaded.viewer}</div> : null}
+      {loaded && !editable && loaded.viewer ? (
+        <div {...slot("view-viewer", "wr:lg:col-span-2")}>{loaded.viewer}</div>
+      ) : null}
       {loaded && editable ? (
         <>
           {loaded.opening && loaded.opening.drops.length > 0 ? (
             <div
               inert={rendering}
-              className={cn(
+              {...slot(
+                "view-scan",
                 "wr:transition-opacity wr:lg:col-span-2",
                 rendering && "wr:opacity-50",
                 // As the page, the scan takes the box the video is about to take.
@@ -290,12 +348,17 @@ export function WrappedView(
                 sessionKey={loaded.opening.sessionKey}
                 gate={gated}
                 onRunChange={loaded.opening.gate ? onScanChange : undefined}
+                classNames={classNames}
               />
             </div>
           ) : null}
           {!gated && loaded.share?.graphics && loaded.share.graphics.length > 0 ? (
-            <div className="wr:lg:col-span-2">
-              <GraphicsGallery graphics={loaded.share.graphics} palette={resolvePalette(config)} />
+            <div {...slot("view-gallery", "wr:lg:col-span-2")}>
+              <GraphicsGallery
+                graphics={loaded.share.graphics}
+                palette={resolvePalette(config)}
+                classNames={classNames}
+              />
             </div>
           ) : null}
           <div className="wr:lg:col-span-2">
@@ -308,6 +371,7 @@ export function WrappedView(
                 if (editingKey) saveScene(editingKey, values, style);
               }}
               onClose={() => setEditingKey(null)}
+              classNames={classNames}
             />
           </div>
         </>

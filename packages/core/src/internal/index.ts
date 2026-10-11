@@ -8,5 +8,6 @@ export * from "./cn";
 export * from "./icons";
 export * from "./modal";
 export * from "./pill";
+export * from "./slots";
 export * from "./switch";
 export * from "./use-copied";

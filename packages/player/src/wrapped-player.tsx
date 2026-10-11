@@ -1,11 +1,12 @@
 import { type Ref, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 
-import { Timeline, type TimelineEditing } from "./timeline";
+import { Timeline, type TimelineEditing, type TimelineSlot } from "./timeline";
 import {
   LoadingStage,
   type LoadingSubject,
   type SceneInstance,
   type SceneMark,
+  type SlotClassNames,
   type StageTake,
   useLabels,
   useWrappedTimeline,
@@ -15,7 +16,26 @@ import {
   WrappedStage,
   type WrappedSubject,
 } from "@react-wrapped/core";
-import { cn, Maximize2, Minimize2, Pause, Play, RotateCcw } from "@react-wrapped/core/internal";
+import { Maximize2, Minimize2, Pause, Play, RotateCcw, useSlots } from "@react-wrapped/core/internal";
+
+/** Every part of the player a class can be given to, by its `data-wr-slot`. The timeline in it has its own list. */
+export const WRAPPED_PLAYER_SLOTS = [
+  // The root: the video and the controls under it.
+  "player",
+  // The space the frame is fitted into.
+  "player-room",
+  // The frame around the video: its corners, its shadow, its outline.
+  "player-frame",
+  // The row of controls.
+  "player-transport",
+  "player-play",
+  "player-restart",
+  // Where the playhead is and how long the video runs.
+  "player-clock",
+  "player-fullscreen",
+] as const;
+
+export type WrappedPlayerSlot = (typeof WRAPPED_PLAYER_SLOTS)[number];
 
 /** The tallest the frame may get on a phone, as a share of the viewport, so the controls stay on screen. */
 const PHONE_HEIGHT_SHARE = 0.72;
@@ -77,33 +97,40 @@ export function WrappedPlayerLoading({
   lines,
   config,
   className,
+  classNames,
 }: {
   subject: LoadingSubject;
   lines: readonly string[];
   config: WrappedConfig;
   className?: string;
+  /**
+   * A class per part, by slot name: the player's own slots, so the frame and the controls look the same before the
+   * year arrives as after. The resting bar where the timeline will be takes `timeline` and `timeline-segment-bar`.
+   */
+  classNames?: SlotClassNames<WrappedPlayerSlot | TimelineSlot>;
 }) {
   const { boxRef, scale, style } = useStageFit(config.format, false);
   const labels = useLabels();
+  const slot = useSlots<WrappedPlayerSlot | TimelineSlot>(classNames);
   return (
-    <div className={cn("wr-root", shell, className)}>
-      <div ref={boxRef} className={room}>
-        <div className={frame} style={style}>
+    <div {...slot("player", "wr-root", shell, className)}>
+      <div ref={boxRef} {...slot("player-room", room)}>
+        <div {...slot("player-frame", frame)} style={style}>
           <LoadingStage subject={subject} lines={lines} config={config} scale={scale} />
         </div>
       </div>
-      <div aria-hidden className={cn(transport, "wr:opacity-40")}>
-        <span className={cn(control, "wr:bg-foreground wr:text-background")}>
+      <div aria-hidden {...slot("player-transport", transport, "wr:opacity-40")}>
+        <span {...slot("player-play", control, "wr:bg-foreground wr:text-background")}>
           <Play fill="currentColor" />
         </span>
-        <span className={cn(control, "wr:ring-1 wr:ring-border")}>
+        <span {...slot("player-restart", control, "wr:ring-1 wr:ring-border")}>
           <RotateCcw />
         </span>
-        <span className="wr:flex wr:h-11 wr:flex-1 wr:items-center">
-          <i className="wr:h-2 wr:w-full wr:rounded-full wr:bg-muted" />
+        <span {...slot("timeline", "wr:flex wr:h-11 wr:flex-1 wr:items-center")}>
+          <i {...slot("timeline-segment-bar", "wr:h-2 wr:w-full wr:rounded-full wr:bg-muted")} />
         </span>
-        <span className={clock}>{labels.player.clock("0:00", "0:00")}</span>
-        <span className={cn(control, "wr:ring-1 wr:ring-border")}>
+        <span {...slot("player-clock", clock)}>{labels.player.clock("0:00", "0:00")}</span>
+        <span {...slot("player-fullscreen", control, "wr:ring-1 wr:ring-border")}>
           <Maximize2 />
         </span>
       </div>
@@ -142,6 +169,7 @@ export function WrappedPlayer({
   editing,
   seed,
   className,
+  classNames,
   ref,
 }: {
   ref?: Ref<WrappedPlayerHandle>;
@@ -157,7 +185,13 @@ export function WrappedPlayer({
    */
   editing?: TimelineEditing & { scenes: readonly SceneInstance[] };
   className?: string;
+  /**
+   * A class per part, by slot name (`"player-play"`, `"timeline-segment-bar"`). Added after the library's own classes
+   * on that part. The timeline's slots are taken here too and handed on to it.
+   */
+  classNames?: SlotClassNames<WrappedPlayerSlot | TimelineSlot>;
 }) {
+  const slot = useSlots<WrappedPlayerSlot>(classNames);
   const rootRef = useRef<HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -198,7 +232,8 @@ export function WrappedPlayer({
   return (
     <div
       ref={rootRef}
-      className={cn(
+      {...slot(
+        "player",
         "wr-root",
         shell,
         // Full screen plays on a dark room whatever the site theme is.
@@ -206,7 +241,7 @@ export function WrappedPlayer({
         className,
       )}
     >
-      <div ref={boxRef} className={room}>
+      <div ref={boxRef} {...slot("player-room", room)}>
         {/* Taps on the frame are a shortcut for touch; the buttons below are the accessible controls. */}
         <div
           aria-hidden
@@ -217,7 +252,7 @@ export function WrappedPlayer({
             else if (x > 0.66) step(1);
             else toggle();
           }}
-          className={cn(frame, "wr:cursor-pointer")}
+          {...slot("player-frame", frame, "wr:cursor-pointer")}
           style={style}
         >
           <WrappedStage stageRef={stageRef} subject={subject} scenes={scenes} config={config} scale={scale} />
@@ -227,7 +262,7 @@ export function WrappedPlayer({
       <div
         role="toolbar"
         aria-label={labels.player.controls}
-        className={transport}
+        {...slot("player-transport", transport)}
         onKeyDown={(event) => {
           if (event.key === "ArrowRight") step(1);
           if (event.key === "ArrowLeft") step(-1);
@@ -238,7 +273,8 @@ export function WrappedPlayer({
           type="button"
           onClick={toggle}
           aria-label={playing ? labels.player.pause : labels.player.play}
-          className={cn(
+          {...slot(
+            "player-play",
             control,
             "wr:cursor-pointer wr:bg-foreground wr:text-background wr:transition-transform wr:hover:-translate-y-px",
           )}
@@ -249,7 +285,8 @@ export function WrappedPlayer({
           type="button"
           onClick={restart}
           aria-label={labels.player.restart}
-          className={cn(
+          {...slot(
+            "player-restart",
             control,
             "wr:cursor-pointer wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",
           )}
@@ -264,15 +301,17 @@ export function WrappedPlayer({
           config={config}
           editing={editing}
           onSeek={seekTime}
+          classNames={classNames}
         />
-        <span ref={clockRef} className={clock}>
+        <span ref={clockRef} {...slot("player-clock", clock)}>
           {labels.player.clock("0:00", "0:00")}
         </span>
         <button
           type="button"
           onClick={toggleFullscreen}
           aria-label={fullscreen ? labels.player.exitFullscreen : labels.player.fullscreen}
-          className={cn(
+          {...slot(
+            "player-fullscreen",
             control,
             "wr:cursor-pointer wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",
           )}

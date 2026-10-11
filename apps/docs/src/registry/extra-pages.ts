@@ -22,6 +22,11 @@ const PROVIDER_PROPS: PropDocs<Parameters<typeof WrappedProvider>[0]> = {
     'How the controls write numbers, such as `"pl-PL"`. Left out, it is the provider\'s above, or `"en-US"`.',
     "optional",
   ],
+  classNames: [
+    "SlotClassNames",
+    'A class per slot, such as `"player-play"`, for every part under the provider. See [styling](/docs/guides/styling/).',
+    "optional",
+  ],
   children: ["ReactNode", "Everything that should read its words from this provider.", "optional"],
 };
 
@@ -64,6 +69,7 @@ const labels: DocPage = {
         "**A sentence with a number in it is a function.** `scan.hiding` gets the count and returns the sentence, so a language with three plural forms can have all three.",
         "**Providers nest.** One around your app can set the language, and one around a single player can reword that player. The inner one is merged over the outer one.",
         "**No provider is fine.** Without one, every part reads the English defaults.",
+        "**It restyles too.** The same provider takes `classNames`, a class per part for everything under it. That is covered in [styling](/docs/guides/styling/).",
         "**Your scenes are yours.** The text you pass to a scene is never touched. Labels cover only the words the library adds itself.",
       ],
     },
@@ -98,6 +104,7 @@ const labels: DocPage = {
   ],
   related: [
     "/docs/guides/palette-and-chrome/",
+    "/docs/guides/styling/",
     "/docs/scanner/year-scan/",
     "/docs/player/wrapped-player/",
     "/docs/guides/from-parts/",
@@ -123,6 +130,11 @@ const SHARE_PROPS: PropDocs<Parameters<typeof ShareActions>[0]> = {
     "optional",
   ],
   className: ["string", "A class for the row's own box, for the card you put around it.", "optional"],
+  classNames: [
+    "SlotClassNames<ShareActionsSlot>",
+    'A class per part, by slot name: `"share-copy"`, `"share-download"`. See [styling](/docs/guides/styling/).',
+    "optional",
+  ],
 };
 
 const shareActions: DocPage = {

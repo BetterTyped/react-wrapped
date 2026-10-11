@@ -153,6 +153,24 @@ export const player = {
     }, seconds),
 };
 
+/* ---------- the library's stylesheet ---------- */
+
+/**
+ * The address of the library's stylesheet on the test server: the one the full example links whose rules style
+ * `.wr-stage`. Read from the built files, so a test that only needs the stylesheet does not have to open the
+ * example and play its video to find it.
+ */
+export function libraryStylesheetAddress(): string {
+  const html = builtFile("examples/full-wrapped/index.html");
+  const hrefs = [...html.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/g)].flatMap(([link]) => {
+    const href = /\bhref="([^"]+)"/.exec(link)?.[1];
+    return href?.startsWith(BASE) ? [href] : [];
+  });
+  const found = hrefs.find((href) => builtFile(href.slice(BASE.length)).includes(".wr-stage"));
+  if (!found) throw new Error(`None of the example's stylesheets has a .wr-stage rule: ${hrefs.join(", ")}`);
+  return found;
+}
+
 /* ---------- computed styles ---------- */
 
 /** The computed value of each named property of an element (the first one a locator finds). */

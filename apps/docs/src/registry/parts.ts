@@ -21,6 +21,7 @@ export const PART_IDS = [
   "marks",
   "own-colour",
   "own-chrome",
+  "own-style",
   "config-url",
   "labels",
   "share-actions",

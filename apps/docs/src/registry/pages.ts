@@ -11,6 +11,7 @@ import { type PropDocs, propsTable } from "./props";
 import { scannerPages } from "./scanner-pages";
 import { scenePages } from "./scene-pages";
 import { fileBlock } from "./shared";
+import { stylingPage } from "./styling-page";
 import { TRANSITIONS } from "./transitions";
 import type { WrappedView } from "@react-wrapped/kit";
 
@@ -499,6 +500,12 @@ const VIEW_PROPS: PropDocs<Extract<Parameters<typeof WrappedView>[0], { subject:
     "The [player's handle](/docs/player/wrapped-player/): play, pause, seek.",
     "optional",
   ],
+  className: ["string", "A class for the page's root.", "optional"],
+  classNames: [
+    "SlotClassNames<WrappedSlot>",
+    'A class per part, by slot name, for the page and everything on it: `"view-player-panel"`, `"player-play"`, `"settings-chip"`. See [styling](/docs/guides/styling/).',
+    "optional",
+  ],
   loading: [
     "undefined",
     "Not passed with a year. Pass it in place of the year and the view is the [loading page](/docs/player/loading/).",
@@ -603,7 +610,7 @@ export const SECTIONS: readonly Section[] = [
   { id: "scanner", title: "Scanner", pages: [...scannerPages, extraPages.scanGate] },
   { id: "graphics", title: "Graphics", pages: graphicsPages },
   { id: "marks", title: "Marks", pages: marksPages },
-  { id: "guides", title: "Guides", pages: [...guidePages, extraPages.labels] },
+  { id: "guides", title: "Guides", pages: [...guidePages, extraPages.labels, stylingPage] },
 ];
 
 export const PAGES: readonly DocPage[] = SECTIONS.flatMap((section) => section.pages);

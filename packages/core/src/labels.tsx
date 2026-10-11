@@ -1,6 +1,8 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 
+import { mergeSlotClassNames, SlotClassNamesContext } from "./internal/slot-context";
 import { type Rarity, RARITY_LABELS } from "./rarity";
+import type { SlotClassNames } from "./slots";
 
 /*
  * Every word the library puts on screen by itself: the player's buttons, the timeline, the scene editor, the settings,
@@ -220,28 +222,43 @@ const LabelsContext = createContext<WrappedLabels>(DEFAULT_LABELS);
 const LocaleContext = createContext<string>(DEFAULT_LOCALE);
 
 /**
- * Rewords or translates everything under it. `labels` holds only what changes and is laid over what the nearest
- * provider above already says, so a site can set its language once at the top and reword one button further down.
+ * Rewords, translates or restyles everything under it. `labels` holds only what changes and is laid over what the
+ * nearest provider above already says, so a site can set its language once at the top and reword one button further
+ * down. `classNames` works the same way for looks: a class per slot, for every part under the provider.
  *
- * Keep `labels` the same object between renders (a constant, or `useMemo`): a new one is a new table, and everything
- * that reads a label draws again.
+ * Keep `labels` and `classNames` the same objects between renders (constants, or `useMemo`): a new one is a new
+ * table, and everything that reads it draws again.
  */
 export function WrappedProvider({
   labels,
   locale,
+  classNames,
   children,
 }: {
   labels?: WrappedLabelOverrides;
   /** How the chrome writes numbers: "en-US", "pl-PL". Left out, it is the provider's above, or "en-US". */
   locale?: string;
+  /**
+   * A class per slot (`"player-play"`, `"settings-chip"`), for every part under this provider. It lands after the
+   * library's own classes and before the ones a component is given through its own `classNames`. A slot named here
+   * and by a provider above takes this one's class.
+   */
+  classNames?: SlotClassNames;
   children: ReactNode;
 }) {
   const inherited = useContext(LabelsContext);
   const inheritedLocale = useContext(LocaleContext);
+  const inheritedClassNames = useContext(SlotClassNamesContext);
   const merged = useMemo(() => mergeLabels(inherited, labels), [inherited, labels]);
+  const mergedClassNames = useMemo(
+    () => mergeSlotClassNames(inheritedClassNames, classNames),
+    [inheritedClassNames, classNames],
+  );
   return (
     <LocaleContext.Provider value={locale ?? inheritedLocale}>
-      <LabelsContext.Provider value={merged}>{children}</LabelsContext.Provider>
+      <LabelsContext.Provider value={merged}>
+        <SlotClassNamesContext.Provider value={mergedClassNames}>{children}</SlotClassNamesContext.Provider>
+      </LabelsContext.Provider>
     </LocaleContext.Provider>
   );
 }

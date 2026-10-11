@@ -106,6 +106,36 @@ specific than a single class and will reach the library's headings. Render a Wra
 When code comes in from the app this library was cut from, its utility classes have no prefix yet:
 `node scripts/prefix-classes.mjs packages/<name>/src --write` adds it (see `UPSTREAM.md`).
 
+## Slots: every part of the chrome has a name
+
+The tokens recolour the chrome. To change a shape, a size or a font on one part, a host needs to reach that part, so
+every element of the chrome somebody might restyle is a slot: it carries `data-wr-slot="player-play"`, and it takes a
+class for that name.
+
+- **In a component** an element becomes a slot by spreading `slot(...)` from `useSlots`
+  (`packages/core/src/internal/slots.ts`): `<button {...slot("player-play", control, "wr:bg-foreground")}>`. The first
+  argument is the name, the rest are the library's classes, joined the way `cn` joins them.
+- **From outside** a class arrives three ways, in this order on the element: `classNames` on `WrappedProvider` (for
+  everything under it), then the component's own `classNames`, both after the library's classes. And any stylesheet can
+  target `[data-wr-slot="player-play"]`.
+- **Names** are kebab-case and start with their component: `player-`, `timeline-`, `settings-`, `share-`, `editor-`,
+  `scan-`, `gallery-`, `view-`. Each component exports its list (`WRAPPED_PLAYER_SLOTS`) and the union made from it
+  (`WrappedPlayerSlot`). A component that renders another takes that one's slots too and hands them on, so `WrappedView`
+  takes all of them in one flat object.
+- **The shared pieces** in `core/src/internal` (chips, switch, dialog) have no names of their own. The component using
+  one says what it is called there: a chip is `settings-chip` in the settings and `editor-transition` in the editor.
+
+Three rules when you add or change an element:
+
+1. A new part gets a name in its component's list, and the docs' table for that component then fails the typecheck until
+   the name has a description (`apps/docs/src/registry/styling-page.ts`).
+2. Every name in a list must be rendered in some state. The `slots.test.tsx` next to each component checks it.
+3. A slot's name is public. Renaming one is a breaking change, like renaming a prop. The `data-*` attributes the code
+   itself reads (`data-seg`, `data-scan-grid`, `data-flyer-card`) are separate and stay as they are.
+
+With no `classNames` anywhere a component renders exactly the classes it always did. The stage has no slots: a scene's
+look is the palette's and the scene's own.
+
 ## The docs are generated from registries
 
 `apps/docs/src/registry` is the source of the docs site. `charts.ts` and `transitions.ts` are keyed by the library's own

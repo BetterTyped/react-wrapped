@@ -45,6 +45,12 @@ const SCAN_PROPS: PropDocs<Parameters<typeof YearScan>[0]> = {
     "A scan started, or came to rest: finished, stopped or skipped to its end.",
     "optional",
   ],
+  className: ["string", "A class for the panel.", "optional"],
+  classNames: [
+    "SlotClassNames<YearScanSlot>",
+    'A class per part, by slot name: `"scan-start"`, `"scan-card"`. See [styling](/docs/guides/styling/).',
+    "optional",
+  ],
 };
 
 const DROP_DOCS: PropDocs<HiddenDrop> = {

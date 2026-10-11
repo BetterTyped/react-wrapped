@@ -377,6 +377,30 @@ body {
 }
 ```
 
+### Restyle a part
+
+Every part of the controls is a slot with a name. It carries the name as `data-wr-slot`, and takes a class for it
+through `classNames`, on one component or on `WrappedProvider` for the whole page.
+
+```tsx
+<WrappedPlayer
+  {...video}
+  classNames={{
+    "player-play": "my-play-button",
+    "timeline-segment-bar": "my-bar",
+  }}
+/>
+```
+
+With Tailwind, import the stylesheet into a layer before utilities and your utilities win over the library's classes:
+
+```css
+@import "tailwindcss";
+@import "@react-wrapped/kit/styles.css" layer(components);
+```
+
+The [styling guide](https://bettertyped.github.io/react-wrapped/docs/guides/styling/) lists every slot.
+
 <p align="center">
 	<a href="https://github.com/sponsors/prc5?tier=Silver">
 		<picture>

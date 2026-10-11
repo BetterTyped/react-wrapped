@@ -52,6 +52,8 @@ try {
 
   const rendered = run("node", ["ssr.mjs"], project).trim();
   if (!rendered.includes("has stage: true")) throw new Error(`The server render came out wrong: ${rendered}`);
+  // A class given for a slot has to arrive on that part, through the packed packages too.
+  if (!rendered.includes("has a restyled slot: true")) throw new Error(`A slot's class did not land: ${rendered}`);
   console.log(`ok    ${rendered}`);
 } catch (error) {
   console.log(`FAIL\n${error.stdout ?? ""}${error.stderr ?? ""}${error.message ?? ""}`);

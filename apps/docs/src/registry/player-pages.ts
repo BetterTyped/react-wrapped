@@ -26,6 +26,8 @@ import type {
  * panel, the frame while a year loads, and the MP4. Every props table is keyed by the real props.
  */
 
+const STYLING = "See [styling](/docs/guides/styling/).";
+
 const INSTALL = code("bash", ["pnpm add @react-wrapped/player @react-wrapped/core gsap"]);
 const STYLES = code("tsx", [`import "@react-wrapped/core/styles.css";`, `import "@react-wrapped/player/styles.css";`]);
 
@@ -48,6 +50,11 @@ const PLAYER_PROPS: PropDocs<Parameters<typeof WrappedPlayer>[0]> = {
     "optional",
   ],
   className: ["string", "A class for the player's root, for sizing it in your layout.", "optional"],
+  classNames: [
+    "SlotClassNames<WrappedPlayerSlot | TimelineSlot>",
+    `A class per part, by slot name: \`"player-play"\`, \`"timeline-segment-bar"\`. ${STYLING}`,
+    "optional",
+  ],
 };
 
 const SUBJECT_PROPS: PropDocs<WrappedSubject> = {
@@ -103,6 +110,12 @@ const TIMELINE_PROPS: PropDocs<Parameters<typeof Timeline>[0]> = {
     "optional",
   ],
   onSeek: ["(seconds: number) => void", "Called while the viewer clicks or drags along the row."],
+  className: ["string", "A class for the timeline's root.", "optional"],
+  classNames: [
+    "SlotClassNames<TimelineSlot>",
+    `A class per part, by slot name: \`"timeline-segment-bar"\`, \`"timeline-preview"\`. ${STYLING}`,
+    "optional",
+  ],
 };
 
 const EDITING_DOCS: PropDocs<TimelineEditing & { scenes: readonly SceneInstance[] }> = {
@@ -126,6 +139,12 @@ const EDITOR_PROPS: PropDocs<Parameters<typeof SceneEditor>[0]> = {
     "The texts that differ from the original, by field name, and the picked transition.",
   ],
   onClose: ["() => void", "The dialog was closed, by saving or by leaving."],
+  className: ["string", "A class for the dialog itself.", "optional"],
+  classNames: [
+    "SlotClassNames<SceneEditorSlot>",
+    `A class per part, by slot name: \`"editor-input"\`, \`"editor-save"\`. ${STYLING}`,
+    "optional",
+  ],
 };
 
 const CUT_DOCS: PropDocs<SceneCut> = {
@@ -138,6 +157,11 @@ const CONFIGURATOR_PROPS: PropDocs<Parameters<typeof WrappedConfigurator>[0]> = 
   config: ["WrappedConfig", "What the panel shows as picked."],
   onChange: ["(next: WrappedConfig) => void", "Called with the whole next config on every change."],
   className: ["string", "A class for the panel's root.", "optional"],
+  classNames: [
+    "SlotClassNames<ConfiguratorSlot>",
+    `A class per part, by slot name: \`"settings-chip"\`, \`"settings-swatch"\`. ${STYLING}`,
+    "optional",
+  ],
 };
 
 const CONFIG_DOCS: PropDocs<WrappedConfig> = {
@@ -159,6 +183,11 @@ const LOADING_PROPS: PropDocs<Parameters<typeof WrappedPlayerLoading>[0]> = {
   lines: ["readonly string[]", "What to read meanwhile. More than one take turns, 2.6 seconds each."],
   config: ["WrappedConfig", "The frame takes the format and palette the video will have."],
   className: ["string", "A class for the root, the same one you give the player.", "optional"],
+  classNames: [
+    "SlotClassNames<WrappedPlayerSlot | TimelineSlot>",
+    `The same object you give the player, so the frame and the controls look the same before the year as after. ${STYLING}`,
+    "optional",
+  ],
 };
 
 const LOADING_SUBJECT: PropDocs<LoadingSubject> = {

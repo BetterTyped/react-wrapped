@@ -2,11 +2,44 @@ import { type RefObject, useEffect, useRef, useState } from "react";
 
 import { frameTimes, renderVideo, VIDEO_FPS } from "./export-video";
 import type { WrappedPlayerHandle } from "./wrapped-player";
-import { useLabels, useLocale, WRAPPED_FORMATS, type WrappedConfig, type WrappedLabels } from "@react-wrapped/core";
-import { Check, cn, Download, Link2, Square, useCopied } from "@react-wrapped/core/internal";
+import {
+  type SlotClassNames,
+  useLabels,
+  useLocale,
+  WRAPPED_FORMATS,
+  type WrappedConfig,
+  type WrappedLabels,
+} from "@react-wrapped/core";
+import { Check, Download, Link2, type SlotProps, Square, useCopied, useSlots } from "@react-wrapped/core/internal";
+
+/** Every part of the share row a class can be given to, by its `data-wr-slot`. */
+export const SHARE_ACTIONS_SLOTS = [
+  // The root: the row's own box.
+  "share",
+  "share-copy",
+  "share-download",
+  // What the download button turns into while the file is made: it counts up, and stops the file when pressed.
+  "share-stop",
+  // The line under the buttons that says what is being made and how long is left.
+  "share-progress",
+  // The line under the buttons that says why a file could not be made.
+  "share-problem",
+] as const;
+
+export type ShareActionsSlot = (typeof SHARE_ACTIONS_SLOTS)[number];
 
 const pill =
   "wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:justify-center wr:gap-2 wr:rounded-full wr:px-5 wr:text-[15px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px wr:disabled:pointer-events-none wr:disabled:opacity-50 wr:[&_svg]:size-4";
+
+/**
+ * A pill button's classes as they have always been written out, with the slot's classes after them. The list is
+ * joined and not merged on purpose: each button names a second horizontal padding after the pill's own, and merging
+ * would drop the pill's, which is the one the stylesheet lets win today. The buttons would get narrower.
+ */
+const pillSlot = (slot: SlotProps, classes: string): SlotProps => ({
+  ...slot,
+  className: slot.className ? `${classes} ${slot.className}` : classes,
+});
 
 /** "About 40s left.", "About 2 min left." Rounded, so the line does not tick like a stopwatch. */
 function timeLeft(seconds: number, labels: WrappedLabels): string {
@@ -25,6 +58,7 @@ export function ShareActions({
   onRendering,
   onError,
   className,
+  classNames,
 }: {
   player: RefObject<WrappedPlayerHandle | null>;
   config: WrappedConfig;
@@ -35,7 +69,10 @@ export function ShareActions({
   onError?: (message: string) => void;
   /** Classes for the row's own box: a card around it, where the page wants one. */
   className?: string;
+  /** A class per part, by slot name (`"share-copy"`). Added after the library's own classes on that part. */
+  classNames?: SlotClassNames<ShareActionsSlot>;
 }) {
+  const slot = useSlots<ShareActionsSlot>(classNames);
   const labels = useLabels();
   const locale = useLocale();
   const [linkCopied, copyLink] = useCopied();
@@ -92,17 +129,21 @@ export function ShareActions({
   };
 
   return (
-    <div className={cn("wr-root wr:grid wr:grid-cols-2 wr:gap-2", className)}>
+    <div {...slot("share", "wr-root wr:grid wr:grid-cols-2 wr:gap-2", className)}>
       <button
         type="button"
         onClick={() => copyLink(window.location.href)}
-        className={`${pill} wr:bg-foreground wr:px-3 wr:text-background`}
+        {...pillSlot(slot("share-copy"), `${pill} wr:bg-foreground wr:px-3 wr:text-background`)}
       >
         {linkCopied ? <Check /> : <Link2 />}
         {linkCopied ? labels.share.copied : labels.share.copyLink}
       </button>
       {percent === null ? (
-        <button type="button" onClick={() => void download()} className={`${pill} wr:px-3 wr:ring-1 wr:ring-border`}>
+        <button
+          type="button"
+          onClick={() => void download()}
+          {...pillSlot(slot("share-download"), `${pill} wr:px-3 wr:ring-1 wr:ring-border`)}
+        >
           <Download />
           {labels.share.download}
         </button>
@@ -112,7 +153,7 @@ export function ShareActions({
           onClick={() => stopRef.current?.abort()}
           aria-label={labels.share.stopMaking(percent)}
           title={labels.share.stop}
-          className={`${pill} wr:px-3 wr:tabular-nums wr:ring-1 wr:ring-border`}
+          {...pillSlot(slot("share-stop"), `${pill} wr:px-3 wr:tabular-nums wr:ring-1 wr:ring-border`)}
         >
           <Square fill="currentColor" />
           {labels.share.percent(percent)}
@@ -120,7 +161,12 @@ export function ShareActions({
       )}
       {/* Why it is not instant: the file is not a screen recording, every frame is drawn for it. */}
       {making ? (
-        <p className="wr:col-span-2 wr:px-1 wr:pt-1 wr:text-[13px] wr:leading-[1.45] wr:text-muted-foreground wr:tabular-nums">
+        <p
+          {...slot(
+            "share-progress",
+            "wr:col-span-2 wr:px-1 wr:pt-1 wr:text-[13px] wr:leading-[1.45] wr:text-muted-foreground wr:tabular-nums",
+          )}
+        >
           {labels.share.drawing(
             making.frames.toLocaleString(locale),
             making.left === null ? null : timeLeft(making.left, labels),
@@ -130,7 +176,10 @@ export function ShareActions({
       {problem ? (
         <p
           role="alert"
-          className="wr:col-span-2 wr:px-1 wr:pt-1 wr:text-[13px] wr:leading-[1.45] wr:text-muted-foreground"
+          {...slot(
+            "share-problem",
+            "wr:col-span-2 wr:px-1 wr:pt-1 wr:text-[13px] wr:leading-[1.45] wr:text-muted-foreground",
+          )}
         >
           {problem}
         </p>

@@ -5,6 +5,7 @@ import {
   CUSTOM_PALETTE,
   isPresetPalette,
   randomAccent,
+  type SlotClassNames,
   themePalette,
   useLabels,
   WRAPPED_FORMATS,
@@ -12,17 +13,59 @@ import {
   WRAPPED_SPEEDS,
   type WrappedConfig,
 } from "@react-wrapped/core";
-import { Chips, cn, Dices, Switch } from "@react-wrapped/core/internal";
+import { Chips, Dices, type Slots, Switch, useSlots } from "@react-wrapped/core/internal";
+
+/** Every part of the settings panel a class can be given to, by its `data-wr-slot`. */
+export const CONFIGURATOR_SLOTS = [
+  // The root.
+  "settings",
+  // One setting: its name and what there is to pick.
+  "settings-field",
+  "settings-label",
+  // The grid of palettes, and one palette in it.
+  "settings-palette",
+  "settings-swatch",
+  // The palette's colours on its swatch, and one of them.
+  "settings-swatch-colors",
+  "settings-swatch-color",
+  "settings-swatch-name",
+  // The row under the palettes for a colour of your own: the colour input and the random button.
+  "settings-accent",
+  "settings-accent-input",
+  "settings-accent-random",
+  // A row of choices, and one choice in it.
+  "settings-chips",
+  "settings-chip",
+  // The line above the switches.
+  "settings-divider",
+  // A setting that is on or off: its row, its name, the switch and the dot that slides in it.
+  "settings-switch-row",
+  "settings-switch-label",
+  "settings-switch",
+  "settings-switch-thumb",
+] as const;
+
+export type ConfiguratorSlot = (typeof CONFIGURATOR_SLOTS)[number];
 
 const RAINBOW = ["#ff4d6d", "#ffb703", "#3ddc84", "#3a86ff", "#b15cff"] as const;
 
 /** The cell shapes in the order the picker offers them. */
 const SHAPES: readonly CellShape[] = ["round", "square", "circle"];
 
-function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  slot,
+  children,
+}: {
+  label: string;
+  htmlFor?: string;
+  slot: Slots<ConfiguratorSlot>;
+  children: ReactNode;
+}) {
   return (
-    <div className="wr:flex wr:flex-col wr:gap-2.5">
-      <label htmlFor={htmlFor} className="wr:text-[14px] wr:font-semibold wr:tracking-[-0.01em]">
+    <div {...slot("settings-field", "wr:flex wr:flex-col wr:gap-2.5")}>
+      <label htmlFor={htmlFor} {...slot("settings-label", "wr:text-[14px] wr:font-semibold wr:tracking-[-0.01em]")}>
         {label}
       </label>
       {children}
@@ -38,11 +81,16 @@ export function WrappedConfigurator({
   config,
   onChange,
   className,
+  classNames,
 }: {
   config: WrappedConfig;
   onChange: (next: WrappedConfig) => void;
   className?: string;
+  /** A class per part, by slot name (`"settings-chip"`). Added after the library's own classes on that part. */
+  classNames?: SlotClassNames<ConfiguratorSlot>;
 }) {
+  const slot = useSlots<ConfiguratorSlot>(classNames);
+  const chips = { group: slot("settings-chips"), chip: slot("settings-chip") };
   const accentId = useId();
   const grainId = useId();
   const labels = useLabels();
@@ -63,9 +111,13 @@ export function WrappedConfigurator({
   ];
 
   return (
-    <div className={cn("wr-root wr:flex wr:flex-col wr:gap-6", className)}>
-      <Field label={labels.settings.colors}>
-        <div role="radiogroup" aria-label={labels.settings.palette} className="wr:grid wr:grid-cols-3 wr:gap-2">
+    <div {...slot("settings", "wr-root wr:flex wr:flex-col wr:gap-6", className)}>
+      <Field label={labels.settings.colors} slot={slot}>
+        <div
+          role="radiogroup"
+          aria-label={labels.settings.palette}
+          {...slot("settings-palette", "wr:grid wr:grid-cols-3 wr:gap-2")}
+        >
           {palettes.map((palette) => (
             <button
               key={palette.id}
@@ -73,36 +125,51 @@ export function WrappedConfigurator({
               role="radio"
               aria-checked={config.palette === palette.id}
               onClick={() => set("palette", palette.id)}
-              className="wr:flex wr:cursor-pointer wr:flex-col wr:gap-1.5 wr:rounded-2xl wr:bg-card wr:p-2 wr:text-left wr:ring-1 wr:ring-border wr:aria-checked:ring-2 wr:aria-checked:ring-foreground"
+              {...slot(
+                "settings-swatch",
+                "wr:flex wr:cursor-pointer wr:flex-col wr:gap-1.5 wr:rounded-2xl wr:bg-card wr:p-2 wr:text-left wr:ring-1 wr:ring-border wr:aria-checked:ring-2 wr:aria-checked:ring-foreground",
+              )}
             >
               <span
-                className="wr:grid wr:grid-cols-5 wr:gap-[2px] wr:rounded-[9px] wr:p-1.5"
+                {...slot("settings-swatch-colors", "wr:grid wr:grid-cols-5 wr:gap-[2px] wr:rounded-[9px] wr:p-1.5")}
                 style={{ background: palette.bg }}
               >
                 {palette.levels.map((color) => (
-                  <i key={color} className="wr:aspect-square wr:rounded-[2px]" style={{ background: color }} />
+                  <i
+                    key={color}
+                    {...slot("settings-swatch-color", "wr:aspect-square wr:rounded-[2px]")}
+                    style={{ background: color }}
+                  />
                 ))}
               </span>
-              <span className="wr:truncate wr:text-[12.5px] wr:font-semibold">{palette.label}</span>
+              <span {...slot("settings-swatch-name", "wr:truncate wr:text-[12.5px] wr:font-semibold")}>
+                {palette.label}
+              </span>
             </button>
           ))}
         </div>
         {config.palette === CUSTOM_PALETTE ? (
-          <div className="wr:flex wr:items-center wr:gap-3">
+          <div {...slot("settings-accent", "wr:flex wr:items-center wr:gap-3")}>
             <input
               id={accentId}
               type="color"
               value={config.accent}
               aria-label={labels.settings.accent}
               onChange={(event) => set("accent", event.target.value)}
-              className="wr:h-10 wr:w-13 wr:cursor-pointer wr:rounded-xl wr:border wr:border-border wr:bg-card wr:p-1"
+              {...slot(
+                "settings-accent-input",
+                "wr:h-10 wr:w-13 wr:cursor-pointer wr:rounded-xl wr:border wr:border-border wr:bg-card wr:p-1",
+              )}
             />
             <button
               type="button"
               onClick={() => set("accent", randomAccent())}
               aria-label={labels.settings.randomAccent}
               title={labels.settings.randomAccentHint}
-              className="wr:grid wr:size-10 wr:shrink-0 wr:cursor-pointer wr:place-items-center wr:rounded-xl wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px"
+              {...slot(
+                "settings-accent-random",
+                "wr:grid wr:size-10 wr:shrink-0 wr:cursor-pointer wr:place-items-center wr:rounded-xl wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",
+              )}
             >
               <Dices className="wr:size-4" />
             </button>
@@ -116,10 +183,11 @@ export function WrappedConfigurator({
             { value: "light", label: labels.settings.light },
           ]}
           onChange={(mode) => set("mode", mode)}
+          slots={chips}
         />
       </Field>
 
-      <Field label={labels.settings.format}>
+      <Field label={labels.settings.format} slot={slot}>
         <Chips
           label={labels.settings.format}
           value={config.format}
@@ -128,32 +196,43 @@ export function WrappedConfigurator({
             label: labels.formats[value] ?? format.label,
           }))}
           onChange={(format) => set("format", format)}
+          slots={chips}
         />
       </Field>
 
-      <Field label={labels.settings.cells}>
+      <Field label={labels.settings.cells} slot={slot}>
         <Chips
           label={labels.settings.cellShape}
           value={config.shape}
           options={SHAPES.map((value) => ({ value, label: labels.settings.shapes[value] }))}
           onChange={(shape) => set("shape", shape)}
+          slots={chips}
         />
       </Field>
 
-      <Field label={labels.settings.speed}>
+      <Field label={labels.settings.speed} slot={slot}>
         <Chips
           label={labels.settings.speed}
           value={config.speed}
           options={WRAPPED_SPEEDS.map((speed) => ({ value: speed, label: labels.settings.speedValue(speed) }))}
           onChange={(speed) => set("speed", speed)}
+          slots={chips}
         />
       </Field>
 
-      <div className="wr:h-px wr:bg-border" />
+      <div {...slot("settings-divider", "wr:h-px wr:bg-border")} />
 
-      <div className="wr:flex wr:items-center wr:justify-between wr:gap-3 wr:text-[14px]">
-        <label htmlFor={grainId}>{labels.settings.grain}</label>
-        <Switch id={grainId} checked={config.grain} onCheckedChange={(grain) => set("grain", grain)} />
+      <div {...slot("settings-switch-row", "wr:flex wr:items-center wr:justify-between wr:gap-3 wr:text-[14px]")}>
+        <label htmlFor={grainId} {...slot("settings-switch-label")}>
+          {labels.settings.grain}
+        </label>
+        <Switch
+          id={grainId}
+          checked={config.grain}
+          onCheckedChange={(grain) => set("grain", grain)}
+          {...slot("settings-switch")}
+          thumb={slot("settings-switch-thumb")}
+        />
       </div>
     </div>
   );
