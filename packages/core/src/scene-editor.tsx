@@ -119,7 +119,7 @@ function SceneEditorForm({
                   maxLength={240}
                   value={values[field.name] ?? ""}
                   onChange={(event) => setValues({ ...values, [field.name]: event.target.value })}
-                  className={cn("w-full resize-y outline-none", modalInputClassName)}
+                  className={cn("wr:w-full wr:resize-y wr:outline-none", modalInputClassName)}
                 />
               ) : (
                 <input
@@ -127,7 +127,7 @@ function SceneEditorForm({
                   maxLength={240}
                   value={values[field.name] ?? ""}
                   onChange={(event) => setValues({ ...values, [field.name]: event.target.value })}
-                  className={cn("w-full outline-none", modalInputClassName)}
+                  className={cn("wr:w-full wr:outline-none", modalInputClassName)}
                 />
               )}
             </ModalField>
@@ -135,9 +135,9 @@ function SceneEditorForm({
         })}
         {cut && style ? (
           <ModalField label="Transition to the next scene">
-            <div className={cn("flex flex-col items-start gap-4", !wide && "sm:flex-row")}>
+            <div className={cn("wr:flex wr:flex-col wr:items-start wr:gap-4", !wide && "wr:sm:flex-row")}>
               {/* The video is behind the modal, so the pick plays here: this scene handing over to the next one. */}
-              <div className="shrink-0 rounded-[12px] ring-1 ring-border">
+              <div className="wr:shrink-0 wr:rounded-[12px] wr:ring-1 wr:ring-border">
                 <CutPreview
                   style={style}
                   first={scene}

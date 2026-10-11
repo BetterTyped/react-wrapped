@@ -1,11 +1,10 @@
 import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
 
-/**
- * Joins class names. Temporary: it still merges Tailwind utilities, because the player, the editor and the
- * scanner carry the classes they were written with. It goes away with those classes, when the chrome moves to
- * the library's own stylesheet.
- */
+/** The chrome's utility classes all carry the library's prefix (see chrome.css). */
+const merge = extendTailwindMerge({ prefix: "wr" });
+
+/** Joins class names, a later utility winning over an earlier one it contradicts. */
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return merge(clsx(inputs));
 }

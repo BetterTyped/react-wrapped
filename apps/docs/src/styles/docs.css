@@ -48,7 +48,28 @@
   --d-code: oklch(0.15 0.008 260);
 }
 
+/* The site's own small reset. The library does not lean on it: it resets its own roots (see its reset.css). */
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+:where(h1, h2, h3, h4, p, ul, ol, dl, dd, figure, pre) {
+  margin: 0;
+}
+:where(ul, ol) {
+  padding: 0;
+}
+:where(button, input) {
+  font: inherit;
+  color: inherit;
+}
+:where(svg, img) {
+  display: block;
+}
+
 html {
+  line-height: 1.5;
   scroll-padding-top: calc(var(--d-bar) + 24px);
   -webkit-text-size-adjust: 100%;
 }
@@ -356,15 +377,24 @@ body {
   color: var(--d-ink);
 }
 
-:where(.d-article, .d-plain, .d-hero, .d-band) :where(h1, h2, h3) {
+/*
+ * Headings, paragraphs and links are styled as direct children of the site's own containers, never as "anything
+ * inside": a live preview sits inside these containers too, and a rule that reached into it would restyle the
+ * library's own headings.
+ */
+.d-article > :where(h1, h2, h3),
+.d-plain > :where(h1, h2),
+.d-hero-copy > h1,
+.d-band > h2,
+.d-split > div > h2 {
   margin: 0;
   font-weight: 600;
   letter-spacing: -0.04em;
   line-height: 1.05;
   text-wrap: balance;
 }
-.d-article h1,
-.d-plain h1 {
+.d-article > h1,
+.d-plain > h1 {
   font-size: clamp(2.25rem, 4.2vw, 3.25rem);
 }
 .d-lead {
@@ -374,42 +404,44 @@ body {
   line-height: 1.55;
   text-wrap: pretty;
 }
-.d-article h2 {
+.d-article > h2 {
   margin-top: 56px;
   font-size: clamp(1.5rem, 2.2vw, 1.875rem);
   letter-spacing: -0.035em;
 }
-.d-article h2 a:hover::after {
+.d-article > h2 a:hover::after {
   content: " #";
   color: var(--d-faint);
 }
-.d-article h3 {
+.d-article > h3 {
   margin-top: 32px;
   font-size: 1.1875rem;
   letter-spacing: -0.02em;
 }
-.d-article :where(p, ul, ol, dl) {
+.d-article > :where(p, ul, ol, dl) {
   margin: 16px 0 0;
   text-wrap: pretty;
 }
-.d-article :where(ul, ol):not([class]) {
+.d-article > :where(ul, ol):not([class]) {
   padding-left: 1.2em;
 }
-.d-article :where(ul, ol):not([class]) li + li,
+.d-article > :where(ul, ol):not([class]) > li + li,
 .d-steps li + li {
   margin-top: 6px;
 }
-.d-article :where(p, li, td, dd, aside) a {
+.d-article > :where(p, ul, ol, dl, aside, .d-table) a {
   color: var(--d-brand-ink);
   font-weight: 550;
   text-decoration: underline;
   text-decoration-color: color-mix(in oklch, currentColor 35%, transparent);
   text-underline-offset: 3px;
 }
-.d-article :where(p, li, td, dd, aside) a:hover {
+.d-article > :where(p, ul, ol, dl, aside, .d-table) a:hover {
   text-decoration-color: currentColor;
 }
-:where(.d-article, .d-plain, .d-band, .d-hero) :not(pre) > code {
+.d-article > :where(p, ul, ol, dl, aside, .d-table) code,
+.d-plain > p code,
+.d-split > div code {
   padding: 0.14em 0.4em;
   border-radius: 7px;
   background: var(--d-sunk);
@@ -774,11 +806,11 @@ main:has(> .d-plain, > .d-hero) {
 .d-plain > p {
   max-width: 62ch;
 }
-.d-plain h2 {
+.d-plain > h2 {
   margin-top: 64px;
   font-size: clamp(1.5rem, 2.2vw, 2rem);
 }
-.d-plain h2 small {
+.d-plain > h2 small {
   color: var(--d-faint);
   font-size: 1em;
   font-weight: 600;
@@ -792,12 +824,13 @@ main:has(> .d-plain, > .d-hero) {
 }
 
 .d-example {
-  margin-top: 28px;
+  max-width: 1400px;
+  margin: 12px auto 0;
 }
-.d-plain > .d-example + p {
-  margin-top: 28px;
+main:has(> .d-example) > .d-plain:last-child {
+  margin-top: 12px;
 }
-.d-plain :where(p) a {
+.d-plain > p a {
   color: var(--d-brand-ink);
   font-weight: 550;
   text-decoration: underline;
@@ -822,12 +855,12 @@ main:has(> .d-plain, > .d-hero) {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.d-hero h1 {
+.d-hero-copy > h1 {
   font-size: clamp(2.5rem, 5.6vw, 4.75rem);
   letter-spacing: -0.055em;
   line-height: 0.98;
 }
-.d-hero h1 em {
+.d-hero-copy > h1 em {
   color: var(--d-brand);
   font-style: normal;
 }
@@ -860,11 +893,12 @@ main:has(> .d-plain, > .d-hero) {
   box-shadow: 0 40px 80px -40px oklch(0.15 0.02 60 / 0.6);
 }
 
-.d-band h2 {
+.d-band > h2,
+.d-split > div > h2 {
   font-size: clamp(1.75rem, 3vw, 2.5rem);
 }
 .d-band > p,
-.d-split p {
+.d-split > div > p {
   max-width: 60ch;
   margin: 14px 0 0;
   color: var(--d-dim);

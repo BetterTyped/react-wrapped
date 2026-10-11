@@ -84,7 +84,7 @@ function legendLoops(flight: HTMLElement): gsap.core.Animation[] {
 /** Pixel art outside the video: drawn with inline colours, so it needs no stage around it. */
 export function PixelGlyph({ art, colour, cell = 11 }: { art: PixelArt; colour: string; cell?: number }) {
   return (
-    <span className="grid grid-cols-9" style={{ gap: Math.max(1, Math.round(cell / 4)) }}>
+    <span className="wr:grid wr:grid-cols-9" style={{ gap: Math.max(1, Math.round(cell / 4)) }}>
       {art
         .join("")
         .split("")
@@ -92,7 +92,7 @@ export function PixelGlyph({ art, colour, cell = 11 }: { art: PixelArt; colour: 
           <i
             // oxlint-disable-next-line react/no-array-index-key -- a fixed 9x9 grid
             key={index}
-            className="rounded-[2px]"
+            className="wr:rounded-[2px]"
             style={{
               width: cell,
               height: cell,
@@ -919,10 +919,10 @@ export function YearScan({
         )
       }
       disabled={peek !== null}
-      className="inline-flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full px-6 text-[15px] font-semibold transition-transform hover:-translate-y-px"
+      className="wr:inline-flex wr:h-11 wr:shrink-0 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-6 wr:text-[15px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px"
       style={{ background: palette.levels[4], color: palette.bg }}
     >
-      <ScanLine className="size-4" />
+      <ScanLine className="wr:size-4" />
       {found.length > 0 ? "Keep scanning" : gate ? "Find my scenes" : "Scan my year"}
     </button>
   );
@@ -932,9 +932,9 @@ export function YearScan({
         <button
           type="button"
           onClick={findAll}
-          className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full px-4 text-[14px] font-semibold ring-1 ring-current/25"
+          className="wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-4 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25"
         >
-          <FastForward className="size-4" />
+          <FastForward className="wr:size-4" />
           Find all
         </button>
       ) : null;
@@ -949,9 +949,9 @@ export function YearScan({
           )
         }
         disabled={peek !== null}
-        className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full px-5 text-[14px] font-semibold ring-1 ring-current/25 transition-transform hover:-translate-y-px"
+        className="wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-5 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25 wr:transition-transform wr:hover:-translate-y-px"
       >
-        <RotateCcw className="size-4" />
+        <RotateCcw className="wr:size-4" />
         Scan again
       </button>
     );
@@ -978,45 +978,47 @@ export function YearScan({
       data-scan-gate={gate ? "" : undefined}
       // As the page, the panel fills the box the video is about to take and sets its year in the middle of it.
       className={cn(
-        "relative overflow-hidden rounded-[28px] p-4 md:p-6",
-        gate && "flex h-full flex-col justify-center md:p-10",
+        "wr-root wr:relative wr:overflow-hidden wr:rounded-[28px] wr:p-4 wr:md:p-6",
+        gate && "wr:flex wr:h-full wr:flex-col wr:justify-center wr:md:p-10",
       )}
       style={{ background: palette.bg, color: palette.fg } as CSSProperties}
     >
       <div
         data-scan-flash
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0"
+        className="wr:pointer-events-none wr:absolute wr:inset-0 wr:opacity-0"
         style={{ background: `radial-gradient(circle at 50% 60%, ${tone}, transparent 70%)` }}
       />
-      <div className="relative z-10 mb-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="min-w-0">
+      <div className="wr:relative wr:z-10 wr:mb-5 wr:flex wr:flex-wrap wr:items-center wr:justify-between wr:gap-4">
+        <div className="wr:min-w-0">
           <p
             className={cn(
-              "font-semibold leading-tight tracking-[-0.03em]",
-              gate ? "text-[clamp(1.75rem,3vw,2.75rem)] tracking-[-0.04em]" : "text-[clamp(1.25rem,1.8vw,1.625rem)]",
+              "wr:font-semibold wr:leading-tight wr:tracking-[-0.03em]",
+              gate
+                ? "wr:text-[clamp(1.75rem,3vw,2.75rem)] wr:tracking-[-0.04em]"
+                : "wr:text-[clamp(1.25rem,1.8vw,1.625rem)]",
             )}
           >
             {headline}
           </p>
           <p
-            className={cn("mt-1", gate ? "text-[16px] md:mt-2 md:text-[17px]" : "text-[14.5px]")}
+            className={cn("wr:mt-1", gate ? "wr:text-[16px] wr:md:mt-2 wr:md:text-[17px]" : "wr:text-[14.5px]")}
             style={{ color: palette.muted }}
           >
             {subline}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="wr:flex wr:flex-wrap wr:items-center wr:gap-2">
           {gate ? null : actions}
           {button}
         </div>
       </div>
 
-      <div className="relative">
+      <div className="wr:relative">
         <div
           data-scan-grid
           data-veiled={veiled ? "" : undefined}
-          className="relative grid grid-flow-col gap-[3px]"
+          className="wr:relative wr:grid wr:grid-flow-col wr:gap-[3px]"
           style={
             {
               gridTemplateRows: "repeat(7, auto)",
@@ -1033,7 +1035,7 @@ export function YearScan({
                 <i
                   key={slot}
                   data-cell
-                  className="aspect-square rounded-[22%]"
+                  className="wr:aspect-square wr:rounded-[22%]"
                   style={{ background: palette.levels[0] }}
                 />
               );
@@ -1045,7 +1047,7 @@ export function YearScan({
                 key={slot}
                 data-cell
                 data-day={day}
-                className="relative aspect-square rounded-[22%] transition-[background-color] duration-200 in-data-veiled:not-data-lit:bg-(--blank)! data-hit:z-10 data-hit:shadow-[0_0_0_2px_var(--hit),0_0_18px_3px_var(--hit)]"
+                className="wr:relative wr:aspect-square wr:rounded-[22%] wr:transition-[background-color] wr:duration-200 wr:in-data-veiled:not-data-lit:bg-(--blank)! wr:data-hit:z-10 wr:data-hit:shadow-[0_0_0_2px_var(--hit),0_0_18px_3px_var(--hit)]"
                 data-found={marker ? "" : undefined}
                 style={
                   {
@@ -1067,7 +1069,7 @@ export function YearScan({
                     onClick={() => setPeek({ id: Date.now(), drop: marker.id, from: "tile" })}
                     aria-label={`Open ${marker.name}`}
                     title={marker.name}
-                    className="absolute inset-0 cursor-pointer rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-white/70 disabled:cursor-default"
+                    className="wr:absolute wr:inset-0 wr:cursor-pointer wr:rounded-[inherit] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70 wr:disabled:cursor-default"
                   />
                 ) : null}
               </i>
@@ -1076,7 +1078,7 @@ export function YearScan({
           <i
             data-scan-band
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 rounded-full opacity-0"
+            className="wr:pointer-events-none wr:absolute wr:inset-x-0 wr:rounded-full wr:opacity-0"
             style={{
               background: `linear-gradient(90deg, transparent, color-mix(in oklch, ${tone} 30%, transparent) 50%, transparent)`,
             }}
@@ -1084,40 +1086,44 @@ export function YearScan({
           <i
             data-scan-reticle
             aria-hidden
-            className="pointer-events-none absolute z-20 size-7 -translate-x-1/2 -translate-y-1/2 rounded-[7px] opacity-0"
+            className="wr:pointer-events-none wr:absolute wr:z-20 wr:size-7 wr:-translate-x-1/2 wr:-translate-y-1/2 wr:rounded-[7px] wr:opacity-0"
             style={{ boxShadow: `0 0 0 2px ${tone}` }}
           />
           <i
             data-scan-ring
             aria-hidden
-            className="pointer-events-none absolute z-20 size-40 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0"
+            className="wr:pointer-events-none wr:absolute wr:z-20 wr:size-40 wr:-translate-x-1/2 wr:-translate-y-1/2 wr:rounded-full wr:opacity-0"
           />
-          <span aria-hidden data-scan-crack className="pointer-events-none absolute inset-0 z-20">
+          <span aria-hidden data-scan-crack className="wr:pointer-events-none wr:absolute wr:inset-0 wr:z-20">
             {Array.from({ length: CRACK }, (_unused, index) => (
               <i
                 // oxlint-disable-next-line react/no-array-index-key -- particles are positional
                 key={index}
-                className="absolute -m-1 size-2 rounded-[2px] opacity-0"
+                className="wr:absolute wr:-m-1 wr:size-2 wr:rounded-[2px] wr:opacity-0"
                 style={{ background: tone }}
               />
             ))}
           </span>
         </div>
-        <span data-scan-beam aria-hidden className="pointer-events-none absolute -inset-y-2 left-0 w-0 opacity-0">
+        <span
+          data-scan-beam
+          aria-hidden
+          className="wr:pointer-events-none wr:absolute wr:-inset-y-2 wr:left-0 wr:w-0 wr:opacity-0"
+        >
           <i
-            className="absolute inset-y-0 -left-5 w-10"
+            className="wr:absolute wr:inset-y-0 wr:-left-5 wr:w-10"
             style={{
               background: `linear-gradient(90deg, transparent, color-mix(in oklch, ${palette.levels[4]} 22%, transparent) 50%, transparent)`,
             }}
           />
           <i
-            className="absolute inset-y-0 -left-px w-0.5 rounded-full"
+            className="wr:absolute wr:inset-y-0 wr:-left-px wr:w-0.5 wr:rounded-full"
             style={{ background: palette.fg, boxShadow: `0 0 10px 1px ${palette.levels[4]}` }}
           />
         </span>
       </div>
 
-      <ul className="mt-5 flex flex-wrap gap-2" aria-label="Your finds">
+      <ul className="wr:mt-5 wr:flex wr:flex-wrap wr:gap-2" aria-label="Your finds">
         {drops.map((drop) => {
           const spot = found.includes(drop.id) && !veiled ? spots[drop.id] : undefined;
           const colour = palette.rarity[drop.rarity];
@@ -1125,13 +1131,13 @@ export function YearScan({
             <li key={drop.id}>
               {spot === undefined ? (
                 <span
-                  className="flex items-center gap-2.5 rounded-[14px] py-1.5 pr-3.5 pl-1.5"
+                  className="wr:flex wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5"
                   style={{ background: palette.card, color: palette.muted }}
                 >
-                  <span className="rounded-[9px] p-1.5" style={{ background: palette.bg }}>
+                  <span className="wr:rounded-[9px] wr:p-1.5" style={{ background: palette.bg }}>
                     <PixelGlyph art={PIXEL_ART.question} colour={palette.muted} cell={3} />
                   </span>
-                  <span className="text-[13px] font-semibold">Still hidden</span>
+                  <span className="wr:text-[13px] wr:font-semibold">Still hidden</span>
                 </span>
               ) : (
                 <button
@@ -1140,21 +1146,21 @@ export function YearScan({
                   disabled={run !== null}
                   onClick={() => setPeek({ id: Date.now(), drop: drop.id, from: "badge" })}
                   title="Open this card"
-                  className="flex cursor-pointer items-center gap-2.5 rounded-[14px] py-1.5 pr-3.5 pl-1.5 text-left transition-transform hover:-translate-y-px disabled:cursor-default"
+                  className="wr:flex wr:cursor-pointer wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5 wr:text-left wr:transition-transform wr:hover:-translate-y-px wr:disabled:cursor-default"
                   style={{
                     background: `color-mix(in oklch, ${colour} 14%, ${palette.card})`,
                     boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${colour} 40%, transparent)`,
                   }}
                 >
                   <span
-                    className="rounded-[9px] p-1.5"
+                    className="wr:rounded-[9px] wr:p-1.5"
                     style={{ background: `color-mix(in oklch, ${colour} 10%, ${palette.bg})` }}
                   >
                     <PixelGlyph art={drop.art} colour={colour} cell={3} />
                   </span>
-                  <span className="min-w-0">
-                    <span className="block text-[13px] font-semibold leading-tight">{drop.name}</span>
-                    <span className="block text-[11.5px]" style={{ color: palette.muted }}>
+                  <span className="wr:min-w-0">
+                    <span className="wr:block wr:text-[13px] wr:font-semibold wr:leading-tight">{drop.name}</span>
+                    <span className="wr:block wr:text-[11.5px]" style={{ color: palette.muted }}>
                       {describeDay(spot)}
                     </span>
                   </span>
@@ -1167,12 +1173,16 @@ export function YearScan({
 
       {mounted
         ? createPortal(
-            <div ref={flightRef} className="pointer-events-none fixed inset-0 z-[80]" aria-live="polite">
+            <div
+              ref={flightRef}
+              className="wr-root wr:pointer-events-none wr:fixed wr:inset-0 wr:z-[80]"
+              aria-live="polite"
+            >
               <div
                 data-flight-backdrop
                 aria-hidden
                 onClick={() => stopRef.current?.()}
-                className="absolute inset-0 opacity-0"
+                className="wr:absolute wr:inset-0 wr:opacity-0"
                 style={{
                   background: `radial-gradient(circle at 50% 50%, color-mix(in oklch, ${tone} 28%, transparent), transparent 55%), rgb(8 8 10 / 0.62)`,
                   backdropFilter: "blur(3px)",
@@ -1181,7 +1191,7 @@ export function YearScan({
               <div
                 data-flyer-rays
                 aria-hidden
-                className="absolute top-1/2 left-1/2 -mt-[45vmin] -ml-[45vmin] size-[90vmin] rounded-full opacity-0"
+                className="wr:absolute wr:top-1/2 wr:left-1/2 wr:-mt-[45vmin] wr:-ml-[45vmin] wr:size-[90vmin] wr:rounded-full wr:opacity-0"
                 style={{
                   background: `repeating-conic-gradient(from 0deg, color-mix(in oklch, ${tone} 30%, transparent) 0deg 8deg, transparent 8deg 24deg)`,
                   maskImage: "radial-gradient(circle, black 20%, transparent 70%)",
@@ -1192,7 +1202,7 @@ export function YearScan({
                   <div
                     data-legend-rays
                     aria-hidden
-                    className="absolute top-1/2 left-1/2 -mt-[60vmin] -ml-[60vmin] size-[120vmin] rounded-full opacity-0"
+                    className="wr:absolute wr:top-1/2 wr:left-1/2 wr:-mt-[60vmin] wr:-ml-[60vmin] wr:size-[120vmin] wr:rounded-full wr:opacity-0"
                     style={{
                       background: `repeating-conic-gradient(from 6deg, color-mix(in oklch, ${tone} 28%, transparent) 0deg 3deg, transparent 3deg 15deg)`,
                       maskImage: "radial-gradient(circle, black 15%, transparent 68%)",
@@ -1201,14 +1211,17 @@ export function YearScan({
                   <div
                     data-legend-flash
                     aria-hidden
-                    className="absolute inset-0 opacity-0"
+                    className="wr:absolute wr:inset-0 wr:opacity-0"
                     style={{
                       background: `radial-gradient(circle at 50% 50%, color-mix(in oklch, ${tone} 55%, white), color-mix(in oklch, ${tone} 25%, transparent) 45%, transparent 75%)`,
                     }}
                   />
                 </>
               ) : null}
-              <div data-flyer className="invisible absolute top-0 left-0 opacity-0 [perspective:1100px]">
+              <div
+                data-flyer
+                className="wr:invisible wr:absolute wr:top-0 wr:left-0 wr:opacity-0 wr:[perspective:1100px]"
+              >
                 {current?.rarity === "legendary" ? (
                   <>
                     {[0, 1].map((wave) => (
@@ -1216,13 +1229,13 @@ export function YearScan({
                         key={wave}
                         data-legend-wave
                         aria-hidden
-                        className="absolute top-1/2 left-1/2 -mt-[50%] -ml-[50%] aspect-square w-full rounded-full opacity-0"
+                        className="wr:absolute wr:top-1/2 wr:left-1/2 wr:-mt-[50%] wr:-ml-[50%] wr:aspect-square wr:w-full wr:rounded-full wr:opacity-0"
                         style={{
                           boxShadow: `0 0 0 3px ${tone}, 0 0 40px 6px color-mix(in oklch, ${tone} 60%, transparent)`,
                         }}
                       />
                     ))}
-                    <span aria-hidden data-legend-sparkles className="absolute inset-0">
+                    <span aria-hidden data-legend-sparkles className="wr:absolute wr:inset-0">
                       {Array.from({ length: SPARKLES }, (_unused, index) => {
                         const angle = (index / SPARKLES) * Math.PI * 2;
                         const reach = 0.62 + ((index * 37) % 20) / 100;
@@ -1230,7 +1243,7 @@ export function YearScan({
                           <i
                             // oxlint-disable-next-line react/no-array-index-key -- sparkles are positional
                             key={index}
-                            className="absolute -m-1.5 size-3 rotate-45 rounded-[2px] opacity-0"
+                            className="wr:absolute wr:-m-1.5 wr:size-3 wr:rotate-45 wr:rounded-[2px] wr:opacity-0"
                             style={{
                               left: `${50 + Math.cos(angle) * reach * 100}%`,
                               top: `${50 + Math.sin(angle) * reach * 80}%`,
@@ -1244,23 +1257,23 @@ export function YearScan({
                     <div
                       data-legend-border
                       aria-hidden
-                      className="absolute -inset-[4px] overflow-hidden rounded-[32px] opacity-0"
+                      className="wr:absolute wr:-inset-[4px] wr:overflow-hidden wr:rounded-[32px] wr:opacity-0"
                       style={{ boxShadow: `0 0 50px 4px color-mix(in oklch, ${tone} 55%, transparent)` }}
                     >
                       <i
                         data-legend-spin
-                        className="absolute top-1/2 left-1/2 -mt-[100%] -ml-[100%] size-[200%]"
+                        className="wr:absolute wr:top-1/2 wr:left-1/2 wr:-mt-[100%] wr:-ml-[100%] wr:size-[200%]"
                         style={{ background: foil(tone) }}
                       />
                     </div>
                   </>
                 ) : null}
-                <span aria-hidden data-flyer-burst className="absolute top-1/2 left-1/2">
+                <span aria-hidden data-flyer-burst className="wr:absolute wr:top-1/2 wr:left-1/2">
                   {Array.from({ length: BURST }, (_unused, index) => (
                     <i
                       // oxlint-disable-next-line react/no-array-index-key -- burst particles are positional
                       key={index}
-                      className="absolute -m-1.5 size-3 rounded-[3px] opacity-0"
+                      className="wr:absolute wr:-m-1.5 wr:size-3 wr:rounded-[3px] wr:opacity-0"
                       style={{ background: tone }}
                     />
                   ))}
@@ -1271,11 +1284,11 @@ export function YearScan({
                   aria-label={peek ? "Close this card" : "Turn the card over, then add it to your video"}
                   title={peek ? "Click to close" : "Click to turn it over, click again to add it"}
                   onClick={() => cardRef.current?.()}
-                  className="pointer-events-auto absolute inset-0 z-10 cursor-pointer rounded-[28px] outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                  className="wr:pointer-events-auto wr:absolute wr:inset-0 wr:z-10 wr:cursor-pointer wr:rounded-[28px] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70"
                 />
-                <div data-flyer-inner className="relative size-full [transform-style:preserve-3d]">
+                <div data-flyer-inner className="wr:relative wr:size-full wr:[transform-style:preserve-3d]">
                   <div
-                    className="absolute inset-0 flex flex-col overflow-hidden rounded-[28px] p-6 [backface-visibility:hidden]"
+                    className="wr:absolute wr:inset-0 wr:flex wr:flex-col wr:overflow-hidden wr:rounded-[28px] wr:p-6 wr:[backface-visibility:hidden]"
                     style={{
                       background: `linear-gradient(165deg, color-mix(in oklch, ${tone} 26%, ${palette.card}), ${palette.card} 62%)`,
                       boxShadow: `inset 0 0 0 2px ${tone}, 0 40px 90px -20px black`,
@@ -1286,7 +1299,7 @@ export function YearScan({
                       <i
                         data-legend-foil
                         aria-hidden
-                        className="pointer-events-none absolute inset-0 opacity-0 mix-blend-screen"
+                        className="wr:pointer-events-none wr:absolute wr:inset-0 wr:opacity-0 wr:mix-blend-screen"
                         style={{
                           background: `linear-gradient(115deg, transparent 35%, color-mix(in oklch, ${tone} 50%, transparent) 46%, rgb(255 255 255 / 0.85) 50%, color-mix(in oklch, ${tone} 45%, transparent) 54%, transparent 65%)`,
                           backgroundSize: "300% 100%",
@@ -1297,25 +1310,32 @@ export function YearScan({
                     ) : null}
                     {current ? (
                       <>
-                        <div data-flyer-line className="grid flex-1 place-items-center">
+                        <div data-flyer-line className="wr:grid wr:flex-1 wr:place-items-center">
                           <PixelGlyph art={current.art} colour={tone} cell={14} />
                         </div>
-                        <p data-flyer-line className="text-[25px] font-semibold leading-[1.05] tracking-[-0.035em]">
+                        <p
+                          data-flyer-line
+                          className="wr:text-[25px] wr:font-semibold wr:leading-[1.05] wr:tracking-[-0.035em]"
+                        >
                           {current.name}
                         </p>
-                        <p data-flyer-line className="mt-1.5 text-[14px] font-semibold" style={{ color: tone }}>
+                        <p
+                          data-flyer-line
+                          className="wr:mt-1.5 wr:text-[14px] wr:font-semibold"
+                          style={{ color: tone }}
+                        >
                           {RARITY_LABELS[current.rarity]}
                         </p>
                         <p
                           data-flyer-line
-                          className="mt-2 line-clamp-3 text-[14px] leading-[1.4]"
+                          className="wr:mt-2 wr:line-clamp-3 wr:text-[14px] wr:leading-[1.4]"
                           style={{ color: palette.muted }}
                         >
                           {current.line}
                         </p>
                         <p
                           data-flyer-line
-                          className="mt-3 text-[12.5px] font-semibold"
+                          className="wr:mt-3 wr:text-[12.5px] wr:font-semibold"
                           style={{ color: palette.muted }}
                         >
                           {shownDay === undefined ? " " : `Found on ${describeDay(shownDay)}`}
@@ -1325,7 +1345,7 @@ export function YearScan({
                   </div>
                   <div
                     data-flyer-back
-                    className="absolute inset-0 grid place-items-center rounded-[28px] [backface-visibility:hidden] [transform:rotateY(180deg)]"
+                    className="wr:absolute wr:inset-0 wr:grid wr:place-items-center wr:rounded-[28px] wr:[backface-visibility:hidden] wr:[transform:rotateY(180deg)]"
                     style={{
                       background: `radial-gradient(circle at 50% 40%, color-mix(in oklch, ${palette.levels[4]} 18%, ${palette.card}), ${palette.bg} 75%)`,
                     }}

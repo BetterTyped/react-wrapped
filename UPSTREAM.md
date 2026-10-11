@@ -33,6 +33,19 @@ are separate from here on: nothing is shared at build time, and changes are carr
   opened nothing gets the scan as the page, and the video takes over once it has run. Also a second pass over the
   chart entrances.
 
+## The chrome's classes carry a prefix here
+
+In the app the player, the timeline, the scan and the gallery are styled with Tailwind utilities (`flex`, `bg-card`).
+Here every one of them carries the library's prefix (`wr:flex`, `wr:bg-card`) and is compiled once into the stylesheet
+the library ships, so nobody who installs it needs Tailwind. After carrying a change across, run the prefixer over
+the files that came in:
+
+```bash
+node scripts/prefix-classes.mjs packages/core/src --write
+```
+
+It leaves prefixed classes and the library's own `wr-` classes alone, so it is safe to run again.
+
 ## Carrying a later change across
 
 File names and the `wr-` class names are kept the same on purpose, so a change made on either side can be read as a diff

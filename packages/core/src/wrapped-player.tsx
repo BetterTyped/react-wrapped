@@ -18,13 +18,14 @@ import { useWrappedTimeline } from "./use-wrapped-timeline";
 /** The tallest the frame may get on a phone, as a share of the viewport, so the controls stay on screen. */
 const PHONE_HEIGHT_SHARE = 0.72;
 
-const shell = "flex min-w-0 flex-col gap-4";
-const room = "grid min-h-[320px] flex-1 place-items-center";
+const shell = "wr:flex wr:min-w-0 wr:flex-col wr:gap-4";
+const room = "wr:grid wr:min-h-[320px] wr:flex-1 wr:place-items-center";
 const frame =
-  "relative overflow-hidden rounded-[22px] shadow-[0_40px_80px_-40px_oklch(0.2_0.05_170/0.55)] ring-1 ring-black/5";
-const transport = "flex items-center gap-3 px-1";
-const control = "grid size-11 shrink-0 place-items-center rounded-full [&_svg]:size-4";
-const clock = "shrink-0 whitespace-nowrap text-right text-[14px] font-medium tabular-nums text-muted-foreground";
+  "wr:relative wr:overflow-hidden wr:rounded-[22px] wr:shadow-[0_40px_80px_-40px_oklch(0.2_0.05_170/0.55)] wr:ring-1 wr:ring-black/5";
+const transport = "wr:flex wr:items-center wr:gap-3 wr:px-1";
+const control = "wr:grid wr:size-11 wr:shrink-0 wr:place-items-center wr:rounded-full wr:[&_svg]:size-4";
+const clock =
+  "wr:shrink-0 wr:whitespace-nowrap wr:text-right wr:text-[14px] wr:font-medium wr:tabular-nums wr:text-muted-foreground";
 
 /** Fits the fixed-size frame into whatever room the layout gives it. Full screen, it takes the whole height. */
 function useStageFit(format: WrappedFormat, fullscreen: boolean) {
@@ -71,24 +72,24 @@ export function WrappedPlayerLoading({
 }) {
   const { boxRef, scale, style } = useStageFit(config.format, false);
   return (
-    <div className={cn(shell, className)}>
+    <div className={cn("wr-root", shell, className)}>
       <div ref={boxRef} className={room}>
         <div className={frame} style={style}>
           <LoadingStage subject={subject} lines={lines} config={config} scale={scale} />
         </div>
       </div>
-      <div aria-hidden className={cn(transport, "opacity-40")}>
-        <span className={cn(control, "bg-foreground text-background")}>
+      <div aria-hidden className={cn(transport, "wr:opacity-40")}>
+        <span className={cn(control, "wr:bg-foreground wr:text-background")}>
           <Play fill="currentColor" />
         </span>
-        <span className={cn(control, "ring-1 ring-border")}>
+        <span className={cn(control, "wr:ring-1 wr:ring-border")}>
           <RotateCcw />
         </span>
-        <span className="flex h-11 flex-1 items-center">
-          <i className="h-2 w-full rounded-full bg-muted" />
+        <span className="wr:flex wr:h-11 wr:flex-1 wr:items-center">
+          <i className="wr:h-2 wr:w-full wr:rounded-full wr:bg-muted" />
         </span>
         <span className={clock}>0:00 / 0:00</span>
-        <span className={cn(control, "ring-1 ring-border")}>
+        <span className={cn(control, "wr:ring-1 wr:ring-border")}>
           <Maximize2 />
         </span>
       </div>
@@ -162,9 +163,10 @@ export function WrappedPlayer({
     <div
       ref={rootRef}
       className={cn(
+        "wr-root",
         shell,
         // Full screen plays on a dark room whatever the site theme is.
-        fullscreen && "dark bg-background p-6 text-foreground md:p-10",
+        fullscreen && "wr-dark wr:bg-background wr:p-6 wr:text-foreground wr:md:p-10",
         className,
       )}
     >
@@ -179,7 +181,7 @@ export function WrappedPlayer({
             else if (x > 0.66) step(1);
             else toggle();
           }}
-          className={cn(frame, "cursor-pointer")}
+          className={cn(frame, "wr:cursor-pointer")}
           style={style}
         >
           <WrappedStage stageRef={stageRef} subject={subject} scenes={scenes} config={config} scale={scale} />
@@ -202,7 +204,7 @@ export function WrappedPlayer({
           aria-label={playing ? "Pause" : "Play"}
           className={cn(
             control,
-            "cursor-pointer bg-foreground text-background transition-transform hover:-translate-y-px",
+            "wr:cursor-pointer wr:bg-foreground wr:text-background wr:transition-transform wr:hover:-translate-y-px",
           )}
         >
           {playing ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}
@@ -211,7 +213,10 @@ export function WrappedPlayer({
           type="button"
           onClick={restart}
           aria-label="Play from the start"
-          className={cn(control, "cursor-pointer ring-1 ring-border transition-transform hover:-translate-y-px")}
+          className={cn(
+            control,
+            "wr:cursor-pointer wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",
+          )}
         >
           <RotateCcw />
         </button>
@@ -231,7 +236,10 @@ export function WrappedPlayer({
           type="button"
           onClick={toggleFullscreen}
           aria-label={fullscreen ? "Leave full screen" : "Full screen"}
-          className={cn(control, "cursor-pointer ring-1 ring-border transition-transform hover:-translate-y-px")}
+          className={cn(
+            control,
+            "wr:cursor-pointer wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",
+          )}
         >
           {fullscreen ? <Minimize2 /> : <Maximize2 />}
         </button>

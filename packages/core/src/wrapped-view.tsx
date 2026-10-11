@@ -22,11 +22,11 @@ import { WrappedConfigurator } from "./wrapped-configurator";
 import { WrappedPlayer, type WrappedPlayerHandle, WrappedPlayerLoading } from "./wrapped-player";
 import { type HiddenDrop, YearScan } from "./year-scan";
 
-const panel = "rounded-[28px] bg-card p-4 ring-1 ring-border md:p-6";
+const panel = "wr:rounded-[28px] wr:bg-card wr:p-4 wr:ring-1 wr:ring-border wr:md:p-6";
 /** The player and the column beside it share one height on desktop, so their edges line up. */
-const rowHeight = "lg:h-[calc(100vh-140px)] lg:max-h-[1000px] lg:min-h-[640px]";
+const rowHeight = "wr:lg:h-[calc(100vh-140px)] wr:lg:max-h-[1000px] wr:lg:min-h-[640px]";
 const pill =
-  "inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold transition-transform hover:-translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4";
+  "wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:justify-center wr:gap-2 wr:rounded-full wr:px-5 wr:text-[15px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px wr:disabled:pointer-events-none wr:disabled:opacity-50 wr:[&_svg]:size-4";
 
 /** "about 40s left", "about 2 min left". Rounded, so the line does not tick like a stopwatch. */
 function timeLeft(seconds: number): string {
@@ -106,17 +106,17 @@ function ShareActions({
   };
 
   return (
-    <div className={`${panel} grid grid-cols-2 gap-2`}>
+    <div className={`${panel} wr:grid wr:grid-cols-2 wr:gap-2`}>
       <button
         type="button"
         onClick={() => copyLink(window.location.href)}
-        className={`${pill} bg-foreground px-3 text-background`}
+        className={`${pill} wr:bg-foreground wr:px-3 wr:text-background`}
       >
         {linkCopied ? <Check /> : <Link2 />}
         {linkCopied ? "Copied" : "Copy link"}
       </button>
       {percent === null ? (
-        <button type="button" onClick={() => void download()} className={`${pill} px-3 ring-1 ring-border`}>
+        <button type="button" onClick={() => void download()} className={`${pill} wr:px-3 wr:ring-1 wr:ring-border`}>
           <Download />
           Download
         </button>
@@ -126,7 +126,7 @@ function ShareActions({
           onClick={() => stopRef.current?.abort()}
           aria-label={`Stop making the video, ${percent}% done`}
           title="Stop"
-          className={`${pill} px-3 tabular-nums ring-1 ring-border`}
+          className={`${pill} wr:px-3 wr:tabular-nums wr:ring-1 wr:ring-border`}
         >
           <Square fill="currentColor" />
           {percent}%
@@ -134,13 +134,16 @@ function ShareActions({
       )}
       {/* Why it is not instant: the file is not a screen recording, every frame is drawn for it. */}
       {making ? (
-        <p className="col-span-2 px-1 pt-1 text-[13px] leading-[1.45] text-muted-foreground tabular-nums">
+        <p className="wr:col-span-2 wr:px-1 wr:pt-1 wr:text-[13px] wr:leading-[1.45] wr:text-muted-foreground wr:tabular-nums">
           Drawing {making.frames.toLocaleString("en-US")} frames at full size, one by one, so the video is sharp and
           smooth on any machine{making.left === null ? "." : `. ${timeLeft(making.left).replace(/^a/, "A")}.`}
         </p>
       ) : null}
       {problem ? (
-        <p role="alert" className="col-span-2 px-1 pt-1 text-[13px] leading-[1.45] text-muted-foreground">
+        <p
+          role="alert"
+          className="wr:col-span-2 wr:px-1 wr:pt-1 wr:text-[13px] wr:leading-[1.45] wr:text-muted-foreground"
+        >
           {problem}
         </p>
       ) : null}
@@ -337,16 +340,16 @@ export function WrappedView(
       ref={rootRef}
       className={cn(
         // Under the page's bar when the view is scrolled back to after the first scan.
-        "scroll-mt-24",
+        "wr-root wr:scroll-mt-24",
         // The creator's column is a track that opens: who the page belongs to is often known a beat after the page
         // is up, and a column that just appeared would shove the frame sideways. It eases in as well as out, because
         // the settings mount on the same frame and a curve that starts fast would spend that long frame jumping.
         // grid-cols-1: on a phone the one column is the screen. Left to size itself it grows to its widest panel and
         // runs off the right edge.
-        "grid grid-cols-1 gap-y-3 lg:transition-[grid-template-columns,column-gap] lg:duration-700 lg:ease-[cubic-bezier(0.6,0,0.2,1)] motion-reduce:transition-none",
+        "wr:grid wr:grid-cols-1 wr:gap-y-3 wr:lg:transition-[grid-template-columns,column-gap] wr:lg:duration-700 wr:lg:ease-[cubic-bezier(0.6,0,0.2,1)] wr:motion-reduce:transition-none",
         editable && !gated
-          ? "lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-x-3"
-          : "lg:grid-cols-[minmax(0,1fr)_0px] lg:gap-x-0",
+          ? "wr:lg:grid-cols-[minmax(0,1fr)_380px] wr:lg:gap-x-3"
+          : "wr:lg:grid-cols-[minmax(0,1fr)_0px] wr:lg:gap-x-0",
       )}
     >
       {/* While the scan is the page there is no video to show. The scan below keeps its place in the tree, so it is
@@ -354,12 +357,7 @@ export function WrappedView(
       {gated ? null : (
         <div
           inert={rendering}
-          className={cn(
-            panel,
-            "flex min-h-[560px] flex-col",
-            rowHeight,
-            passed !== null && "animate-in fade-in-0 slide-in-from-bottom-4 duration-700",
-          )}
+          className={cn(panel, "wr:flex wr:min-h-[560px] wr:flex-col", rowHeight, passed !== null && "wr-view-enter")}
         >
           {loaded ? (
             <WrappedPlayer
@@ -370,27 +368,27 @@ export function WrappedView(
               config={config}
               autoplay={loaded.autoplay ?? true}
               editing={editable ? editing : undefined}
-              className="flex-1"
+              className="wr:flex-1"
             />
           ) : loading ? (
             <>
-              <p role="status" className="sr-only">
+              <p role="status" className="wr:sr-only">
                 {loading.lines[0]}
               </p>
               <WrappedPlayerLoading
                 subject={loading.subject}
                 lines={loading.lines}
                 config={config}
-                className="flex-1"
+                className="wr:flex-1"
               />
             </>
           ) : null}
         </div>
       )}
       {/* One pixel of room all round, so the clip that hides the opening column does not shave the panels' rings. */}
-      <div className={cn("-m-px overflow-hidden p-px", (!editable || gated) && "max-lg:hidden")}>
+      <div className={cn("wr:-m-px wr:overflow-hidden wr:p-px", (!editable || gated) && "wr:max-lg:hidden")}>
         {editable && !gated ? (
-          <div className={`flex min-h-0 flex-col gap-3 lg:w-[380px] ${rowHeight}`}>
+          <div className={`wr:flex wr:min-h-0 wr:flex-col wr:gap-3 wr:lg:w-[380px] ${rowHeight}`}>
             {loaded?.share ? (
               <ShareActions
                 player={playerRef}
@@ -404,8 +402,8 @@ export function WrappedView(
               inert={rendering}
               className={cn(
                 panel,
-                "min-h-0 flex-1 overflow-y-auto overscroll-contain transition-opacity",
-                rendering && "opacity-50",
+                "wr:min-h-0 wr:flex-1 wr:overflow-y-auto wr:overscroll-contain wr:transition-opacity",
+                rendering && "wr:opacity-50",
               )}
             >
               <WrappedConfigurator config={config} onChange={onConfigChange} />
@@ -413,17 +411,17 @@ export function WrappedView(
           </div>
         ) : null}
       </div>
-      {loaded && !editable && loaded.viewer ? <div className="lg:col-span-2">{loaded.viewer}</div> : null}
+      {loaded && !editable && loaded.viewer ? <div className="wr:lg:col-span-2">{loaded.viewer}</div> : null}
       {loaded && editable ? (
         <>
           {loaded.opening && loaded.opening.drops.length > 0 ? (
             <div
               inert={rendering}
               className={cn(
-                "transition-opacity lg:col-span-2",
-                rendering && "opacity-50",
+                "wr:transition-opacity wr:lg:col-span-2",
+                rendering && "wr:opacity-50",
                 // As the page, the scan takes the box the video is about to take.
-                gated && `min-h-[420px] ${rowHeight}`,
+                gated && `wr:min-h-[420px] ${rowHeight}`,
               )}
             >
               <YearScan
@@ -441,11 +439,11 @@ export function WrappedView(
             </div>
           ) : null}
           {!gated && loaded.share?.graphics && loaded.share.graphics.length > 0 ? (
-            <div className="lg:col-span-2">
+            <div className="wr:lg:col-span-2">
               <GraphicsGallery graphics={loaded.share.graphics} palette={resolvePalette(config)} />
             </div>
           ) : null}
-          <div className="lg:col-span-2">
+          <div className="wr:lg:col-span-2">
             <SceneEditor
               scene={ordered.find((scene) => scene.key === editingKey) ?? null}
               original={arranged.find((scene) => scene.key === editingKey) ?? null}

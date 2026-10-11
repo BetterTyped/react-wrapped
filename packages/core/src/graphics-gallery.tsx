@@ -59,7 +59,7 @@ function save(blob: Blob, fileName: string) {
 }
 
 const action =
-  "inline-flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 text-[13.5px] font-semibold transition-transform hover:-translate-y-px disabled:pointer-events-none disabled:opacity-55 [&_svg]:size-4";
+  "wr:inline-flex wr:h-10 wr:min-w-0 wr:cursor-pointer wr:items-center wr:justify-center wr:gap-2 wr:whitespace-nowrap wr:rounded-full wr:px-4 wr:text-[13.5px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px wr:disabled:pointer-events-none wr:disabled:opacity-55 wr:[&_svg]:size-4";
 
 function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: WrappedPalette }) {
   const [copied, copy] = useCopied();
@@ -137,25 +137,25 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
   if (locked) {
     return (
       <article
-        className="flex min-h-[340px] flex-col rounded-[32px] p-7"
+        className="wr:flex wr:min-h-[340px] wr:flex-col wr:rounded-[32px] wr:p-7"
         style={{
           background: palette.bg,
           color: soft,
           boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${ink} 12%, transparent)`,
         }}
       >
-        <div className="grid flex-1 place-items-center">
+        <div className="wr:grid wr:flex-1 wr:place-items-center">
           <span
-            className="grid size-16 place-items-center rounded-full"
+            className="wr:grid wr:size-16 wr:place-items-center wr:rounded-full"
             style={{ background: `color-mix(in oklch, ${ink} 7%, transparent)` }}
           >
-            <Lock className="size-6" />
+            <Lock className="wr:size-6" />
           </span>
         </div>
-        <h4 className="text-[clamp(1.25rem,1.6vw,1.5rem)] font-semibold leading-none tracking-[-0.04em]">
+        <h4 className="wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]">
           Still hidden
         </h4>
-        <p className="mt-2 text-[14.5px] leading-[1.4]">Scan your year to unlock it.</p>
+        <p className="wr:mt-2 wr:text-[14.5px] wr:leading-[1.4]">Scan your year to unlock it.</p>
       </article>
     );
   }
@@ -164,8 +164,8 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
     <article
       ref={tileRef}
       className={cn(
-        "group/tile relative flex min-h-[340px] flex-col overflow-hidden rounded-[32px] p-7 transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-1.5",
-        graphic.wide && "md:col-span-2",
+        "wr:group/tile wr:relative wr:flex wr:min-h-[340px] wr:flex-col wr:overflow-hidden wr:rounded-[32px] wr:p-7 wr:transition-transform wr:duration-500 wr:ease-[cubic-bezier(0.2,0.8,0.2,1)] wr:hover:-translate-y-1.5",
+        graphic.wide && "wr:md:col-span-2",
       )}
       style={{
         color: ink,
@@ -173,19 +173,19 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
         boxShadow: `inset 0 0 0 1px color-mix(in oklch, ${ink} 8%, transparent)`,
       }}
     >
-      <div className="@container grid flex-1 place-items-center py-6">
+      <div className="wr:@container wr:grid wr:flex-1 wr:place-items-center wr:py-6">
         {src ? (
           <img
             src={src}
             alt={graphic.title}
             loading="lazy"
             className={cn(
-              "w-auto max-w-full object-contain transition-transform duration-500 ease-[cubic-bezier(0.2,1.4,0.4,1)] group-hover/tile:scale-[1.04]",
+              "wr:w-auto wr:max-w-full wr:object-contain wr:transition-transform wr:duration-500 wr:ease-[cubic-bezier(0.2,1.4,0.4,1)] wr:group-hover/tile:scale-[1.04]",
               // A badge's height follows its tile's width, so every badge is shown at one scale: the widest ("2,052
               // contributions made") fits, and a short one beside it is not drawn bigger just because it had room.
-              graphic.wide ? "max-h-[300px]" : "h-[27cqw] max-h-[90px]",
+              graphic.wide ? "wr:max-h-[300px]" : "wr:h-[27cqw] wr:max-h-[90px]",
               // A drawn card is a full frame in the plate's own color: a soft edge is what tells it from the plate.
-              typeof image === "string" ? null : "rounded-[18px]",
+              typeof image === "string" ? null : "wr:rounded-[18px]",
             )}
             style={
               typeof image === "string"
@@ -195,27 +195,27 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
           />
         ) : (
           <span
-            className="size-8 animate-pulse rounded-full"
+            className="wr:size-8 wr:animate-pulse wr:rounded-full"
             style={{ background: `color-mix(in oklch, ${ink} 15%, transparent)` }}
           />
         )}
       </div>
       <div
         className={cn(
-          "flex gap-5",
-          graphic.wide ? "items-end justify-between max-sm:flex-col max-sm:items-start" : "flex-col",
+          "wr:flex wr:gap-5",
+          graphic.wide ? "wr:items-end wr:justify-between wr:max-sm:flex-col wr:max-sm:items-start" : "wr:flex-col",
         )}
       >
-        <div className="min-w-0 flex-1">
-          <h4 className="text-[clamp(1.25rem,1.6vw,1.5rem)] font-semibold leading-none tracking-[-0.04em]">
+        <div className="wr:min-w-0 wr:flex-1">
+          <h4 className="wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]">
             {graphic.title}
           </h4>
-          <p className="mt-2 max-w-[46ch] text-[14.5px] leading-[1.4]" style={{ color: soft }}>
+          <p className="wr:mt-2 wr:max-w-[46ch] wr:text-[14.5px] wr:leading-[1.4]" style={{ color: soft }}>
             {graphic.line}
           </p>
         </div>
         {/* Side by side, always. */}
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="wr:flex wr:shrink-0 wr:items-center wr:gap-2">
           <button
             type="button"
             onClick={() => void download()}
@@ -241,7 +241,7 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
         </div>
       </div>
       {failed ? (
-        <p role="alert" className="mt-3 text-[13px]" style={{ color: soft }}>
+        <p role="alert" className="wr:mt-3 wr:text-[13px]" style={{ color: soft }}>
           That did not come through. Try again in a moment.
         </p>
       ) : null}
@@ -265,16 +265,16 @@ export function GraphicsGallery({
   const unlocked = graphics.filter((graphic) => !graphic.locked).length;
   const locked = graphics.length - unlocked;
   return (
-    <section className="pt-10 md:pt-14">
-      <h3 className="text-[clamp(1.75rem,2.6vw,2.5rem)] font-semibold leading-none tracking-[-0.05em]">
-        {unlocked} {unlocked === 1 ? "graphic" : "graphics"} <span className="text-primary">to keep.</span>
+    <section className="wr-root wr:pt-10 wr:md:pt-14">
+      <h3 className="wr:text-[clamp(1.75rem,2.6vw,2.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.05em]">
+        {unlocked} {unlocked === 1 ? "graphic" : "graphics"} <span className="wr:text-primary">to keep.</span>
       </h3>
-      <p className="mt-3 mb-7 max-w-[60ch] text-[17px] leading-[1.5] text-muted-foreground">
+      <p className="wr:mt-3 wr:mb-7 wr:max-w-[60ch] wr:text-[17px] wr:leading-[1.5] wr:text-muted-foreground">
         {locked > 0
           ? `Post them, pin them, put them in your README. ${locked} more ${locked === 1 ? "unlocks" : "unlock"} as the scan finds ${locked === 1 ? "it" : "them"}.`
           : "Post them, pin them, put them in your README."}
       </p>
-      <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="wr:grid wr:gap-3.5 wr:md:grid-cols-2 wr:xl:grid-cols-4">
         {/* What can be taken first; what is still locked after it. */}
         {graphics
           .toSorted((a, b) => Number(Boolean(a.locked)) - Number(Boolean(b.locked)))

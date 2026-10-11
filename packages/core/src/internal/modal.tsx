@@ -45,20 +45,20 @@ export function Modal({
       onClick={(event) => {
         if (event.target === ref.current) onOpenChange(false);
       }}
-      className="m-auto w-[min(92vw,640px)] rounded-[28px] bg-card p-0 text-foreground ring-1 ring-border backdrop:bg-black/60"
+      className="wr-root wr:m-auto wr:w-[min(92vw,640px)] wr:rounded-[28px] wr:bg-card wr:p-0 wr:text-foreground wr:ring-1 wr:ring-border wr:backdrop:bg-black/60"
     >
       {open ? (
         <>
-          <header className="flex items-start gap-3 px-6 pt-6">
+          <header className="wr:flex wr:items-start wr:gap-3 wr:px-6 wr:pt-6">
             {Icon ? (
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted">
-                <Icon className="size-5" />
+              <span className="wr:grid wr:size-10 wr:shrink-0 wr:place-items-center wr:rounded-full wr:bg-muted">
+                <Icon className="wr:size-5" />
               </span>
             ) : null}
-            <div className="min-w-0">
-              <h2 className="text-[24px] leading-[1.1] font-semibold tracking-[-0.04em]">{title}</h2>
+            <div className="wr:min-w-0">
+              <h2 className="wr:text-[24px] wr:leading-[1.1] wr:font-semibold wr:tracking-[-0.04em]">{title}</h2>
               {description ? (
-                <p className="mt-2 text-[14.5px] leading-normal text-muted-foreground">{description}</p>
+                <p className="wr:mt-2 wr:text-[14.5px] wr:leading-normal wr:text-muted-foreground">{description}</p>
               ) : null}
             </div>
           </header>
@@ -70,17 +70,21 @@ export function Modal({
 }
 
 export function ModalBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("flex flex-col gap-5 px-6 py-5", className)}>{children}</div>;
+  return <div className={cn("wr:flex wr:flex-col wr:gap-5 wr:px-6 wr:py-5", className)}>{children}</div>;
 }
 
 export function ModalFooter({ children }: { children: ReactNode }) {
-  return <footer className="flex flex-wrap items-center justify-between gap-2 px-6 pb-6">{children}</footer>;
+  return (
+    <footer className="wr:flex wr:flex-wrap wr:items-center wr:justify-between wr:gap-2 wr:px-6 wr:pb-6">
+      {children}
+    </footer>
+  );
 }
 
 export function ModalField({ label, htmlFor, children }: { label: string; htmlFor?: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <label htmlFor={htmlFor} className="text-sm font-semibold">
+    <div className="wr:flex wr:min-w-0 wr:flex-col wr:gap-2">
+      <label htmlFor={htmlFor} className="wr:text-sm wr:font-semibold">
         {label}
       </label>
       {children}
@@ -89,4 +93,4 @@ export function ModalField({ label, htmlFor, children }: { label: string; htmlFo
 }
 
 export const modalInputClassName =
-  "rounded-[14px] bg-muted px-3.5 py-2.5 text-[15px] ring-1 ring-border focus-visible:ring-2 focus-visible:ring-foreground";
+  "wr:rounded-[14px] wr:bg-muted wr:px-3.5 wr:py-2.5 wr:text-[15px] wr:ring-1 wr:ring-border wr:focus-visible:ring-2 wr:focus-visible:ring-foreground";

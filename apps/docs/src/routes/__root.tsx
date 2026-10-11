@@ -6,7 +6,6 @@ import { SiteFrame, THEME_SCRIPT } from "../components/shell";
 import { SiteLink } from "../components/site-link";
 import { seoHead } from "../seo/head";
 import { SITE } from "../site";
-import baselineCss from "../styles/baseline.css?url";
 import docsCss from "../styles/docs.css?url";
 // oxlint-disable-next-line import/no-unassigned-import -- The library's own stylesheet.
 import libraryCss from "@react-wrapped/core/styles.css?url";
@@ -21,7 +20,6 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "icon", href: `${SITE.base}favicon.svg`, type: "image/svg+xml" },
-      { rel: "stylesheet", href: baselineCss },
       { rel: "stylesheet", href: libraryCss },
       { rel: "stylesheet", href: docsCss },
       { rel: "alternate", type: "text/plain", href: `${SITE.base}llms.txt`, title: "llms.txt" },

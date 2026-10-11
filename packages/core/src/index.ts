@@ -1,3 +1,6 @@
+// oxlint-disable-next-line import/no-unassigned-import -- The library's one stylesheet: built to dist/index.css.
+import "./styles.css";
+
 export {
   configFromSearch,
   DEFAULT_WRAPPED_CONFIG,

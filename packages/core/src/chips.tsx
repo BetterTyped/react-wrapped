@@ -1,7 +1,7 @@
 import { cn } from "./internal/cn";
 
 const chip =
-  "inline-flex h-9 flex-none cursor-pointer items-center justify-center rounded-full bg-muted px-3.5 text-[13.5px] font-semibold whitespace-nowrap outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-checked:bg-foreground aria-checked:text-background";
+  "wr:inline-flex wr:h-9 wr:flex-none wr:cursor-pointer wr:items-center wr:justify-center wr:rounded-full wr:bg-muted wr:px-3.5 wr:text-[13.5px] wr:font-semibold wr:whitespace-nowrap wr:outline-none wr:transition-colors wr:hover:text-foreground wr:focus-visible:ring-[3px] wr:focus-visible:ring-ring/50 wr:aria-checked:bg-foreground wr:aria-checked:text-background";
 
 /** One choice out of a few, as a row of chips that wraps. One is always picked. */
 export function Chips<T extends string>({
@@ -16,7 +16,11 @@ export function Chips<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex w-fit flex-wrap items-center gap-1.5">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="wr-root wr:flex wr:w-fit wr:flex-wrap wr:items-center wr:gap-1.5"
+    >
       {options.map((option) => (
         <button
           key={option.value}

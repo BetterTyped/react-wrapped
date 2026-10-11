@@ -7,10 +7,6 @@ import { Chart, type SceneChart } from "./charts";
 import { paletteStyle } from "./palettes";
 import { RARITY_LABELS, type Rarity } from "./rarity";
 import type { WrappedPalette } from "./types";
-// oxlint-disable-next-line import/no-unassigned-import -- The charts' own styles: the card carries the video's charts.
-import "./wrapped.css";
-// oxlint-disable-next-line import/no-unassigned-import -- The card's layout.
-import "./insight-card.css";
 
 /**
  * One thing a year turned out to be, as a card worth posting: the number, the chart that shows it, and the line that

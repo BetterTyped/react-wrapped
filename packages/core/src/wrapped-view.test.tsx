@@ -124,7 +124,7 @@ describe("WrappedView download", () => {
   it("counts up while the file is made, keeps the page off the stage, and stops when asked", async () => {
     const held = heldRender();
     const { container } = show();
-    const player = container.querySelector(".wr-stage")?.closest("[inert], .rounded-\\[28px\\]");
+    const player = container.querySelector(".wr-stage")?.closest("[inert], .wr\\:rounded-\\[28px\\]");
 
     fireEvent.click(screen.getByRole("button", { name: "Download" }));
     act(() => held.options().onProgress(0.427));

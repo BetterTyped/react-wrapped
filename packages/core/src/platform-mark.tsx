@@ -1,8 +1,6 @@
 import { useId } from "react";
 
 import type { StageMark } from "./types";
-// oxlint-disable-next-line import/no-unassigned-import -- The mark's own stylesheet.
-import "./platform-mark.css";
 
 /** How far the light and the shade reach into the mark, in the mark's own 24-unit box. */
 const DEPTH = 0.42;

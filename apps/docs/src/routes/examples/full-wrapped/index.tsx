@@ -43,9 +43,12 @@ function Example() {
             </button>
           </div>
         </div>
-        <div className="d-example">
-          <FullWrapped key={gate ? "gate" : "play"} gate={gate} />
-        </div>
+      </section>
+      {/* The example stands on the page itself, outside the site's own panels, the way it would in an app. */}
+      <div className="d-example">
+        <FullWrapped key={gate ? "gate" : "play"} gate={gate} />
+      </div>
+      <section className="d-plain d-plain-wide">
         <p>
           Every part of this page is exported on its own. See the <SiteLink path="/docs/charts/">charts</SiteLink>, the{" "}
           <SiteLink path="/docs/transitions/">transitions</SiteLink> and{" "}

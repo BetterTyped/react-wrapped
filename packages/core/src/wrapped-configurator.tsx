@@ -13,8 +13,8 @@ const SHAPES: Record<CellShape, string> = { round: "Rounded", square: "Square", 
 const SPEED_LABELS: Record<(typeof WRAPPED_SPEEDS)[number], string> = { "0.75": "0.75x", "1": "1x", "1.5": "1.5x" };
 function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2.5">
-      <label htmlFor={htmlFor} className="text-[14px] font-semibold tracking-[-0.01em]">
+    <div className="wr:flex wr:flex-col wr:gap-2.5">
+      <label htmlFor={htmlFor} className="wr:text-[14px] wr:font-semibold wr:tracking-[-0.01em]">
         {label}
       </label>
       {children}
@@ -49,9 +49,9 @@ export function WrappedConfigurator({
   ];
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
+    <div className={cn("wr-root wr:flex wr:flex-col wr:gap-6", className)}>
       <Field label="Colors">
-        <div role="radiogroup" aria-label="Palette" className="grid grid-cols-3 gap-2">
+        <div role="radiogroup" aria-label="Palette" className="wr:grid wr:grid-cols-3 wr:gap-2">
           {palettes.map((palette) => (
             <button
               key={palette.id}
@@ -59,35 +59,38 @@ export function WrappedConfigurator({
               role="radio"
               aria-checked={config.palette === palette.id}
               onClick={() => set("palette", palette.id)}
-              className="flex cursor-pointer flex-col gap-1.5 rounded-2xl bg-card p-2 text-left ring-1 ring-border aria-checked:ring-2 aria-checked:ring-foreground"
+              className="wr:flex wr:cursor-pointer wr:flex-col wr:gap-1.5 wr:rounded-2xl wr:bg-card wr:p-2 wr:text-left wr:ring-1 wr:ring-border wr:aria-checked:ring-2 wr:aria-checked:ring-foreground"
             >
-              <span className="grid grid-cols-5 gap-[2px] rounded-[9px] p-1.5" style={{ background: palette.bg }}>
+              <span
+                className="wr:grid wr:grid-cols-5 wr:gap-[2px] wr:rounded-[9px] wr:p-1.5"
+                style={{ background: palette.bg }}
+              >
                 {palette.levels.map((color) => (
-                  <i key={color} className="aspect-square rounded-[2px]" style={{ background: color }} />
+                  <i key={color} className="wr:aspect-square wr:rounded-[2px]" style={{ background: color }} />
                 ))}
               </span>
-              <span className="truncate text-[12.5px] font-semibold">{palette.label}</span>
+              <span className="wr:truncate wr:text-[12.5px] wr:font-semibold">{palette.label}</span>
             </button>
           ))}
         </div>
         {config.palette === CUSTOM_PALETTE ? (
-          <div className="flex items-center gap-3">
+          <div className="wr:flex wr:items-center wr:gap-3">
             <input
               id={accentId}
               type="color"
               value={config.accent}
               aria-label="Accent color"
               onChange={(event) => set("accent", event.target.value)}
-              className="h-10 w-13 cursor-pointer rounded-xl border border-border bg-card p-1"
+              className="wr:h-10 wr:w-13 wr:cursor-pointer wr:rounded-xl wr:border wr:border-border wr:bg-card wr:p-1"
             />
             <button
               type="button"
               onClick={() => set("accent", randomAccent())}
               aria-label="Pick a random color"
               title="Random color"
-              className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-xl ring-1 ring-border transition-transform hover:-translate-y-px"
+              className="wr:grid wr:size-10 wr:shrink-0 wr:cursor-pointer wr:place-items-center wr:rounded-xl wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px"
             >
-              <Dices className="size-4" />
+              <Dices className="wr:size-4" />
             </button>
           </div>
         ) : null}
@@ -132,9 +135,9 @@ export function WrappedConfigurator({
         />
       </Field>
 
-      <div className="h-px bg-border" />
+      <div className="wr:h-px wr:bg-border" />
 
-      <div className="flex items-center justify-between gap-3 text-[14px]">
+      <div className="wr:flex wr:items-center wr:justify-between wr:gap-3 wr:text-[14px]">
         <label htmlFor={grainId}>Film grain</label>
         <Switch id={grainId} checked={config.grain} onCheckedChange={(grain) => set("grain", grain)} />
       </div>

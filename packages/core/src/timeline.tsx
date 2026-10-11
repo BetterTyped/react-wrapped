@@ -22,7 +22,7 @@ export interface TimelineEditing {
  * A switched-off scene keeps a sliver of the timeline, so it can be found and switched back on. On a phone the whole
  * row is about 60px wide, so the sliver is thinner there.
  */
-const offSegment = "w-1.5 flex-none sm:w-3.5";
+const offSegment = "wr:w-1.5 wr:flex-none wr:sm:w-3.5";
 
 /** Seconds as the timeline shows them: 4s, or 1:05 past a minute. */
 function playTime(seconds: number): string {
@@ -157,7 +157,7 @@ export function Timeline({
       ref={wrapRef}
       // min-w-0: in the transport row this is the part that gives way. Without it the row is as wide as its segments
       // want and pushes the clock and the full screen button out of the card on a phone.
-      className="relative min-w-0 flex-1"
+      className="wr-root wr:relative wr:min-w-0 wr:flex-1"
       onPointerLeave={(event) => {
         if (event.pointerType === "mouse") hideSoon();
       }}
@@ -168,7 +168,7 @@ export function Timeline({
       <div
         ref={trackRef}
         aria-hidden
-        className="flex h-11 cursor-pointer touch-none items-center gap-px sm:gap-[3px]"
+        className="wr:flex wr:h-11 wr:cursor-pointer wr:touch-none wr:items-center wr:gap-px wr:sm:gap-[3px]"
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           seekFrom(event);
@@ -187,24 +187,24 @@ export function Timeline({
             <div
               key={scene.key}
               data-seg={scene.key}
-              className={cn("relative h-full min-w-0 sm:min-w-[8px]", !span && offSegment)}
+              className={cn("wr:relative wr:h-full wr:min-w-0 wr:sm:min-w-[8px]", !span && offSegment)}
               style={span ? { flex: `${Math.max(span.length, 0.4)} 1 0px` } : undefined}
             >
               <div
                 data-seg-bar
                 data-rarity={rarity ?? undefined}
                 className={cn(
-                  "absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 overflow-hidden rounded-full bg-muted transition-[height] duration-150",
-                  active && "h-3",
+                  "wr:absolute wr:inset-x-0 wr:top-1/2 wr:h-2 wr:-translate-y-1/2 wr:overflow-hidden wr:rounded-full wr:bg-muted wr:transition-[height] wr:duration-150",
+                  active && "wr:h-3",
                   // Off: a hollow sliver, still there to find and switch back on.
-                  !span && "bg-transparent ring-1 ring-inset ring-muted-foreground/45",
+                  !span && "wr:bg-transparent wr:ring-1 wr:ring-inset wr:ring-muted-foreground/45",
                 )}
                 style={rarity && span ? { background: `color-mix(in oklch, ${rarity} 30%, var(--muted))` } : undefined}
               >
                 {span ? (
                   <i
                     data-seg-fill={scene.key}
-                    className="block h-full w-0 rounded-full bg-primary"
+                    className="wr:block wr:h-full wr:w-0 wr:rounded-full wr:bg-primary"
                     style={rarity ? { background: rarity } : undefined}
                   />
                 ) : null}
@@ -215,35 +215,35 @@ export function Timeline({
       </div>
 
       {shown && open ? (
-        <div className="absolute bottom-full z-30 -translate-x-1/2 pb-1.5" style={{ left }}>
-          <div className="rounded-[18px] bg-card p-1.5 shadow-[0_18px_40px_-12px_rgb(0_0_0/0.35)] ring-1 ring-border">
-            <div className={cn(!shownSpan && "opacity-45 grayscale")}>
+        <div className="wr:absolute wr:bottom-full wr:z-30 wr:-translate-x-1/2 wr:pb-1.5" style={{ left }}>
+          <div className="wr:rounded-[18px] wr:bg-card wr:p-1.5 wr:shadow-[0_18px_40px_-12px_rgb(0_0_0/0.35)] wr:ring-1 wr:ring-border">
+            <div className={cn(!shownSpan && "wr:opacity-45 wr:grayscale")}>
               <SceneThumb scene={shown} config={config} width={thumbWidth} />
             </div>
-            <div className="px-1.5 pt-2 pb-1" style={{ width: thumbWidth }}>
-              <p className="flex items-baseline justify-between gap-2 text-[13px]">
-                <span className="truncate font-semibold">{shown.label}</span>
-                <span className="shrink-0 tabular-nums text-muted-foreground">
+            <div className="wr:px-1.5 wr:pt-2 wr:pb-1" style={{ width: thumbWidth }}>
+              <p className="wr:flex wr:items-baseline wr:justify-between wr:gap-2 wr:text-[13px]">
+                <span className="wr:truncate wr:font-semibold">{shown.label}</span>
+                <span className="wr:shrink-0 wr:tabular-nums wr:text-muted-foreground">
                   {shownSpan ? playTime(shownSpan.length / speed) : "Off"}
                 </span>
               </p>
               {shown.drop ? (
-                <p className="mt-0.5 text-[12px] font-semibold" style={{ color: rarityColors[shown.drop] }}>
+                <p className="wr:mt-0.5 wr:text-[12px] wr:font-semibold" style={{ color: rarityColors[shown.drop] }}>
                   {RARITY_LABELS[shown.drop]}
                 </p>
               ) : null}
               {editing ? (
-                <div className="mt-2 flex items-center justify-between gap-1">
-                  <span className="flex items-center gap-0.5">
+                <div className="wr:mt-2 wr:flex wr:items-center wr:justify-between wr:gap-1">
+                  <span className="wr:flex wr:items-center wr:gap-0.5">
                     <button
                       type="button"
                       onClick={() => editing.onMove(shown.key, -1)}
                       disabled={shownIndex <= 0}
                       aria-label={`Play ${shown.label} earlier`}
                       title="Earlier"
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-35"
+                      className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35"
                     >
-                      <ChevronLeft className="size-4" />
+                      <ChevronLeft className="wr:size-4" />
                     </button>
                     <button
                       type="button"
@@ -251,9 +251,9 @@ export function Timeline({
                       disabled={shownIndex >= scenes.length - 1}
                       aria-label={`Play ${shown.label} later`}
                       title="Later"
-                      className="grid size-8 cursor-pointer place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-35"
+                      className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35"
                     >
-                      <ChevronRight className="size-4" />
+                      <ChevronRight className="wr:size-4" />
                     </button>
                     {/* Words to rewrite, or a way out to pick: a scene playing before another one has that. */}
                     {shown.fields.length > 0 || (shownSpan && shown.key !== lastOn) ? (
@@ -262,9 +262,9 @@ export function Timeline({
                         onClick={() => editing.onEdit(shown.key)}
                         aria-label={`Edit ${shown.label}`}
                         title="Its words and transition"
-                        className="grid size-8 cursor-pointer place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                        className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground"
                       >
-                        <PencilLine className="size-4" />
+                        <PencilLine className="wr:size-4" />
                       </button>
                     ) : null}
                   </span>

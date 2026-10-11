@@ -14,8 +14,6 @@ import {
   type StageMark,
   type WrappedTransition,
 } from "./types";
-// oxlint-disable-next-line import/no-unassigned-import -- The stage's own stylesheet: shapes, rings, scene type.
-import "./wrapped.css";
 
 export function initials(handle: string) {
   return (
@@ -163,7 +161,10 @@ export function SceneThumb({
   }, [loop, scene, config.format]);
 
   return (
-    <div className="relative overflow-hidden rounded-[12px]" style={{ width, height: format.height * scale }}>
+    <div
+      className="wr-root wr:relative wr:overflow-hidden wr:rounded-[12px]"
+      style={{ width, height: format.height * scale }}
+    >
       <div
         ref={stageRef}
         className="wr-stage wr-thumb"
@@ -244,7 +245,10 @@ export function CutPreview({
   }, [style, first, second, config.format]);
 
   return (
-    <div className="relative overflow-hidden rounded-[12px]" style={{ width, height: format.height * scale }}>
+    <div
+      className="wr-root wr:relative wr:overflow-hidden wr:rounded-[12px]"
+      style={{ width, height: format.height * scale }}
+    >
       <div
         ref={stageRef}
         className="wr-stage wr-thumb"
@@ -264,7 +268,7 @@ export function CutPreview({
           // Hidden in the markup, not by the loop: the page is server-rendered, and until it wakes up the stills would
           // sit on top of each other.
           // oxlint-disable-next-line react/no-array-index-key -- three fixed stills, the first one twice
-          <div key={index} data-still className={index === 0 ? "contents" : "invisible contents"}>
+          <div key={index} data-still className={index === 0 ? "wr:contents" : "wr:invisible wr:contents"}>
             {scene.content}
           </div>
         ))}

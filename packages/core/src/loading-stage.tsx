@@ -4,8 +4,6 @@ import { beamFrames, LOOP_SECONDS, placeholderYear, weekFrames } from "./loading
 import { paletteStyle, resolvePalette } from "./palettes";
 import { initials, StageBackdrop } from "./stage";
 import { WRAPPED_FORMATS, type StageMark, type WrappedConfig } from "./types";
-// oxlint-disable-next-line import/no-unassigned-import -- The stage's own stylesheet: the loader is drawn on the stage.
-import "./wrapped.css";
 
 /** How long one line stays up before the next one rises. */
 const LINE_MS = 2600;

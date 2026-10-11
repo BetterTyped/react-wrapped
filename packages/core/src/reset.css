@@ -1,0 +1,79 @@
+/*
+ * A reset for the library's own elements and nothing else. A host may have any global styles or none; inside a
+ * root of ours (`.wr-root`, or a stage) boxes, buttons, lists and headings start from the same place either way.
+ * Every selector is wrapped in `:where()`, so it weighs nothing: any class, ours or the host's, wins over it.
+ */
+:where(.wr-root, .wr-stage),
+:where(.wr-root, .wr-stage) :where(*),
+:where(.wr-root, .wr-stage)::before,
+:where(.wr-root, .wr-stage)::after,
+:where(.wr-root, .wr-stage) :where(*)::before,
+:where(.wr-root, .wr-stage) :where(*)::after,
+:where(.wr-root, .wr-stage) :where(*)::backdrop,
+:where(.wr-root, .wr-stage) :where(*)::file-selector-button {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+:where(.wr-root) {
+  line-height: 1.5;
+  font-family: var(--wr-font, inherit);
+  -webkit-tap-highlight-color: transparent;
+  tab-size: 4;
+}
+
+:where(.wr-root, .wr-stage) :where(h1, h2, h3, h4, h5, h6) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+:where(.wr-root, .wr-stage) :where(a) {
+  color: inherit;
+  text-decoration: inherit;
+}
+:where(.wr-root, .wr-stage) :where(b, strong) {
+  font-weight: bolder;
+}
+:where(.wr-root, .wr-stage) :where(small) {
+  font-size: 80%;
+}
+:where(.wr-root, .wr-stage) :where(ol, ul, menu) {
+  list-style: none;
+}
+:where(.wr-root, .wr-stage) :where(img, svg, video, canvas) {
+  display: block;
+  vertical-align: middle;
+}
+:where(.wr-root, .wr-stage) :where(img, video) {
+  max-width: 100%;
+  height: auto;
+}
+:where(.wr-root, .wr-stage) :where(button, input, select, textarea),
+:where(.wr-root, .wr-stage) :where(*)::file-selector-button {
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  border-radius: 0;
+  background-color: transparent;
+  opacity: 1;
+}
+:where(.wr-root, .wr-stage) :where(textarea) {
+  resize: vertical;
+}
+:where(.wr-root, .wr-stage) :where(*)::placeholder {
+  opacity: 1;
+  color: color-mix(in oklab, currentcolor 50%, transparent);
+}
+:where(.wr-root, .wr-stage) :where(button, input:where([type="button"], [type="reset"], [type="submit"])),
+:where(.wr-root, .wr-stage) :where(*)::file-selector-button {
+  appearance: button;
+}
+:where(.wr-root, .wr-stage) :where([hidden]:where(:not([hidden="until-found"]))) {
+  display: none !important;
+}
+:where(dialog.wr-root) {
+  color: inherit;
+}
