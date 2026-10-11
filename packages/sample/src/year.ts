@@ -1,4 +1,4 @@
-import { createRng, type Rng } from "@react-wrapped/kit";
+import { calendarFromCounts, type CalendarLevels, createRng, type Rng } from "@react-wrapped/kit";
 
 /*
  * A made-up year on Orbit, a code platform that does not exist. Everything a Wrapped says about it is worked out
@@ -77,6 +77,8 @@ export interface SampleYear {
   from: Date;
   to: Date;
   days: readonly SampleDay[];
+  /** The year as the calendar draws it: a level per day, the first day's weekday and the month names. */
+  calendar: CalendarLevels;
   /** Weekday of the first day, so the calendar's first column starts in the right row. */
   lead: number;
   /** Every month the window touches, in order. A window that starts mid-month has thirteen. */
@@ -122,14 +124,6 @@ export interface SampleYearInput {
 }
 
 const monthName = (date: Date) => date.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" });
-
-/** The usual bucketing of a contribution graph: 0 is no activity, 1 to 4 are quartiles of the active days. */
-function levelsOf(counts: readonly number[]): number[] {
-  const active = counts.filter((count) => count > 0).toSorted((a, b) => a - b);
-  const quartile = (fraction: number) => active[Math.floor((active.length - 1) * fraction)] ?? 1;
-  const [q1, q2, q3] = [quartile(0.25), quartile(0.5), quartile(0.75)];
-  return counts.map((count) => (count === 0 ? 0 : count <= q1 ? 1 : count <= q2 ? 2 : count <= q3 ? 3 : 4));
-}
 
 /** Every run of days in a row that pass the test. */
 function runs(days: readonly SampleDay[], test: (day: SampleDay) => boolean): { start: number; length: number }[] {
@@ -184,23 +178,26 @@ const biggest = (months: readonly SampleMonth[]) =>
 export function yearFromCounts(input: SampleYearInput): SampleYear {
   const to = new Date(`${input.end}T00:00:00Z`);
   const from = new Date(to.getTime() - (input.counts.length - 1) * DAY_MS);
-  const levels = levelsOf(input.counts);
+  // The levels, the first weekday and the month names are the engine's to work out: one place decides them.
+  const calendar = calendarFromCounts(input.counts, from);
   const days: SampleDay[] = input.counts.map((count, index) => {
     const date = new Date(from.getTime() + index * DAY_MS);
-    return { date, count, level: levels[index], weekday: date.getUTCDay() };
+    return { date, count, level: calendar.levels[index], weekday: date.getUTCDay() };
   });
 
   const weekdays = [0, 0, 0, 0, 0, 0, 0];
   for (const day of days) weekdays[day.weekday] += day.count;
 
+  // One total per month the calendar names, in the same order.
   const months: SampleMonthTotal[] = [];
+  let monthOf = -1;
   for (const day of days) {
-    const label = day.date.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
-    let month = months.at(-1);
-    if (!month || month.label !== label) {
-      month = { label, name: monthName(day.date), total: 0, activeDays: 0 };
-      months.push(month);
+    if (day.date.getUTCMonth() !== monthOf) {
+      monthOf = day.date.getUTCMonth();
+      const label = calendar.months?.[months.length] ?? "";
+      months.push({ label, name: monthName(day.date), total: 0, activeDays: 0 });
     }
+    const month = months[months.length - 1];
     month.total += day.count;
     month.activeDays += day.count > 0 ? 1 : 0;
   }
@@ -214,7 +211,8 @@ export function yearFromCounts(input: SampleYearInput): SampleYear {
     from,
     to,
     days,
-    lead: days[0]?.weekday ?? 0,
+    calendar,
+    lead: calendar.lead,
     months,
     totals: {
       contributions,

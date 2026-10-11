@@ -1,9 +1,14 @@
 import { render } from "@testing-library/react";
 
-import { createRng, type SceneInstance, WRAPPED_FORMATS } from "@react-wrapped/kit";
+import {
+  createRng,
+  type SceneContext,
+  type SceneInstance,
+  WRAPPED_FORMATS,
+  type WrappedFormat,
+} from "@react-wrapped/kit";
 
-export type Format = keyof typeof WRAPPED_FORMATS;
-export const FORMATS = Object.keys(WRAPPED_FORMATS) as Format[];
+export const FORMATS = Object.keys(WRAPPED_FORMATS) as WrappedFormat[];
 
 /** jsdom draws nothing, so an SVG shape has no box to take its transform origin from. Charts need one to animate. */
 export function giveSvgABox() {
@@ -22,9 +27,10 @@ export function mountScene(scene: SceneInstance): HTMLElement {
 }
 
 /** Builds a scene's animation for a format and plays it to its last frame, the way an export does. */
-export function playScene(scene: SceneInstance, format: Format): number {
+export function playScene(scene: SceneInstance, format: WrappedFormat): number {
   const root = mountScene(scene);
-  const timeline = scene.animate({ root, format, rng: createRng(`${scene.key}:${format}`) });
+  const context: SceneContext = { root, format, rng: createRng(`${scene.key}:${format}`) };
+  const timeline = scene.animate(context);
   timeline.progress(1);
   const seconds = timeline.duration();
   timeline.kill();

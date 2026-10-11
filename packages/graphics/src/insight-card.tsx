@@ -3,8 +3,9 @@ import type { CSSProperties } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 
+import type { CardWording } from "./share-card";
 import { Chart, type SceneChart } from "@react-wrapped/charts";
-import { paletteStyle, type Rarity, RARITY_LABELS, type WrappedPalette } from "@react-wrapped/core";
+import { paletteStyle, type Rarity, useLabels, WrappedProvider, type WrappedPalette } from "@react-wrapped/core";
 
 /**
  * One thing a year turned out to be, as a card worth posting: the number, the chart that shows it, and the line that
@@ -47,13 +48,14 @@ export function InsightCard({ spec, palette }: { spec: InsightCardSpec; palette:
   const rarity = spec.rarity ? palette.rarity[spec.rarity] : palette.fg;
   const point = spec.rarity && spec.rarity !== "common" ? rarity : palette.fg;
   const width = drawnWidth(spec.chart);
+  const labels = useLabels();
   return (
     <div className="wr-insight" style={{ ...paletteStyle(palette), "--wr-rarity": rarity } as CSSProperties}>
       <div className="wr-insight-light" />
       <div className="wr-insight-copy">
         <div className="wr-insight-name">
           {spec.name}
-          {spec.rarity ? <span>{RARITY_LABELS[spec.rarity]}</span> : null}
+          {spec.rarity ? <span>{labels.rarity[spec.rarity]}</span> : null}
         </div>
         <div className="wr-insight-stat">
           <strong style={{ fontSize: valueSize(spec.stat.value) }}>{spec.stat.value}</strong>
@@ -113,14 +115,21 @@ let fonts: Promise<string> | null = null;
 /** Captures run one at a time. Each copies the style of every node it draws, and eight at once froze the page. */
 let queue: Promise<unknown> = Promise.resolve();
 
-async function capture(spec: InsightCardSpec, palette: WrappedPalette): Promise<Blob> {
+async function capture(spec: InsightCardSpec, palette: WrappedPalette, wording: CardWording): Promise<Blob> {
   // Drawn for real, off screen: the capture copies what the browser laid out, so the card has to exist.
   const host = document.createElement("div");
   host.setAttribute("aria-hidden", "true");
   host.style.cssText = `position:fixed;left:-99999px;top:0;width:${WIDTH}px;height:${HEIGHT}px;pointer-events:none;`;
   document.body.append(host);
   const root = createRoot(host);
-  flushSync(() => root.render(<InsightCard spec={spec} palette={palette} />));
+  // A root of its own is under no provider: the page's wording has to be handed in and set up again here.
+  flushSync(() =>
+    root.render(
+      <WrappedProvider labels={wording.labels} locale={wording.locale}>
+        <InsightCard spec={spec} palette={palette} />
+      </WrappedProvider>,
+    ),
+  );
   const card = host.firstElementChild as HTMLElement;
 
   await document.fonts.ready;
@@ -136,11 +145,18 @@ async function capture(spec: InsightCardSpec, palette: WrappedPalette): Promise<
   return blob;
 }
 
-/** The card as a PNG at twice its size, sharp on any screen and ready to post. */
-export function renderInsightCard(spec: InsightCardSpec, palette: WrappedPalette): Promise<Blob> {
+/**
+ * The card as a PNG at twice its size, sharp on any screen and ready to post. It is drawn in a React root of its
+ * own, which no provider on the page reaches, so reworded labels and a locale are passed in as `wording`.
+ */
+export function renderInsightCard(
+  spec: InsightCardSpec,
+  palette: WrappedPalette,
+  wording: CardWording = {},
+): Promise<Blob> {
   const next = queue.then(
-    () => capture(spec, palette),
-    () => capture(spec, palette),
+    () => capture(spec, palette, wording),
+    () => capture(spec, palette, wording),
   );
   queue = next.catch(() => null);
   return next;

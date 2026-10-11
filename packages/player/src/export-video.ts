@@ -1,7 +1,7 @@
 import { BufferTarget, canEncodeVideo, CanvasSource, Mp4OutputFormat, Output } from "mediabunny";
 
 import { createFramePainter } from "./stage-frame";
-import type { StageTake } from "@react-wrapped/core";
+import { DEFAULT_LABELS, type StageTake, type WrappedLabels } from "@react-wrapped/core";
 
 /** Frames a second in the file. The timeline is asked for each one exactly, so the motion is as smooth as this. */
 export const VIDEO_FPS = 60;
@@ -21,7 +21,16 @@ export function frameTimes(seconds: number, fps: number): number[] {
 export async function renderVideo(
   take: StageTake,
   { width, height }: { width: number; height: number },
-  { onProgress, signal }: { onProgress: (share: number) => void; signal: AbortSignal },
+  {
+    onProgress,
+    signal,
+    labels = DEFAULT_LABELS,
+  }: {
+    onProgress: (share: number) => void;
+    signal: AbortSignal;
+    /** What to say when the video cannot be made: pass `useLabels()`. Left out, it is said in English. */
+    labels?: Pick<WrappedLabels, "video">;
+  },
 ): Promise<Blob> {
   // A bitrate, not a quality level: a level asks for a fixed quantizer, which no hardware encoder takes, and the
   // software one made a minute of video in three. This much is about 12 Mbps at 1080p, well past what flat colour
@@ -29,15 +38,15 @@ export async function renderVideo(
   const bitrate = width * height * BITS_PER_PIXEL;
   const hardware = await canEncodeVideo("avc", { width, height, bitrate, hardwareAcceleration: "prefer-hardware" });
   if (!hardware && !(await canEncodeVideo("avc", { width, height, bitrate }))) {
-    throw new Error("This browser cannot make the video. Chrome, Edge and Safari can.");
+    throw new Error(labels.video.unsupported);
   }
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const context = canvas.getContext("2d", { alpha: false });
-  if (!context) throw new Error("Your browser blocked the canvas the video is drawn on.");
+  if (!context) throw new Error(labels.video.canvasBlocked);
 
-  const painter = await createFramePainter(take.stage, { width, height });
+  const painter = await createFramePainter(take.stage, { width, height }, labels);
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: "in-memory" }), target: new BufferTarget() });
   const source = new CanvasSource(canvas, {
     codec: "avc",
@@ -52,7 +61,7 @@ export async function renderVideo(
   try {
     for (const [frame, time] of times.entries()) {
       signal.throwIfAborted();
-      if (!take.intact()) throw new Error("The video changed while it was being made. Try again.");
+      if (!take.intact()) throw new Error(labels.video.changed);
       take.show(time);
       // oxlint-disable-next-line no-await-in-loop -- frames are made in order: each one is the stage at its moment
       await painter.paint(context);
@@ -67,6 +76,6 @@ export async function renderVideo(
   }
   await output.finalize();
   const { buffer } = output.target;
-  if (!buffer) throw new Error("The browser could not finish the video file.");
+  if (!buffer) throw new Error(labels.video.unfinished);
   return new Blob([buffer], { type: "video/mp4" });
 }

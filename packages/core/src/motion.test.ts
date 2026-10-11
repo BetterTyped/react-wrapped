@@ -1,4 +1,6 @@
-import { fitScene, headingLines, readingSeconds, wordsToRead } from "./motion";
+import { gsap } from "gsap";
+
+import { fitScene, headingLines, linesIn, readingSeconds, riseIn, wordsToRead } from "./motion";
 
 describe("headingLines", () => {
   it("balances a heading across two lines at a word", () => {
@@ -145,5 +147,43 @@ describe("fitScene", () => {
 
     // Assert
     expect(shrunkTo(made[0])).toBe(0.6);
+  });
+});
+
+describe("riseIn", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("skips a part the scene did not render, without a word in the console", () => {
+    // Arrange: a scene with a headline and nothing else, asked for parts it does not have.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const root = document.createElement("section");
+    root.innerHTML = '<h2><span class="wr-line"><span>Hello</span></span></h2>';
+    const tl = gsap.timeline({ paused: true });
+
+    // Act
+    riseIn(tl, root.querySelector(".wr-eyebrow"), { at: 0 });
+    riseIn(tl, root.querySelectorAll(".wr-rise"), { at: 0 });
+    linesIn(tl, document.createElement("section"), { at: 0 });
+
+    // Assert
+    expect(tl.getChildren()).toHaveLength(0);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("still brings in the parts that are there", () => {
+    // Arrange
+    const root = document.createElement("section");
+    root.innerHTML = '<p class="wr-rise">One</p><p class="wr-rise">Two</p>';
+    const tl = gsap.timeline({ paused: true });
+
+    // Act
+    riseIn(tl, root.querySelectorAll(".wr-rise"), { at: 0.5 });
+
+    // Assert
+    const [tween] = tl.getChildren();
+    expect(tween.targets()).toHaveLength(2);
+    expect(tween.startTime()).toBe(0.5);
   });
 });

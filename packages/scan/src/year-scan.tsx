@@ -1,6 +1,5 @@
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { FastForward, RotateCcw, ScanLine } from "lucide-react";
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -9,11 +8,11 @@ import {
   PIXEL_ART,
   type PixelArt,
   type Rarity,
-  RARITY_LABELS,
   readingSeconds,
+  useLabels,
   type WrappedPalette,
 } from "@react-wrapped/core";
-import { cn } from "@react-wrapped/core/internal";
+import { cn, FastForward, RotateCcw, ScanLine } from "@react-wrapped/core/internal";
 
 gsap.registerPlugin(useGSAP);
 
@@ -121,12 +120,12 @@ function pickSpot(levels: readonly number[], taken: readonly number[]): number {
   return pool[Math.floor(Math.random() * pool.length)] ?? 0;
 }
 
-/** Waits a few frames for an element React is about to render. */
-function whenRendered(selector: string, frames = 30): Promise<HTMLElement | null> {
+/** Waits a few frames for an element React is about to render, somewhere inside `within`. */
+function whenRendered(within: ParentNode, selector: string, frames = 30): Promise<HTMLElement | null> {
   return new Promise((resolve) => {
     let left = frames;
     const look = () => {
-      const match = document.querySelector<HTMLElement>(selector);
+      const match = within.querySelector<HTMLElement>(selector);
       if (match || left <= 0) {
         resolve(match);
         return;
@@ -179,6 +178,7 @@ export function YearScan({
   /** A scan started or came to rest: finished, stopped or sent straight to its end. */
   onRunChange?: (running: boolean) => void;
 }) {
+  const labels = useLabels();
   const rootRef = useRef<HTMLDivElement>(null);
   const flightRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -638,9 +638,9 @@ export function YearScan({
       // Face up for as long as this card's own text takes to read, and never less than its show takes to play out.
       const read = readingSeconds([
         current.name,
-        RARITY_LABELS[current.rarity],
+        labels.rarity[current.rarity],
         current.line,
-        `Found on ${describeDay(day)}`,
+        labels.scan.foundOn(describeDay(day)),
       ]);
       tl.to({}, { duration: Math.max(read, reduced ? 1 : legendary ? 2.65 : 1.75) });
       // A click on the backdrop skips straight to the card leaving for its slot.
@@ -677,7 +677,9 @@ export function YearScan({
       const land = contextSafe(async () => {
         openScene();
         // Home is its segment of the timeline. Before the first scan is over there is no timeline: home is its badge.
+        // In this Wrapped only: a page may hold more than one, and a card must not fly off to another's timeline.
         const slotCard = await whenRendered(
+          root.closest("[data-wr-view]") ?? document,
           gate ? `[data-find-badge="${current.id}"]` : `[data-seg="drop-${current.id}"] [data-seg-bar]`,
         );
         const finish = () => {
@@ -903,16 +905,15 @@ export function YearScan({
   const shownDay = current ? spots[current.id] : undefined;
   const left = run ? run.queue.length - step - 1 : 0;
 
-  let headline = `Your year is hiding ${drops.length} ${drops.length === 1 ? "scene" : "scenes"}.`;
+  let headline = labels.scan.hiding(drops.length);
   // Before the first scan the panel is the whole page, so it says where the video is, not only what is hidden.
   const waiting = gate && !run && found.length === 0;
-  if (waiting) headline = "Your Wrapped is almost ready.";
+  if (waiting) headline = labels.scan.almostReady;
   if (run) {
-    if (run.replay) headline = "Scanning your year again.";
-    else headline = left > 0 ? `Scanning your year. ${left} more after this one.` : "Scanning for the last one.";
-  } else if (allFound) headline = `You found all ${drops.length}.`;
-  else if (found.length > 0)
-    headline = `${pending.length} more ${pending.length === 1 ? "is" : "are"} hiding in your year.`;
+    if (run.replay) headline = labels.scan.scanningAgain;
+    else headline = left > 0 ? labels.scan.scanning(left) : labels.scan.scanningLast;
+  } else if (allFound) headline = labels.scan.foundAll(drops.length);
+  else if (found.length > 0) headline = labels.scan.moreHiding(pending.length);
 
   let button: ReactNode = (
     <button
@@ -928,7 +929,7 @@ export function YearScan({
       style={{ background: palette.levels[4], color: palette.bg }}
     >
       <ScanLine className="wr:size-4" />
-      {found.length > 0 ? "Keep scanning" : gate ? "Find my scenes" : "Scan my year"}
+      {found.length > 0 ? labels.scan.resume : gate ? labels.scan.startGate : labels.scan.start}
     </button>
   );
   if (run) {
@@ -940,7 +941,7 @@ export function YearScan({
           className="wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-4 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25"
         >
           <FastForward className="wr:size-4" />
-          Find all
+          {labels.scan.findAll}
         </button>
       ) : null;
   } else if (allFound) {
@@ -957,23 +958,14 @@ export function YearScan({
         className="wr:inline-flex wr:h-11 wr:cursor-pointer wr:items-center wr:gap-2 wr:rounded-full wr:px-5 wr:text-[14px] wr:font-semibold wr:ring-1 wr:ring-current/25 wr:transition-transform wr:hover:-translate-y-px"
       >
         <RotateCcw className="wr:size-4" />
-        Scan again
+        {labels.scan.again}
       </button>
     );
   }
 
-  let subline = "Achievements you earned and a few easter eggs. Each one joins your video when the scan finds it.";
-  if (gate) {
-    const scenes = `${drops.length} ${drops.length === 1 ? "scene" : "scenes"}`;
-    subline = waiting
-      ? `Your year is hiding ${scenes} only you get. Find ${drops.length === 1 ? "it" : "them"} and your video plays.`
-      : "Achievements you earned and a few easter eggs. Your video plays when the scan is done.";
-  }
-  if (allFound) {
-    subline = gate
-      ? "They are in your video. Here it comes."
-      : "They are in your video now. Run the scan again to watch them come out.";
-  }
+  let subline = labels.scan.about;
+  if (gate) subline = waiting ? labels.scan.aboutWaiting(drops.length) : labels.scan.aboutGate;
+  if (allFound) subline = gate ? labels.scan.doneGate : labels.scan.done;
 
   const tone = current ? palette.rarity[current.rarity] : palette.fg;
 
@@ -1072,7 +1064,7 @@ export function YearScan({
                     data-find-tile={marker.id}
                     disabled={run !== null}
                     onClick={() => setPeek({ id: Date.now(), drop: marker.id, from: "tile" })}
-                    aria-label={`Open ${marker.name}`}
+                    aria-label={labels.scan.open(marker.name)}
                     title={marker.name}
                     className="wr:absolute wr:inset-0 wr:cursor-pointer wr:rounded-[inherit] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70 wr:disabled:cursor-default"
                   />
@@ -1128,7 +1120,7 @@ export function YearScan({
         </span>
       </div>
 
-      <ul className="wr:mt-5 wr:flex wr:flex-wrap wr:gap-2" aria-label="Your finds">
+      <ul className="wr:mt-5 wr:flex wr:flex-wrap wr:gap-2" aria-label={labels.scan.finds}>
         {drops.map((drop) => {
           const spot = found.includes(drop.id) && !veiled ? spots[drop.id] : undefined;
           const colour = palette.rarity[drop.rarity];
@@ -1142,7 +1134,7 @@ export function YearScan({
                   <span className="wr:rounded-[9px] wr:p-1.5" style={{ background: palette.bg }}>
                     <PixelGlyph art={PIXEL_ART.question} colour={palette.muted} cell={3} />
                   </span>
-                  <span className="wr:text-[13px] wr:font-semibold">Still hidden</span>
+                  <span className="wr:text-[13px] wr:font-semibold">{labels.scan.stillHidden}</span>
                 </span>
               ) : (
                 <button
@@ -1150,7 +1142,7 @@ export function YearScan({
                   data-find-badge={drop.id}
                   disabled={run !== null}
                   onClick={() => setPeek({ id: Date.now(), drop: drop.id, from: "badge" })}
-                  title="Open this card"
+                  title={labels.scan.openCard}
                   className="wr:flex wr:cursor-pointer wr:items-center wr:gap-2.5 wr:rounded-[14px] wr:py-1.5 wr:pr-3.5 wr:pl-1.5 wr:text-left wr:transition-transform wr:hover:-translate-y-px wr:disabled:cursor-default"
                   style={{
                     background: `color-mix(in oklch, ${colour} 14%, ${palette.card})`,
@@ -1286,8 +1278,8 @@ export function YearScan({
                 <button
                   type="button"
                   data-flyer-card
-                  aria-label={peek ? "Close this card" : "Turn the card over, then add it to your video"}
-                  title={peek ? "Click to close" : "Click to turn it over, click again to add it"}
+                  aria-label={peek ? labels.scan.closeCard : labels.scan.turnCard}
+                  title={peek ? labels.scan.closeCardHint : labels.scan.turnCardHint}
                   onClick={() => cardRef.current?.()}
                   className="wr:pointer-events-auto wr:absolute wr:inset-0 wr:z-10 wr:cursor-pointer wr:rounded-[28px] wr:outline-none wr:focus-visible:ring-2 wr:focus-visible:ring-white/70"
                 />
@@ -1329,7 +1321,7 @@ export function YearScan({
                           className="wr:mt-1.5 wr:text-[14px] wr:font-semibold"
                           style={{ color: tone }}
                         >
-                          {RARITY_LABELS[current.rarity]}
+                          {labels.rarity[current.rarity]}
                         </p>
                         <p
                           data-flyer-line
@@ -1343,7 +1335,7 @@ export function YearScan({
                           className="wr:mt-3 wr:text-[12.5px] wr:font-semibold"
                           style={{ color: palette.muted }}
                         >
-                          {shownDay === undefined ? " " : `Found on ${describeDay(shownDay)}`}
+                          {shownDay === undefined ? " " : labels.scan.foundOn(describeDay(shownDay))}
                         </p>
                       </>
                     ) : null}

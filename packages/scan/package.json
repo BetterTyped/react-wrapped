@@ -53,8 +53,7 @@
     "lint": "pnpm --dir ../.. exec oxlint packages/scan"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
-    "lucide-react": "^1.11.0"
+    "@gsap/react": "^2.1.2"
   },
   "peerDependencies": {
     "@react-wrapped/core": "workspace:*",

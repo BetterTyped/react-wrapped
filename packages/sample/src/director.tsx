@@ -187,11 +187,7 @@ export function directSample(year: SampleYear, traits: SampleTraits, opened: rea
   const rng = createRng(played.seed).fork("director");
   const { totals } = year;
   const period = samplePeriod(year);
-  const calendar: CalendarLevels = {
-    levels: year.days.map((day) => day.level),
-    lead: year.lead,
-    months: year.months.map((month) => month.label),
-  };
+  const { calendar } = year;
   const counter = () => rng.pick(["climb", "slot"] as const);
   const week = weekBars(year);
   const [topLanguage] = year.languages;
@@ -383,7 +379,7 @@ export function directSample(year: SampleYear, traits: SampleTraits, opened: rea
       avatarUrl: null,
       caption: SAMPLE_CAPTION,
       period,
-      graph: { levels: calendar.levels, lead: year.lead },
+      graph: { levels: calendar.levels, lead: calendar.lead },
       stats,
       tokens,
     },

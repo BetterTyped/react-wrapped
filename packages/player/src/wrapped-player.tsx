@@ -1,4 +1,3 @@
-import { Maximize2, Minimize2, Pause, Play, RotateCcw } from "lucide-react";
 import { type Ref, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 
 import { Timeline, type TimelineEditing } from "./timeline";
@@ -8,6 +7,7 @@ import {
   type SceneInstance,
   type SceneMark,
   type StageTake,
+  useLabels,
   useWrappedTimeline,
   WRAPPED_FORMATS,
   type WrappedConfig,
@@ -15,15 +15,18 @@ import {
   WrappedStage,
   type WrappedSubject,
 } from "@react-wrapped/core";
-import { cn } from "@react-wrapped/core/internal";
+import { cn, Maximize2, Minimize2, Pause, Play, RotateCcw } from "@react-wrapped/core/internal";
 
 /** The tallest the frame may get on a phone, as a share of the viewport, so the controls stay on screen. */
 const PHONE_HEIGHT_SHARE = 0.72;
 
 const shell = "wr:flex wr:min-w-0 wr:flex-col wr:gap-4";
-const room = "wr:grid wr:min-h-[320px] wr:flex-1 wr:place-items-center";
+/** The least room the frame is given. Also how the fit tells "the page gave no height" from a real one. */
+const MIN_ROOM = 320;
+const room = "wr:relative wr:min-h-[320px] wr:flex-1";
+// Out of the flow and centred: the room's height is then the page's doing alone, never the frame's.
 const frame =
-  "wr:relative wr:overflow-hidden wr:rounded-[22px] wr:shadow-[0_40px_80px_-40px_oklch(0.2_0.05_170/0.55)] wr:ring-1 wr:ring-black/5";
+  "wr:absolute wr:inset-0 wr:m-auto wr:overflow-hidden wr:rounded-[22px] wr:shadow-[0_40px_80px_-40px_oklch(0.2_0.05_170/0.55)] wr:ring-1 wr:ring-black/5";
 const transport = "wr:flex wr:items-center wr:gap-3 wr:px-1";
 const control = "wr:grid wr:size-11 wr:shrink-0 wr:place-items-center wr:rounded-full wr:[&_svg]:size-4";
 const clock =
@@ -39,10 +42,18 @@ function useStageFit(format: WrappedFormat, fullscreen: boolean) {
     const box = boxRef.current;
     if (!box) return;
     const fit = () => {
+      // What the page gives the room by itself, without the height lent to it below.
+      box.style.minHeight = "";
+      const given = box.clientHeight;
+      // A player dropped into a page with no height set gets only the minimum. It then takes its size from its
+      // width, and holds the room open at the height its frame came out at.
+      const unsized = !fullscreen && given <= MIN_ROOM + 1;
       const maxHeight = fullscreen
-        ? box.clientHeight
-        : Math.min(box.clientHeight || Infinity, window.innerHeight * PHONE_HEIGHT_SHARE);
-      setScale(Math.min(box.clientWidth / width, maxHeight / height));
+        ? given
+        : Math.min(unsized ? Infinity : given, window.innerHeight * PHONE_HEIGHT_SHARE);
+      const next = Math.min(box.clientWidth / width, maxHeight / height);
+      if (unsized) box.style.minHeight = `${Math.round(height * next)}px`;
+      setScale(next);
     };
     fit();
     const observer = new ResizeObserver(fit);
@@ -73,6 +84,7 @@ export function WrappedPlayerLoading({
   className?: string;
 }) {
   const { boxRef, scale, style } = useStageFit(config.format, false);
+  const labels = useLabels();
   return (
     <div className={cn("wr-root", shell, className)}>
       <div ref={boxRef} className={room}>
@@ -90,7 +102,7 @@ export function WrappedPlayerLoading({
         <span className="wr:flex wr:h-11 wr:flex-1 wr:items-center">
           <i className="wr:h-2 wr:w-full wr:rounded-full wr:bg-muted" />
         </span>
-        <span className={clock}>0:00 / 0:00</span>
+        <span className={clock}>{labels.player.clock("0:00", "0:00")}</span>
         <span className={cn(control, "wr:ring-1 wr:ring-border")}>
           <Maximize2 />
         </span>
@@ -152,6 +164,7 @@ export function WrappedPlayer({
   const trackRef = useRef<HTMLDivElement>(null);
   const clockRef = useRef<HTMLSpanElement>(null);
   const { boxRef, scale, style } = useStageFit(config.format, fullscreen);
+  const labels = useLabels();
 
   const { playing, marks, toggle, play, pause, restart, seekTime, step, take, duration } = useWrappedTimeline({
     stageRef,
@@ -213,7 +226,7 @@ export function WrappedPlayer({
 
       <div
         role="toolbar"
-        aria-label="Video controls. Left and right arrows step between scenes."
+        aria-label={labels.player.controls}
         className={transport}
         onKeyDown={(event) => {
           if (event.key === "ArrowRight") step(1);
@@ -224,7 +237,7 @@ export function WrappedPlayer({
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? "Pause" : "Play"}
+          aria-label={playing ? labels.player.pause : labels.player.play}
           className={cn(
             control,
             "wr:cursor-pointer wr:bg-foreground wr:text-background wr:transition-transform wr:hover:-translate-y-px",
@@ -235,7 +248,7 @@ export function WrappedPlayer({
         <button
           type="button"
           onClick={restart}
-          aria-label="Play from the start"
+          aria-label={labels.player.restart}
           className={cn(
             control,
             "wr:cursor-pointer wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",
@@ -253,12 +266,12 @@ export function WrappedPlayer({
           onSeek={seekTime}
         />
         <span ref={clockRef} className={clock}>
-          0:00 / 0:00
+          {labels.player.clock("0:00", "0:00")}
         </span>
         <button
           type="button"
           onClick={toggleFullscreen}
-          aria-label={fullscreen ? "Leave full screen" : "Full screen"}
+          aria-label={fullscreen ? labels.player.exitFullscreen : labels.player.fullscreen}
           className={cn(
             control,
             "wr:cursor-pointer wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px",

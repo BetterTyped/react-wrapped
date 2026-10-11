@@ -1,16 +1,15 @@
-import { ChevronLeft, ChevronRight, PencilLine } from "lucide-react";
 import { type PointerEvent, type RefObject, useEffect, useRef, useState } from "react";
 
 import {
-  RARITY_LABELS,
   resolvePalette,
   type SceneInstance,
   type SceneMark,
   SceneThumb,
+  useLabels,
   WRAPPED_FORMATS,
   type WrappedConfig,
 } from "@react-wrapped/core";
-import { cn, Switch } from "@react-wrapped/core/internal";
+import { ChevronLeft, ChevronRight, cn, PencilLine, Switch } from "@react-wrapped/core/internal";
 
 /** What the creator can do to the cut from the timeline. Left out for anyone just watching. */
 export interface TimelineEditing {
@@ -26,12 +25,6 @@ export interface TimelineEditing {
  * row is about 60px wide, so the sliver is thinner there.
  */
 const offSegment = "wr:w-1.5 wr:flex-none wr:sm:w-3.5";
-
-/** Seconds as the timeline shows them: 4s, or 1:05 past a minute. */
-function playTime(seconds: number): string {
-  const whole = Math.max(0, Math.round(seconds));
-  return whole < 60 ? `${whole}s` : `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
-}
 
 /**
  * The video's timeline, and the place the cut is managed from. Every scene is a segment as long as it plays. Hover one
@@ -61,6 +54,7 @@ export function Timeline({
   const wrapRef = useRef<HTMLDivElement>(null);
   const closing = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [open, setOpen] = useState<{ key: string; x: number } | null>(null);
+  const labels = useLabels();
   const speed = Number(config.speed) || 1;
   // Rarity wears the picked theme, like everything else in the video.
   const rarityColors = resolvePalette(config).rarity;
@@ -227,12 +221,15 @@ export function Timeline({
               <p className="wr:flex wr:items-baseline wr:justify-between wr:gap-2 wr:text-[13px]">
                 <span className="wr:truncate wr:font-semibold">{shown.label}</span>
                 <span className="wr:shrink-0 wr:tabular-nums wr:text-muted-foreground">
-                  {shownSpan ? playTime(shownSpan.length / speed) : "Off"}
+                  {shownSpan
+                    ? // Whole seconds: how the number is written (4s, 1:05) is the label's business.
+                      labels.timeline.length(Math.max(0, Math.round(shownSpan.length / speed)))
+                    : labels.timeline.off}
                 </span>
               </p>
               {shown.drop ? (
                 <p className="wr:mt-0.5 wr:text-[12px] wr:font-semibold" style={{ color: rarityColors[shown.drop] }}>
-                  {RARITY_LABELS[shown.drop]}
+                  {labels.rarity[shown.drop]}
                 </p>
               ) : null}
               {editing ? (
@@ -242,8 +239,8 @@ export function Timeline({
                       type="button"
                       onClick={() => editing.onMove(shown.key, -1)}
                       disabled={shownIndex <= 0}
-                      aria-label={`Play ${shown.label} earlier`}
-                      title="Earlier"
+                      aria-label={labels.timeline.moveEarlier(shown.label)}
+                      title={labels.timeline.earlier}
                       className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35"
                     >
                       <ChevronLeft className="wr:size-4" />
@@ -252,8 +249,8 @@ export function Timeline({
                       type="button"
                       onClick={() => editing.onMove(shown.key, 1)}
                       disabled={shownIndex >= scenes.length - 1}
-                      aria-label={`Play ${shown.label} later`}
-                      title="Later"
+                      aria-label={labels.timeline.moveLater(shown.label)}
+                      title={labels.timeline.later}
                       className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground wr:disabled:pointer-events-none wr:disabled:opacity-35"
                     >
                       <ChevronRight className="wr:size-4" />
@@ -263,8 +260,8 @@ export function Timeline({
                       <button
                         type="button"
                         onClick={() => editing.onEdit(shown.key)}
-                        aria-label={`Edit ${shown.label}`}
-                        title="Its words and transition"
+                        aria-label={labels.timeline.edit(shown.label)}
+                        title={labels.timeline.editHint}
                         className="wr:grid wr:size-8 wr:cursor-pointer wr:place-items-center wr:rounded-lg wr:text-muted-foreground wr:hover:bg-muted wr:hover:text-foreground"
                       >
                         <PencilLine className="wr:size-4" />
@@ -276,7 +273,7 @@ export function Timeline({
                     // The last scene still on cannot be switched off: a video with nothing in it plays nothing.
                     disabled={Boolean(shownSpan) && onCount === 1}
                     onCheckedChange={(on) => editing.onToggle(shown.key, on)}
-                    aria-label={`Play ${shown.label}`}
+                    aria-label={labels.timeline.toggle(shown.label)}
                   />
                 </div>
               ) : null}

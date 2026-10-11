@@ -1,5 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { existsSync, statSync } from "fs";
 import * as path from "path";
 import type { AtRule, Plugin as PostcssPlugin } from "postcss";
 import dts from "vite-plugin-dts";
@@ -40,6 +41,23 @@ const selfContained = (): PostcssPlugin => ({
 });
 
 /**
+ * Type declarations as Node reads them. The sources import each other without extensions ("./charts"), which a
+ * bundler resolves and Node's own ESM rules do not: a project on `moduleResolution: "node16"` would find the
+ * package's entry and then nothing behind it. So every relative import in an emitted declaration gets the file it
+ * really means: "./charts.js", or "./internal/index.js" for a folder.
+ */
+function withExtensions(dir: string, filePath: string, content: string): string {
+  const from = path.join(dir, "src", path.relative(path.join(dir, "dist"), path.dirname(filePath)));
+  return content.replaceAll(/(\bfrom\s+|\bimport\(\s*)(["'])(\.{1,2}\/[^"']*)\2/g, (...match: string[]) => {
+    const [whole, lead, quote, spec] = match;
+    if (/\.(js|mjs|cjs|json|css)$/.test(spec)) return whole;
+    const target = path.join(from, spec);
+    const folder = existsSync(target) && statSync(target).isDirectory();
+    return `${lead}${quote}${spec}${folder ? "/index.js" : ".js"}${quote}`;
+  });
+}
+
+/**
  * How every package of the library is built and tested: one ES module per entry with its types, one stylesheet,
  * and nothing bundled that the package did not write.
  */
@@ -58,7 +76,15 @@ export function libConfig({
     // Tailwind is a build tool here and nothing more: it compiles the chrome's utility classes into the stylesheet
     // the package ships (see packages/core/src/chrome-theme.css).
     css: { postcss: { plugins: [selfContained()] } },
-    plugins: [tailwindcss(), react(), dts({ entryRoot: "src", tsconfigPath: path.join(dir, "tsconfig.lib.json") })],
+    plugins: [
+      tailwindcss(),
+      react(),
+      dts({
+        entryRoot: "src",
+        tsconfigPath: path.join(dir, "tsconfig.lib.json"),
+        beforeWriteFile: (filePath, content) => ({ filePath, content: withExtensions(dir, filePath, content) }),
+      }),
+    ],
     build: {
       outDir: "./dist",
       emptyOutDir: true,

@@ -59,8 +59,7 @@
     "@react-wrapped/marks": "workspace:*",
     "@react-wrapped/player": "workspace:*",
     "@react-wrapped/scan": "workspace:*",
-    "@react-wrapped/scenes": "workspace:*",
-    "lucide-react": "^1.11.0"
+    "@react-wrapped/scenes": "workspace:*"
   },
   "peerDependencies": {
     "gsap": "^3.13.0",

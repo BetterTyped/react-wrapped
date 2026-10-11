@@ -1,9 +1,10 @@
 /*
- * The colours the chrome is painted with, light and dark. A host recolours the whole chrome by setting these on any
- * ancestor of a library root. They are separate from the video's palette (`--wr-bg`, `--wr-l4`, ...), which belongs
- * to the stage and changes with the viewer's pick.
+ * The colours the chrome is painted with, light and dark. They are set on the page's root with no weight at all, so
+ * a host recolours the whole chrome by setting any of them anywhere above the library: on `body`, on a wrapper, on
+ * `:root` itself. Dark values apply under a `.dark` class, the way most apps switch. They are separate from the
+ * video's palette (`--wr-bg`, `--wr-l4`, ...), which belongs to the stage and changes with the viewer's pick.
  */
-:where(.wr-root) {
+:where(:root) {
   --wr-ui-bg: oklch(0.995 0.003 80);
   --wr-ui-fg: oklch(0.16 0.01 75);
   --wr-ui-card: oklch(0.998 0.003 80);
@@ -16,7 +17,7 @@
   --wr-ui-radius: 0.625rem;
 }
 
-:where(.dark .wr-root, .wr-root.dark, .wr-dark) {
+:where(.dark, .wr-dark) {
   --wr-ui-bg: oklch(0.22 0.006 75);
   --wr-ui-fg: oklch(0.985 0 0);
   --wr-ui-card: oklch(0.23 0.005 75);

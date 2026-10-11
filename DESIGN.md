@@ -79,15 +79,32 @@ site, and it is how a palette change repaints everything without a re-render.
 Never write a colour into a component. If a new surface needs one, it is a mix of these (`color-mix`) or a new entry in
 the palette data, for every palette, in both dark and light.
 
-## The `wr-` prefix
+## Styles: two kinds of classes, one prefix
 
-Every class the library ships starts with `wr-`, and every custom property with `--wr-`. The stylesheets bring all the
-components need and touch nothing outside that prefix, so the library can sit in any app without a reset and without
-fighting the app's own CSS. Do not style a bare element selector, and do not depend on a class the host page might
-define.
+Everything the library ships is named so it cannot collide with the page it is loaded on: classes start with `wr`,
+custom properties with `--wr-`, animations with `wr-`.
 
-The stage is a fixed resolution frame (1080 on its short side) scaled to fit, so sizes inside it are in `px` against
-that frame, not `rem`.
+- **The stage** (scenes, charts, transitions, cards) is hand-written CSS: `wr-stage`, `wr-title`, `wr-chart`. It lives
+  in `packages/core/src/wrapped.css`.
+- **The chrome** (player controls, timeline, settings, scan, gallery, editor) is written with utility classes that carry
+  the prefix `wr:`, like `wr:flex wr:rounded-full`. Tailwind compiles them once at build time into the stylesheet each
+  package ships. It is a build tool here and nothing more: nobody who installs the library needs Tailwind, and the
+  page's own Tailwind, if it has one, never sees these classes.
+
+Three things keep the shipped CSS a good guest (`tools/vite-lib.ts`, `packages/core/src/reset.css`):
+
+1. **No cascade layers.** The compiled utilities are taken out of `@layer`, because a layered rule loses to any
+   unlayered rule of the host, such as a plain `button { ... }`.
+2. **A reset that weighs nothing.** Inside a root of ours (`.wr-root`, or a stage) boxes, buttons and headings are reset
+   with selectors wrapped in `:where()`. Outside those roots nothing is touched.
+3. **Colours are variables.** The stage reads the video's palette (`--wr-bg`, `--wr-l4`, ...). The chrome reads
+   `--wr-ui-*` tokens, set on `:root` with no weight, so a host recolours it by setting them anywhere above.
+
+One limit to know: a host rule that targets elements inside a container, like `.prose h2 { margin-top: 2em }`, is more
+specific than a single class and will reach the library's headings. Render a Wrapped outside such containers.
+
+When code comes in from the app this library was cut from, its utility classes have no prefix yet:
+`node scripts/prefix-classes.mjs packages/<name>/src --write` adds it (see `UPSTREAM.md`).
 
 ## The docs are generated from registries
 

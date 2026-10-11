@@ -7,6 +7,8 @@
  * and travel with every frame as they are, and a frame is only the markup of what is on screen right now.
  */
 
+import { DEFAULT_LABELS, type WrappedLabels } from "@react-wrapped/core";
+
 /** Rules for these never match an element, so they are tested by the element they hang on. */
 const PSEUDO_ELEMENT =
   /::?(?:before|after|first-line|first-letter|marker|placeholder|selection|backdrop|file-selector-button)\b|::[\w-]+(?:\([^)]*\))?/g;
@@ -84,26 +86,29 @@ function stageCss(stage: Element): { css: string; faces: DeclaredFace[] } {
 const bare = (family: string) => family.replaceAll(/["']/g, "").trim().toLowerCase();
 const tight = (value: string) => value.replaceAll(/\s+/g, "").toLowerCase();
 
-function dataUrl(blob: Blob): Promise<string> {
+/** What to say when a file the frame carries cannot be had. */
+type FileLabels = Pick<WrappedLabels, "video">;
+
+function dataUrl(blob: Blob, labels: FileLabels): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => resolve(String(reader.result)));
-    reader.addEventListener("error", () => reject(new Error("A file the video needs could not be read.")));
+    reader.addEventListener("error", () => reject(new Error(labels.video.fileUnread)));
     reader.readAsDataURL(blob);
   });
 }
 
-async function inline(url: string): Promise<string> {
+async function inline(url: string, labels: FileLabels): Promise<string> {
   const response = await fetch(url);
-  if (!response.ok) throw new Error(`A file the video needs did not load (${response.status}).`);
-  return dataUrl(await response.blob());
+  if (!response.ok) throw new Error(labels.video.fileMissing(response.status));
+  return dataUrl(await response.blob(), labels);
 }
 
 /**
  * The fonts the page has actually loaded, carried inside the frame: a picture cannot fetch anything. Only loaded
  * faces travel (the Latin file, not the eleven other scripts declared next to it), because every frame parses them.
  */
-async function embeddedFonts(faces: readonly DeclaredFace[], fonts: FontFaceSet): Promise<string> {
+async function embeddedFonts(faces: readonly DeclaredFace[], fonts: FontFaceSet, labels: FileLabels): Promise<string> {
   const loaded = new Set(
     [...fonts]
       .filter((face) => face.status === "loaded")
@@ -125,7 +130,7 @@ async function embeddedFonts(faces: readonly DeclaredFace[], fonts: FontFaceSet)
     used.map(async ({ rule, base }) => {
       const source = /url\((["']?)([^"')]+)\1\)/.exec(rule.style.getPropertyValue("src"));
       if (!source) return "";
-      const file = await inline(new URL(source[2], base).href);
+      const file = await inline(new URL(source[2], base).href, labels);
       return rule.cssText.replace(source[0], `url("${file}")`);
     }),
   );
@@ -180,12 +185,14 @@ export interface FramePainter {
 export async function createFramePainter(
   stage: HTMLElement,
   { width, height }: { width: number; height: number },
+  /** What to say when a font the frame needs cannot be had: pass `useLabels()`. Left out, it is said in English. */
+  labels: FileLabels = DEFAULT_LABELS,
 ): Promise<FramePainter> {
   const page = stage.ownerDocument;
   await page.fonts.ready;
 
   const rules = stageCss(stage);
-  const css = (await embeddedFonts(rules.faces, page.fonts)) + rules.css;
+  const css = (await embeddedFonts(rules.faces, page.fonts, labels)) + rules.css;
 
   // Pictures on the stage (the avatar). One that cannot be read is left out of the frame, not out of the video.
   const images = new Map<string, string>();
@@ -193,7 +200,7 @@ export async function createFramePainter(
     [...stage.querySelectorAll("img")].map(async (image) => {
       const source = image.currentSrc || image.src;
       if (!source || images.has(source)) return;
-      const inlined = await inline(source).catch(() => null);
+      const inlined = await inline(source, labels).catch(() => null);
       if (inlined) images.set(source, inlined);
     }),
   );

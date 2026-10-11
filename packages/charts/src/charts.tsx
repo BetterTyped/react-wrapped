@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 import { CHART_ENTRANCES, notesIn, restIn } from "./chart-entrances";
-import { EASE_OUT } from "@react-wrapped/core";
+import { DEFAULT_LABELS, EASE_OUT, useLabels } from "@react-wrapped/core";
 
 /*
  * The charts a generated scene can carry, so every achievement tells its story
@@ -1056,10 +1056,11 @@ function Wheel({ chart }: { chart: Extract<SceneChart, { type: "wheel" }> }) {
   );
 }
 
-/** An hour of the day as people say it: "12 am", "3 pm". */
-export const hourName = (hour: number) => `${hour % 12 === 0 ? 12 : hour % 12} ${hour < 12 ? "am" : "pm"}`;
-const WEEK_LETTERS = ["M", "T", "W", "T", "F", "S", "S"] as const;
-const WEEK_NAMES = ["Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"] as const;
+/**
+ * An hour of the day as people say it in English: "12 am", "3 pm". For a director's own lines. The charts write
+ * their hours through the labels (`charts.hour`), so a provider can say them another way.
+ */
+export const hourName = (hour: number) => DEFAULT_LABELS.charts.hour(hour);
 /** A value as one of the graph's five levels, 0 for nothing. */
 const levelOf = (value: number, max: number) => (value > 0 ? Math.max(1, Math.ceil((value / max) * 4)) : 0);
 
@@ -1072,6 +1073,7 @@ const CLOCK_HEIGHT = 700;
  */
 function Clock({ chart }: { chart: Extract<SceneChart, { type: "clock" }> }) {
   const id = useId();
+  const labels = useLabels();
   const hours = Array.from({ length: 24 }, (_unused, hour) => Math.max(0, chart.hours[hour] ?? 0));
   const cx = WIDTH / 2;
   const cy = CLOCK_HEIGHT / 2;
@@ -1171,7 +1173,7 @@ function Clock({ chart }: { chart: Extract<SceneChart, { type: "clock" }> }) {
             className="wr-chart-label"
             fill="var(--wr-muted)"
           >
-            {hourName(hour)}
+            {labels.charts.hour(hour)}
           </text>
         );
       })}
@@ -1188,7 +1190,7 @@ function Clock({ chart }: { chart: Extract<SceneChart, { type: "clock" }> }) {
             strokeOpacity="0.22"
             strokeWidth="2"
           />
-          <Pill x={pillAt.x} y={pillAt.y} text={hourName(peak)} tone="rarity" />
+          <Pill x={pillAt.x} y={pillAt.y} text={labels.charts.hour(peak)} tone="rarity" />
         </>
       ) : null}
     </svg>
@@ -1439,6 +1441,7 @@ const growth = (row: { was: number; now: number }) => (row.was > 0 ? row.now / r
  */
 function Dumbbell({ chart }: { chart: Extract<SceneChart, { type: "dumbbell" }> }) {
   const id = useId();
+  const labels = useLabels();
   const left = 232;
   const right = 786;
   const point =
@@ -1461,7 +1464,7 @@ function Dumbbell({ chart }: { chart: Extract<SceneChart, { type: "dumbbell" }> 
         row.was > 0
           ? `${up ? "+" : ""}${Math.round(((row.now - row.was) / row.was) * 100)}%`
           : row.now > 0
-            ? "new"
+            ? labels.charts.new
             : "",
     };
   });
@@ -1734,6 +1737,7 @@ function Month({ chart }: { chart: Extract<SceneChart, { type: "month" }> }) {
   const rows = Math.ceil((lead + chart.days.length) / 7);
   const max = Math.max(1, ...chart.days);
   const peak = chart.days.indexOf(Math.max(...chart.days));
+  const labels = useLabels();
 
   return (
     <svg
@@ -1742,7 +1746,7 @@ function Month({ chart }: { chart: Extract<SceneChart, { type: "month" }> }) {
       data-rows={rows}
       aria-hidden
     >
-      {WEEK_LETTERS.map((letter, column) => (
+      {Array.from({ length: 7 }, (_unused, column) => (
         <text
           // oxlint-disable-next-line react/no-array-index-key -- weekdays are positional
           key={column}
@@ -1753,7 +1757,7 @@ function Month({ chart }: { chart: Extract<SceneChart, { type: "month" }> }) {
           className="wr-chart-label"
           fill="var(--wr-muted)"
         >
-          {letter}
+          {labels.charts.weekdayLetter(column)}
         </text>
       ))}
       {Array.from({ length: rows * 7 }, (_unused, index) => {
@@ -2142,6 +2146,7 @@ function Mirror({ chart }: { chart: Extract<SceneChart, { type: "mirror" }> }) {
  * happened in that hour of that weekday. The busiest cell is the find's color and names its slot in a pill.
  */
 function Hours({ chart }: { chart: Extract<SceneChart, { type: "hours" }> }) {
+  const labels = useLabels();
   const left = 46;
   const gap = 6;
   const cellWidth = (WIDTH - left - gap * 23) / 24;
@@ -2176,7 +2181,7 @@ function Hours({ chart }: { chart: Extract<SceneChart, { type: "hours" }> }) {
             className="wr-chart-label"
             fill="var(--wr-muted)"
           >
-            {WEEK_LETTERS[day]}
+            {labels.charts.weekdayLetter(day)}
           </text>
           {row.map((value, hour) => {
             const lit = best.value > 0 && day === best.day && hour === best.hour;
@@ -2214,13 +2219,18 @@ function Hours({ chart }: { chart: Extract<SceneChart, { type: "hours" }> }) {
           className="wr-chart-label"
           fill="var(--wr-muted)"
         >
-          {hourName(hour)}
+          {labels.charts.hour(hour)}
         </text>
       ))}
       {best.value > 0 ? (
         <>
           <Marker x={pillX} from={66} to={top - 8} />
-          <Pill x={pillX} y={40} text={`${WEEK_NAMES[best.day]}, ${hourName(best.hour)}`} tone="rarity" />
+          <Pill
+            x={pillX}
+            y={40}
+            text={labels.charts.weekdayHour(labels.charts.weekday(best.day), labels.charts.hour(best.hour))}
+            tone="rarity"
+          />
         </>
       ) : null}
     </svg>
@@ -2268,14 +2278,24 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     return;
   }
   const all = (selector: string) => figure.querySelectorAll<SVGElement | HTMLElement>(selector);
+  // A chart is made of a few of the pieces below, never all of them. A move with nothing to move is left out: handed
+  // to GSAP it would still take up time on the timeline, and be warned about in the console once per piece.
+  const moves = {
+    from: (pieces: NodeListOf<Element>, vars: gsap.TweenVars, position: number) => {
+      if (pieces.length > 0) tl.from(pieces, vars, position);
+    },
+    to: (pieces: NodeListOf<Element>, vars: gsap.TweenVars, position: number) => {
+      if (pieces.length > 0) tl.to(pieces, vars, position);
+    },
+  };
 
-  tl.from(
+  moves.from(
     all("[data-chart-band]"),
     { scaleY: 0, transformOrigin: "50% 100%", duration: 0.7, ease: EASE_OUT },
     at + 0.3,
   );
   // A pulse grows out from its centre line; columns rise from the floor.
-  tl.from(
+  moves.from(
     all("[data-chart-tick]"),
     {
       scaleY: 0,
@@ -2286,13 +2306,13 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     },
     at,
   );
-  tl.from(
+  moves.from(
     all("[data-chart-bar]"),
     { scaleY: 0, transformOrigin: "50% 100%", duration: 0.7, ease: "back.out(1.6)", stagger: 0.05 },
     at,
   );
   // What falls from a centre line grows downwards from it.
-  tl.from(
+  moves.from(
     all("[data-chart-fall]"),
     { scaleY: 0, transformOrigin: "50% 0%", duration: 0.7, ease: "back.out(1.6)", stagger: 0.05 },
     at + 0.15,
@@ -2313,12 +2333,12 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     );
   }
   // A dial or a wheel lights up segment by segment; a meter's pills stand up along the row.
-  tl.from(
+  moves.from(
     all("[data-chart-seg]"),
     { autoAlpha: 0, duration: 0.3, ease: "power1.out", stagger: { amount: 0.8, from: "start" } },
     at,
   );
-  tl.from(
+  moves.from(
     all("[data-chart-pill]"),
     {
       scaleY: 0,
@@ -2330,15 +2350,18 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     at,
   );
   // Drawn left to right in one stroke, the way a funnel is read.
-  tl.from(all("[data-chart-glow]"), { autoAlpha: 0, duration: 1.2, ease: "power1.out" }, at);
+  moves.from(all("[data-chart-glow]"), { autoAlpha: 0, duration: 1.2, ease: "power1.out" }, at);
   // Clipped from the scene's first frame, not from this tween's start: left to render late, the whole chart stood
   // there while the title came in, vanished, and was drawn again.
-  tl.fromTo(
-    all("[data-chart-wipe]"),
-    { clipPath: "inset(0% 100% 0% 0%)" },
-    { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power2.inOut" },
-    at,
-  );
+  const wiped = all("[data-chart-wipe]");
+  if (wiped.length > 0) {
+    tl.fromTo(
+      wiped,
+      { clipPath: "inset(0% 100% 0% 0%)" },
+      { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power2.inOut" },
+      at,
+    );
+  }
   for (const [index, ring] of [...all("[data-chart-ring]")].entries()) {
     const length = Number(ring.dataset.length ?? 0);
     const start = at + index * 0.14;
@@ -2347,8 +2370,8 @@ export function animateChart(tl: gsap.core.Timeline, root: HTMLElement, at: numb
     tl.from(ring, { autoAlpha: 0, duration: 0.1, ease: "none" }, start);
     tl.from(ring, { strokeDasharray: `0 ${length}`, duration: 1.2, ease: "power2.inOut" }, start);
   }
-  tl.from(all(".wr-chart-day"), { y: 30, autoAlpha: 0, duration: 0.5, ease: "back.out(2)", stagger: 0.05 }, at);
-  tl.to(
+  moves.from(all(".wr-chart-day"), { y: 30, autoAlpha: 0, duration: 0.5, ease: "back.out(2)", stagger: 0.05 }, at);
+  moves.to(
     all(".wr-chart-day[data-marked]"),
     {
       keyframes: [

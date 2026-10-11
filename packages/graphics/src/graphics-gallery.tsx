@@ -1,8 +1,7 @@
-import { Check, Copy, Download, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import type { WrappedPalette } from "@react-wrapped/core";
-import { cn, useCopied } from "@react-wrapped/core/internal";
+import { useLabels, type WrappedPalette } from "@react-wrapped/core";
+import { Check, cn, Copy, Download, Lock, useCopied } from "@react-wrapped/core/internal";
 
 /** One thing a Wrapped hands its owner to keep: a card, a badge, the trophy case. */
 export interface WrappedGraphic {
@@ -61,6 +60,7 @@ const action =
   "wr:inline-flex wr:h-10 wr:min-w-0 wr:cursor-pointer wr:items-center wr:justify-center wr:gap-2 wr:whitespace-nowrap wr:rounded-full wr:px-4 wr:text-[13.5px] wr:font-semibold wr:transition-transform wr:hover:-translate-y-px wr:disabled:pointer-events-none wr:disabled:opacity-55 wr:[&_svg]:size-4";
 
 function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: WrappedPalette }) {
+  const labels = useLabels();
   const [copied, copy] = useCopied();
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -152,9 +152,9 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
           </span>
         </div>
         <h4 className="wr:text-[clamp(1.25rem,1.6vw,1.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.04em]">
-          Still hidden
+          {labels.gallery.lockedTitle}
         </h4>
-        <p className="wr:mt-2 wr:text-[14.5px] wr:leading-[1.4]">Scan your year to unlock it.</p>
+        <p className="wr:mt-2 wr:text-[14.5px] wr:leading-[1.4]">{labels.gallery.lockedLine}</p>
       </article>
     );
   }
@@ -223,25 +223,25 @@ function GraphicTile({ graphic, palette }: { graphic: WrappedGraphic; palette: W
             style={{ background: ink, color: palette.bg }}
           >
             <Download />
-            Download
+            {labels.gallery.download}
           </button>
           {graphic.markdown ? (
             <button
               type="button"
               onClick={() => copy(graphic.markdown ?? "")}
-              title="Copy the snippet that embeds it"
+              title={labels.gallery.markdownHint}
               className={action}
               style={{ background: `color-mix(in oklch, ${ink} 10%, transparent)`, color: ink }}
             >
               {copied ? <Check /> : <Copy />}
-              {copied ? "Copied" : "Markdown"}
+              {copied ? labels.gallery.copied : labels.gallery.markdown}
             </button>
           ) : null}
         </div>
       </div>
       {failed ? (
         <p role="alert" className="wr:mt-3 wr:text-[13px]" style={{ color: soft }}>
-          That did not come through. Try again in a moment.
+          {labels.gallery.failed}
         </p>
       ) : null}
     </article>
@@ -261,17 +261,16 @@ export function GraphicsGallery({
   /** The picked theme: the plates follow it, like the images on them. */
   palette: WrappedPalette;
 }) {
+  const labels = useLabels();
   const unlocked = graphics.filter((graphic) => !graphic.locked).length;
   const locked = graphics.length - unlocked;
   return (
     <section className="wr-root wr:pt-10 wr:md:pt-14">
       <h3 className="wr:text-[clamp(1.75rem,2.6vw,2.5rem)] wr:font-semibold wr:leading-none wr:tracking-[-0.05em]">
-        {unlocked} {unlocked === 1 ? "graphic" : "graphics"} <span className="wr:text-primary">to keep.</span>
+        {labels.gallery.count(unlocked)} <span className="wr:text-primary">{labels.gallery.toKeep}</span>
       </h3>
       <p className="wr:mt-3 wr:mb-7 wr:max-w-[60ch] wr:text-[17px] wr:leading-[1.5] wr:text-muted-foreground">
-        {locked > 0
-          ? `Post them, pin them, put them in your README. ${locked} more ${locked === 1 ? "unlocks" : "unlock"} as the scan finds ${locked === 1 ? "it" : "them"}.`
-          : "Post them, pin them, put them in your README."}
+        {locked > 0 ? labels.gallery.aboutLocked(locked) : labels.gallery.about}
       </p>
       <div className="wr:grid wr:gap-3.5 wr:md:grid-cols-2 wr:xl:grid-cols-4">
         {/* What can be taken first; what is still locked after it. */}

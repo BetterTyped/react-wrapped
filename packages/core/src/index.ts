@@ -3,6 +3,7 @@ import "./styles.css";
 
 export * from "./config";
 export * from "./cuts";
+export * from "./labels";
 export * from "./loading-stage";
 export * from "./loading-sweep";
 export * from "./motion";

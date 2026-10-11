@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "./labels";
 import type { Rarity } from "./rarity";
 
 /*
@@ -12,6 +13,39 @@ export interface CalendarLevels {
   lead: number;
   /** Month labels across the top, when the scene wants them. */
   months?: readonly string[];
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * A year of daily counts as the calendar draws it. One count per day, oldest first, the first being `start` (its UTC
+ * date). Levels are the usual bucketing of a contribution graph: 0 for a day with nothing, 1 to 4 by quartiles of the
+ * days that had something, so one huge day does not flatten the rest of the year to the lowest level. `months` has a
+ * short name for every month the days touch, in order: a year that starts mid-month has thirteen.
+ */
+export function calendarFromCounts(
+  counts: readonly number[],
+  start: Date,
+  /** The language of the month names. A page with a `WrappedProvider` passes `useLocale()`. */
+  locale: string = DEFAULT_LOCALE,
+): CalendarLevels {
+  const active = counts.filter((count) => count > 0).toSorted((a, b) => a - b);
+  const quartile = (fraction: number) => active[Math.floor((active.length - 1) * fraction)] ?? 1;
+  const [q1, q2, q3] = [quartile(0.25), quartile(0.5), quartile(0.75)];
+  const levels = counts.map((count) => (count <= 0 ? 0 : count <= q1 ? 1 : count <= q2 ? 2 : count <= q3 ? 3 : 4));
+
+  const first = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
+  const name = new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" });
+  const months: string[] = [];
+  let month = -1;
+  for (let index = 0; index < counts.length; index += 1) {
+    const day = new Date(first + index * DAY_MS);
+    if (day.getUTCMonth() === month) continue;
+    month = day.getUTCMonth();
+    months.push(name.format(day));
+  }
+
+  return { levels, lead: start.getUTCDay(), months };
 }
 
 export function Calendar({ calendar, months = false }: { calendar: CalendarLevels; months?: boolean }) {

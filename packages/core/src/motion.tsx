@@ -1,3 +1,4 @@
+import { gsap } from "gsap";
 import type { ReactNode } from "react";
 
 import type { Rng } from "./rng";
@@ -10,6 +11,13 @@ import type { SceneContext, SceneInstance } from "./types";
  */
 
 export const EASE_OUT = "expo.out";
+
+/**
+ * Whether there is anything to move. A scene asks for its parts by selector, and a part it did not render this time
+ * (no chart, no pixel art) comes back as null or as an empty list. GSAP tweens nothing for those, and says so in the
+ * console, once per part per scene: hundreds of lines for a video that is fine.
+ */
+export const hasTargets = (targets: gsap.TweenTarget): boolean => gsap.utils.toArray(targets).length > 0;
 
 /** Heading lines rising out of their own mask. */
 export function linesIn(
@@ -30,6 +38,7 @@ export function riseIn(
   targets: gsap.TweenTarget,
   { at, stagger = 0.12 }: { at: number; stagger?: number },
 ) {
+  if (!hasTargets(targets)) return;
   tl.from(targets, { y: 50, autoAlpha: 0, filter: "blur(12px)", duration: 0.9, ease: EASE_OUT, stagger }, at);
 }
 

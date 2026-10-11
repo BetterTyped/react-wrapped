@@ -1,4 +1,3 @@
-import { Dices } from "lucide-react";
 import { type ReactNode, useId } from "react";
 
 import {
@@ -7,17 +6,19 @@ import {
   isPresetPalette,
   randomAccent,
   themePalette,
+  useLabels,
   WRAPPED_FORMATS,
   WRAPPED_PALETTES,
   WRAPPED_SPEEDS,
   type WrappedConfig,
 } from "@react-wrapped/core";
-import { Chips, cn, Switch } from "@react-wrapped/core/internal";
+import { Chips, cn, Dices, Switch } from "@react-wrapped/core/internal";
 
 const RAINBOW = ["#ff4d6d", "#ffb703", "#3ddc84", "#3a86ff", "#b15cff"] as const;
 
-const SHAPES: Record<CellShape, string> = { round: "Rounded", square: "Square", circle: "Dots" };
-const SPEED_LABELS: Record<(typeof WRAPPED_SPEEDS)[number], string> = { "0.75": "0.75x", "1": "1x", "1.5": "1.5x" };
+/** The cell shapes in the order the picker offers them. */
+const SHAPES: readonly CellShape[] = ["round", "square", "circle"];
+
 function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: ReactNode }) {
   return (
     <div className="wr:flex wr:flex-col wr:gap-2.5">
@@ -44,21 +45,27 @@ export function WrappedConfigurator({
 }) {
   const accentId = useId();
   const grainId = useId();
+  const labels = useLabels();
   const set = <K extends keyof WrappedConfig>(key: K, value: WrappedConfig[K]) => onChange({ ...config, [key]: value });
   // Themes are colors; dark or light is one switch for all of them. Swatches show the theme as it will play.
   const palettes = [
     ...Object.entries(WRAPPED_PALETTES).map(([id, theme]) => {
       const palette = isPresetPalette(id) ? themePalette(id, config.mode) : theme;
-      return { id, label: theme.label, levels: palette.levels, bg: palette.bg };
+      return { id, label: labels.palettes[id] ?? theme.label, levels: palette.levels, bg: palette.bg };
     }),
     // "Your color" shows the whole spectrum on its swatch: it is the one that can be anything.
-    { id: CUSTOM_PALETTE, label: "Your color", levels: RAINBOW, bg: config.mode === "dark" ? "#111214" : "#ffffff" },
+    {
+      id: CUSTOM_PALETTE,
+      label: labels.palettes[CUSTOM_PALETTE] ?? labels.settings.customPalette,
+      levels: RAINBOW,
+      bg: config.mode === "dark" ? "#111214" : "#ffffff",
+    },
   ];
 
   return (
     <div className={cn("wr-root wr:flex wr:flex-col wr:gap-6", className)}>
-      <Field label="Colors">
-        <div role="radiogroup" aria-label="Palette" className="wr:grid wr:grid-cols-3 wr:gap-2">
+      <Field label={labels.settings.colors}>
+        <div role="radiogroup" aria-label={labels.settings.palette} className="wr:grid wr:grid-cols-3 wr:gap-2">
           {palettes.map((palette) => (
             <button
               key={palette.id}
@@ -86,15 +93,15 @@ export function WrappedConfigurator({
               id={accentId}
               type="color"
               value={config.accent}
-              aria-label="Accent color"
+              aria-label={labels.settings.accent}
               onChange={(event) => set("accent", event.target.value)}
               className="wr:h-10 wr:w-13 wr:cursor-pointer wr:rounded-xl wr:border wr:border-border wr:bg-card wr:p-1"
             />
             <button
               type="button"
               onClick={() => set("accent", randomAccent())}
-              aria-label="Pick a random color"
-              title="Random color"
+              aria-label={labels.settings.randomAccent}
+              title={labels.settings.randomAccentHint}
               className="wr:grid wr:size-10 wr:shrink-0 wr:cursor-pointer wr:place-items-center wr:rounded-xl wr:ring-1 wr:ring-border wr:transition-transform wr:hover:-translate-y-px"
             >
               <Dices className="wr:size-4" />
@@ -102,42 +109,42 @@ export function WrappedConfigurator({
           </div>
         ) : null}
         <Chips
-          label="Dark or light"
+          label={labels.settings.mode}
           value={config.mode}
           options={[
-            { value: "dark", label: "Dark" },
-            { value: "light", label: "Light" },
+            { value: "dark", label: labels.settings.dark },
+            { value: "light", label: labels.settings.light },
           ]}
           onChange={(mode) => set("mode", mode)}
         />
       </Field>
 
-      <Field label="Format">
+      <Field label={labels.settings.format}>
         <Chips
-          label="Format"
+          label={labels.settings.format}
           value={config.format}
           options={Object.entries(WRAPPED_FORMATS).map(([value, format]) => ({
             value: value as WrappedConfig["format"],
-            label: format.label,
+            label: labels.formats[value] ?? format.label,
           }))}
           onChange={(format) => set("format", format)}
         />
       </Field>
 
-      <Field label="Cells">
+      <Field label={labels.settings.cells}>
         <Chips
-          label="Cell shape"
+          label={labels.settings.cellShape}
           value={config.shape}
-          options={Object.entries(SHAPES).map(([value, label]) => ({ value: value as CellShape, label }))}
+          options={SHAPES.map((value) => ({ value, label: labels.settings.shapes[value] }))}
           onChange={(shape) => set("shape", shape)}
         />
       </Field>
 
-      <Field label="Speed">
+      <Field label={labels.settings.speed}>
         <Chips
-          label="Speed"
+          label={labels.settings.speed}
           value={config.speed}
-          options={WRAPPED_SPEEDS.map((speed) => ({ value: speed, label: SPEED_LABELS[speed] }))}
+          options={WRAPPED_SPEEDS.map((speed) => ({ value: speed, label: labels.settings.speedValue(speed) }))}
           onChange={(speed) => set("speed", speed)}
         />
       </Field>
@@ -145,7 +152,7 @@ export function WrappedConfigurator({
       <div className="wr:h-px wr:bg-border" />
 
       <div className="wr:flex wr:items-center wr:justify-between wr:gap-3 wr:text-[14px]">
-        <label htmlFor={grainId}>Film grain</label>
+        <label htmlFor={grainId}>{labels.settings.grain}</label>
         <Switch id={grainId} checked={config.grain} onCheckedChange={(grain) => set("grain", grain)} />
       </div>
     </div>

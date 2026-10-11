@@ -21,7 +21,10 @@
   transform-origin: 0 0;
   background: var(--wr-bg);
   color: var(--wr-fg);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  /* Set `--wr-font` to change the video's type. Left alone it is Inter where the page or the machine has a font by
+     that name, and the system's own sans otherwise. The library ships no font file, and the scenes were laid out
+     against the system's sans as much as against Inter. */
+  font-family: var(--wr-font, Inter, ui-sans-serif, system-ui, sans-serif);
   font-feature-settings: "ss01", "cv11";
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;

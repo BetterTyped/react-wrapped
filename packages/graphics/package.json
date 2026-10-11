@@ -54,8 +54,7 @@
   },
   "dependencies": {
     "@react-wrapped/charts": "workspace:*",
-    "html-to-image": "1.11.13",
-    "lucide-react": "^1.11.0"
+    "html-to-image": "1.11.13"
   },
   "peerDependencies": {
     "@react-wrapped/core": "workspace:*",

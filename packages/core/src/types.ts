@@ -111,12 +111,14 @@ export type StageMark = string | readonly string[];
 /** Who the video is about, for the chrome at the top. */
 export interface WrappedSubject {
   handle: string;
-  name: string | null;
-  avatarUrl: string | null;
+  /** Their name, for a director that wants to greet them by it. The stage itself shows the handle. */
+  name?: string | null;
+  /** Their picture. Left out, the stage shows the handle's initials. */
+  avatarUrl?: string | null;
   /** What the video is called: "Orbit Wrapped". */
   caption: string;
-  /** The window the numbers cover, already formatted: "Oct 2025 to Oct 2026". */
-  period: string;
+  /** The window the numbers cover, already formatted: "Oct 2025 to Oct 2026". For your own scenes and cards. */
+  period?: string;
   /** A mark pressed into the corner of the frame. Left out, the corner keeps the plain discs. */
   mark?: StageMark;
   /** A quiet line saying where the video is from: a site address, a product name. Left out, nothing is shown. */

@@ -20,5 +20,13 @@
     "newlinesBetween": true,
     "internalPattern": ["@/", "@react-wrapped/"]
   },
-  "ignorePatterns": ["/dist", "/coverage", "/.nx/cache", "/.nx/workspace-data"]
+  "ignorePatterns": [
+    "**/dist",
+    "**/test-results",
+    "**/playwright-report",
+    "**/routeTree.gen.ts",
+    "/coverage",
+    "/.nx/cache",
+    "/.nx/workspace-data"
+  ]
 }

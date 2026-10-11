@@ -2,6 +2,7 @@ import { gsap } from "gsap";
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { exitScene, HANDOVER, luckyCut } from "./cuts";
+import { useLabels } from "./labels";
 import { EASE_OUT, setText } from "./motion";
 import { createRng } from "./rng";
 import type { StageTake } from "./types";
@@ -58,6 +59,10 @@ export function useWrappedTimeline({
   const currentRef = useRef<string | null>(null);
   const onSceneChangeRef = useRef(onSceneChange);
   onSceneChangeRef.current = onSceneChange;
+  // Read through a ref: the clock is written on every frame, by a function that must not be rebuilt for a reworded label.
+  const labels = useLabels();
+  const clockLabelRef = useRef(labels.player.clock);
+  clockLabelRef.current = labels.player.clock;
   const [playing, setPlaying] = useState(autoplay);
   const [marks, setMarks] = useState<readonly SceneMark[]>([]);
 
@@ -71,7 +76,7 @@ export function useWrappedTimeline({
     const clock = clockRef.current;
     if (clock) {
       const speed = master.timeScale();
-      setText(clock, `${clockTime(time / speed)} / ${clockTime(duration / speed)}`);
+      setText(clock, clockLabelRef.current(clockTime(time / speed), clockTime(duration / speed)));
     }
     const segments = stage.querySelectorAll<HTMLElement>(".wr-segments b");
     const starts = marksRef.current;
@@ -100,6 +105,13 @@ export function useWrappedTimeline({
       if (fill.style.width !== width) fill.style.width = width;
     }
   }, [stageRef, trackRef, clockRef]);
+
+  // A reworded clock arrives through React, which writes the resting "0:00" in the new words. The playhead's own
+  // time goes back on before the browser paints: a paused video would otherwise sit there reading zero.
+  const clockLabel = labels.player.clock;
+  useLayoutEffect(() => {
+    paint();
+  }, [clockLabel, paint]);
 
   const setPlayingState = useCallback((next: boolean) => {
     playingRef.current = next;

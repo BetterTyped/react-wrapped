@@ -1,4 +1,10 @@
-import { RARITY_LABELS, type WrappedPalette, type WrappedToken } from "@react-wrapped/core";
+import {
+  DEFAULT_LABELS,
+  mergeLabels,
+  type WrappedLabelOverrides,
+  type WrappedPalette,
+  type WrappedToken,
+} from "@react-wrapped/core";
 
 /**
  * The share card as a PNG, drawn on a canvas so the file is identical on every
@@ -26,6 +32,7 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 const SCALE = 2;
 const PAD = 64;
+/** A canvas cannot read `--wr-font`: the card is set in Inter where there is a font by that name, or the system's sans. */
 const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
 
 function loadImage(src: string): Promise<HTMLImageElement | null> {
@@ -53,7 +60,21 @@ function fitText(
   }
 }
 
-export async function renderShareCard(spec: ShareCardSpec, palette: WrappedPalette): Promise<Blob> {
+/**
+ * What a card drawn outside React cannot read from a provider. `labels` holds only the words to change (the card
+ * draws the rarity words); `locale` is here for cards that come to write numbers of their own.
+ */
+export interface CardWording {
+  labels?: WrappedLabelOverrides;
+  locale?: string;
+}
+
+export async function renderShareCard(
+  spec: ShareCardSpec,
+  palette: WrappedPalette,
+  wording: CardWording = {},
+): Promise<Blob> {
+  const labels = mergeLabels(DEFAULT_LABELS, wording.labels);
   const canvas = document.createElement("canvas");
   canvas.width = WIDTH * SCALE;
   canvas.height = HEIGHT * SCALE;
@@ -179,7 +200,7 @@ export async function renderShareCard(spec: ShareCardSpec, palette: WrappedPalet
     context.fillText(token.name, artX + 9 * cell + 18, tokenY + 40);
     context.fillStyle = colour;
     context.font = `650 16px ${FONT}`;
-    context.fillText(RARITY_LABELS[token.rarity], artX + 9 * cell + 18, tokenY + 64);
+    context.fillText(labels.rarity[token.rarity], artX + 9 * cell + 18, tokenY + 64);
   });
 
   return new Promise((resolve, reject) => {

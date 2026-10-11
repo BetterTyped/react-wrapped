@@ -14,9 +14,14 @@ import { type BuiltInTransition, WRAPPED_TRANSITIONS, type WrappedFormat, type W
  * cut when the scenes around it are moved, switched off or found later.
  */
 export function luckyCut(seed: string, sceneKey: string): WrappedTransition {
-  // The built-in ones first and in their own order, so adding a transition never changes what an old link plays.
-  const pool = [...WRAPPED_TRANSITIONS, ...[...CUSTOM.values()].filter((spec) => spec.lucky).map((spec) => spec.id)];
-  return createRng(seed).fork("motion").fork(`${sceneKey}/exit`).pick(pool);
+  const luck = createRng(seed).fork("motion").fork(`${sceneKey}/exit`);
+  const builtIn = luck.pick(WRAPPED_TRANSITIONS);
+  const own = [...CUSTOM.values()].filter((spec) => spec.lucky).map((spec) => spec.id);
+  if (own.length === 0) return builtIn;
+  // Yours get their fair share of scenes from a throw of their own, so every scene they do not win keeps the
+  // transition it had before you added them. Adding one never reshuffles a whole video.
+  const joined = luck.fork("own");
+  return joined.next() < own.length / (WRAPPED_TRANSITIONS.length + own.length) ? joined.pick(own) : builtIn;
 }
 
 export const TRANSITION_LABELS: Record<BuiltInTransition, string> = {

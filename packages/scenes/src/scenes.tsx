@@ -9,8 +9,10 @@ import {
   countUp,
   defineScene,
   EASE_OUT,
+  hasTargets,
   headingLines,
   hold,
+  Label,
   Lines,
   linesField,
   linesIn,
@@ -18,7 +20,7 @@ import {
   Pixel,
   PIXEL_ART,
   type PixelArt,
-  RARITY_LABELS,
+  RarityLabel,
   rich,
   riseIn,
   textField,
@@ -55,18 +57,21 @@ export const openingScene = defineScene<{
       </p>
     </>
   ),
-  animate: ({ root }, { variant }) => {
+  animate: ({ root, rng }, { variant }) => {
     const tl = gsap.timeline();
     const cells = cellsOf(root);
     const frame = root.querySelector(".wr-frame");
+    // From the video's own seeded source: the same link flies its cells in the same way every time.
+    const scatter = rng.fork("opening");
+    const within = (reach: number) => () => (scatter.next() * 2 - 1) * reach;
     if (variant === 0) {
       // Cells fly in from everywhere and settle into the year.
       tl.from(cells, {
         scale: 0,
         autoAlpha: 0,
-        x: () => gsap.utils.random(-420, 420),
-        y: () => gsap.utils.random(-640, 640),
-        rotate: () => gsap.utils.random(-90, 90),
+        x: within(420),
+        y: within(640),
+        rotate: within(90),
         duration: 1.3,
         ease: EASE_OUT,
         stagger: { amount: 0.9, grid: "auto", from: "random" },
@@ -311,22 +316,17 @@ export const barsScene = defineScene<{
     const tl = gsap.timeline();
     riseIn(tl, root.querySelectorAll(".wr-rise"), { at: 0 });
     linesIn(tl, root, { at: 0.1 });
-    tl.from(
-      root.querySelectorAll(".wr-bar i"),
-      {
-        scaleY: 0,
-        duration: 1.1,
-        ease: "elastic.out(1, 0.55)",
-        stagger: { each: 0.08, from: rng.pick(["start", "center", "end"] as const) },
-      },
-      0.5,
-    );
-    tl.from(root.querySelectorAll(".wr-bar span"), { autoAlpha: 0, y: 20, duration: 0.5, stagger: 0.06 }, 0.7);
-    tl.to(
-      root.querySelectorAll(".wr-bar[data-peak] i"),
-      { scaleX: 1.08, duration: 0.3, yoyo: true, repeat: 1, ease: "power2.out" },
-      1.8,
-    );
+    const bars = root.querySelectorAll(".wr-bar i");
+    const from = rng.pick(["start", "center", "end"] as const);
+    if (hasTargets(bars)) {
+      tl.from(bars, { scaleY: 0, duration: 1.1, ease: "elastic.out(1, 0.55)", stagger: { each: 0.08, from } }, 0.5);
+      tl.from(root.querySelectorAll(".wr-bar span"), { autoAlpha: 0, y: 20, duration: 0.5, stagger: 0.06 }, 0.7);
+    }
+    // Only when a bar was marked as the peak: a week with no busiest day has nothing to nudge.
+    const peak = root.querySelectorAll(".wr-bar[data-peak] i");
+    if (hasTargets(peak)) {
+      tl.to(peak, { scaleX: 1.08, duration: 0.3, yoyo: true, repeat: 1, ease: "power2.out" }, 1.8);
+    }
     hold(tl, 1.1);
     return tl;
   },
@@ -410,12 +410,18 @@ export const listScene = defineScene<{
     const fromX = rng.pick([140, -140]);
     riseIn(tl, root.querySelectorAll(".wr-rise"), { at: 0 });
     linesIn(tl, root, { at: 0.1 });
-    tl.from(
-      root.querySelectorAll(".wr-item"),
-      { x: fromX, autoAlpha: 0, rotate: fromX > 0 ? 2 : -2, duration: 1, ease: EASE_OUT, stagger: 0.16 },
-      0.45,
-    );
-    tl.from(root.querySelectorAll(".wr-meter i"), { scaleX: 0, duration: 1.2, ease: "power3.out", stagger: 0.16 }, 0.8);
+    const items = root.querySelectorAll(".wr-item");
+    if (hasTargets(items)) {
+      tl.from(
+        items,
+        { x: fromX, autoAlpha: 0, rotate: fromX > 0 ? 2 : -2, duration: 1, ease: EASE_OUT, stagger: 0.16 },
+        0.45,
+      );
+    }
+    const meters = root.querySelectorAll(".wr-meter i");
+    if (hasTargets(meters)) {
+      tl.from(meters, { scaleX: 0, duration: 1.2, ease: "power3.out", stagger: 0.16 }, 0.8);
+    }
     root
       .querySelectorAll(".wr-item-meta [data-count]")
       .forEach((element, index) => countUp(tl, element, { at: 0.8 + index * 0.16, duration: 1.2 }));
@@ -467,11 +473,10 @@ export const splitScene = defineScene<{
       { clipPath: "inset(0% 0% 0% 0% round 26px)", duration: 1.3, ease: "expo.inOut" },
       0.45,
     );
-    tl.from(
-      root.querySelectorAll(".wr-legend > div"),
-      { y: 30, autoAlpha: 0, duration: 0.7, ease: EASE_OUT, stagger: 0.1 },
-      0.9,
-    );
+    const legend = root.querySelectorAll(".wr-legend > div");
+    if (hasTargets(legend)) {
+      tl.from(legend, { y: 30, autoAlpha: 0, duration: 0.7, ease: EASE_OUT, stagger: 0.1 }, 0.9);
+    }
     root
       .querySelectorAll(".wr-legend [data-count]")
       .forEach((element, index) => countUp(tl, element, { at: 0.9 + index * 0.1, duration: 1 }));
@@ -520,7 +525,6 @@ export const factScene = defineScene<{
   ),
   animate: ({ root, rng }) => {
     const tl = gsap.timeline();
-    riseIn(tl, root.querySelector(".wr-eyebrow"), { at: 0 });
     const pixels = root.querySelectorAll(".wr-pixel i");
     if (pixels.length > 0) {
       tl.from(
@@ -540,11 +544,15 @@ export const factScene = defineScene<{
     riseIn(tl, root.querySelector(".wr-stamp"), { at: 0.65 });
     animateChart(tl, root, 0.8);
     riseIn(tl, root.querySelector(".wr-lede"), { at: root.querySelector(".wr-chart") ? 1.6 : 0.9 });
-    tl.to(
-      root.querySelectorAll('.wr-pixel i[data-on="2"]'),
-      { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1, stagger: { amount: 0.4, grid: [9, 9], from: "edges" } },
-      1.4,
-    );
+    // A fact told with a chart, or with nothing but its words, has no pixel art to pulse.
+    const lit = root.querySelectorAll('.wr-pixel i[data-on="2"]');
+    if (hasTargets(lit)) {
+      tl.to(
+        lit,
+        { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1, stagger: { amount: 0.4, grid: [9, 9], from: "edges" } },
+        1.4,
+      );
+    }
     hold(tl, 1.5);
     return tl;
   },
@@ -584,11 +592,15 @@ export const personaScene = defineScene<{
       },
       0.2,
     );
-    tl.to(
-      root.querySelectorAll('.wr-pixel i[data-on="2"]'),
-      { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1, stagger: { amount: 0.4, grid: [9, 9], from: "edges" } },
-      1.3,
-    );
+    // Art drawn only in half tones has no fully lit pixel to pulse.
+    const lit = root.querySelectorAll('.wr-pixel i[data-on="2"]');
+    if (hasTargets(lit)) {
+      tl.to(
+        lit,
+        { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1, stagger: { amount: 0.4, grid: [9, 9], from: "edges" } },
+        1.3,
+      );
+    }
     linesIn(tl, root, { at: 0.8, stagger: 0.12 });
     riseIn(tl, root.querySelector(".wr-lede"), { at: 1.1 });
     hold(tl, 1.4);
@@ -639,7 +651,9 @@ export const summaryScene = defineScene<{
                 <Pixel art={token.art} className="wr-pixel wr-pixel-token" />
                 <div>
                   <b>{token.name}</b>
-                  <small>{RARITY_LABELS[token.rarity]}</small>
+                  <small>
+                    <RarityLabel rarity={token.rarity} />
+                  </small>
                 </div>
               </div>
             ))}
@@ -660,23 +674,25 @@ export const summaryScene = defineScene<{
     });
     // The year draws in left to right as one sweep: one element, not 371 cell tweens. The card is rebuilt each time a
     // drop is found, and per-cell tweens made that rebuild stall the reveal.
-    tl.fromTo(
-      root.querySelector(".wr-card .wr-graph"),
-      { clipPath: "inset(0% 100% 0% 0%)" },
-      // Clipped from the first frame: rendered late, the year showed with the card and was then swept in again.
-      { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power2.inOut" },
-      0.35,
-    );
-    tl.from(
-      root.querySelectorAll(".wr-stat"),
-      { y: 40, autoAlpha: 0, duration: 0.7, ease: EASE_OUT, stagger: 0.1 },
-      0.6,
-    );
-    tl.from(
-      root.querySelectorAll(".wr-token"),
-      { scale: 0.6, autoAlpha: 0, duration: 0.9, ease: "elastic.out(1, 0.6)", stagger: 0.15 },
-      1.1,
-    );
+    // The card's year, numbers and tokens are each optional: a card can be made before anything was found.
+    const graph = root.querySelector(".wr-card .wr-graph");
+    if (graph) {
+      tl.fromTo(
+        graph,
+        { clipPath: "inset(0% 100% 0% 0%)" },
+        // Clipped from the first frame: rendered late, the year showed with the card and was then swept in again.
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "power2.inOut" },
+        0.35,
+      );
+    }
+    const stats = root.querySelectorAll(".wr-stat");
+    if (hasTargets(stats)) {
+      tl.from(stats, { y: 40, autoAlpha: 0, duration: 0.7, ease: EASE_OUT, stagger: 0.1 }, 0.6);
+    }
+    const tokens = root.querySelectorAll(".wr-token");
+    if (hasTargets(tokens)) {
+      tl.from(tokens, { scale: 0.6, autoAlpha: 0, duration: 0.9, ease: "elastic.out(1, 0.6)", stagger: 0.15 }, 1.1);
+    }
     hold(tl, 2.5);
     return tl;
   },
@@ -712,7 +728,9 @@ export const trophiesScene = defineScene<{
                 <Pixel art={PIXEL_ART.question} className="wr-pixel wr-pixel-token" />
                 <div>
                   <b>?</b>
-                  <small>Still hidden</small>
+                  <small>
+                    <Label of={(labels) => labels.scenes.stillHidden} />
+                  </small>
                 </div>
               </div>
             ) : (
@@ -720,7 +738,9 @@ export const trophiesScene = defineScene<{
                 <Pixel art={item.art} className="wr-pixel wr-pixel-token" />
                 <div>
                   <b>{item.name}</b>
-                  <small>{RARITY_LABELS[item.rarity]}</small>
+                  <small>
+                    <RarityLabel rarity={item.rarity} />
+                  </small>
                 </div>
               </div>
             ),
@@ -728,7 +748,9 @@ export const trophiesScene = defineScene<{
           {more > 0 ? (
             <div className="wr-trophy" data-hidden="">
               <div>
-                <b>+{more} more</b>
+                <b>
+                  <Label of={(labels) => labels.scenes.more(more)} />
+                </b>
               </div>
             </div>
           ) : null}
@@ -741,28 +763,41 @@ export const trophiesScene = defineScene<{
     riseIn(tl, root.querySelector(".wr-eyebrow"), { at: 0 });
     linesIn(tl, root, { at: 0.15 });
     riseIn(tl, root.querySelector(".wr-lede"), { at: 0.6 });
-    tl.from(
-      root.querySelectorAll(".wr-trophy"),
-      { y: 40, scale: 0.85, autoAlpha: 0, duration: 0.6, ease: "back.out(2)", stagger: 0.07 },
-      0.8,
-    );
+    const trophies = root.querySelectorAll(".wr-trophy");
+    const [starts, rises, each] = [0.8, 0.6, 0.07];
+    if (hasTargets(trophies)) {
+      tl.from(
+        trophies,
+        { y: 40, scale: 0.85, autoAlpha: 0, duration: rises, ease: "back.out(2)", stagger: each },
+        starts,
+      );
+    }
+    // A beat after the last trophy has landed. Worked out, not read off the timeline: either of the two moves below
+    // can be missing (a case with nothing rare in it, or nothing left hidden), and the other still starts here.
+    const landed = starts + rises + each * Math.max(0, trophies.length - 1) + 0.1;
     // The rare ones catch the light once everything has landed.
-    tl.to(
-      root.querySelectorAll('.wr-trophy[data-rarity="legendary"], .wr-trophy[data-rarity="epic"]'),
-      {
-        keyframes: [
-          { scale: 1.06, duration: 0.18 },
-          { scale: 1, duration: 0.35 },
-        ],
-        stagger: 0.12,
-      },
-      ">0.1",
-    );
-    tl.to(
-      root.querySelectorAll(".wr-trophy[data-hidden]"),
-      { keyframes: [{ rotate: -3 }, { rotate: 3 }, { rotate: -2 }, { rotate: 0 }], duration: 0.4, stagger: 0.1 },
-      "<",
-    );
+    const rare = root.querySelectorAll('.wr-trophy[data-rarity="legendary"], .wr-trophy[data-rarity="epic"]');
+    if (hasTargets(rare)) {
+      tl.to(
+        rare,
+        {
+          keyframes: [
+            { scale: 1.06, duration: 0.18 },
+            { scale: 1, duration: 0.35 },
+          ],
+          stagger: 0.12,
+        },
+        landed,
+      );
+    }
+    const hidden = root.querySelectorAll(".wr-trophy[data-hidden]");
+    if (hasTargets(hidden)) {
+      tl.to(
+        hidden,
+        { keyframes: [{ rotate: -3 }, { rotate: 3 }, { rotate: -2 }, { rotate: 0 }], duration: 0.4, stagger: 0.1 },
+        landed,
+      );
+    }
     hold(tl, 2.2);
     return tl;
   },

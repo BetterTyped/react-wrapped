@@ -168,4 +168,21 @@ describe("a transition of your own", () => {
     expect(() => defineTransition({ id: "wipe", label: "Mine", play: () => {} })).toThrow(/built-in transition/);
     expect(() => defineTransition({ id: "Big Wipe", label: "Mine", play: () => {} })).toThrow(/lower case/);
   });
+
+  it("leaves every scene it does not win with the transition it had, once it joins the luck", () => {
+    // Arrange
+    const keys = Array.from({ length: 240 }, (_unused, index) => `scene-${index}`);
+    const before = keys.map((key) => luckyCut("ada", key));
+
+    // Act: registered last in this file, so the tests above still see only built-in luck.
+    defineTransition({ id: "sparkle", label: "Sparkle", lucky: true, play: () => {} });
+    const after = keys.map((key) => luckyCut("ada", key));
+
+    // Assert
+    const won = after.filter((style) => style === "sparkle").length;
+    expect(won).toBeGreaterThan(0);
+    // About one scene in twenty, its fair share among twenty transitions: never most of the video.
+    expect(won).toBeLessThan(keys.length / 5);
+    expect(after.filter((style, index) => style !== "sparkle" && style !== before[index])).toEqual([]);
+  });
 });
