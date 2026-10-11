@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 
 /**
  * Which drops have been opened, remembered on this device (or, with no key,
@@ -15,7 +15,9 @@ export function useOpenedDrops(storageKey: string | null): {
   const [opened, setOpened] = useState<readonly string[]>([]);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
+  // Before the first paint, not after it: a page that puts the scan first for a year with nothing opened would
+  // otherwise show that for a frame to someone who opened everything last week.
+  useLayoutEffect(() => {
     // No key: remembered for this visit only (the landing's example).
     if (!storageKey) {
       setReady(true);

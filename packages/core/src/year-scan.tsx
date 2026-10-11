@@ -4,6 +4,7 @@ import { FastForward, RotateCcw, ScanLine } from "lucide-react";
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { cn } from "./internal/cn";
 import { readingSeconds } from "./motion";
 import { RARITY_LABELS, type Rarity } from "./rarity";
 import { type CalendarLevels, PIXEL_ART, type PixelArt } from "./scenes";
@@ -149,6 +150,8 @@ export function YearScan({
   describeDay,
   actions,
   sessionKey = null,
+  gate = false,
+  onRunChange,
 }: {
   calendar: CalendarLevels;
   /** The video's palette, so the year looks the way it does in the video. */
@@ -163,6 +166,13 @@ export function YearScan({
   actions?: ReactNode;
   /** Where this visit remembers each find's day, so replays reopen the same tiles. Null keeps it in memory. */
   sessionKey?: string | null;
+  /**
+   * The scan is the page for now: the video is not shown until it has run once. The panel says so, offers nothing
+   * but the scan, and a found card lands on its badge here because there is no timeline to land on yet.
+   */
+  gate?: boolean;
+  /** A scan started or came to rest: finished, stopped or sent straight to its end. */
+  onRunChange?: (running: boolean) => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const flightRef = useRef<HTMLDivElement>(null);
@@ -213,6 +223,17 @@ export function YearScan({
   }, [sessionKey, spots]);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Read through a ref: a function from the page above is a new one on every render, and must not rerun this.
+  const onRunChangeRef = useRef(onRunChange);
+  onRunChangeRef.current = onRunChange;
+  const running = run !== null;
+  const wasRunningRef = useRef(false);
+  useEffect(() => {
+    if (running === wasRunningRef.current) return;
+    wasRunningRef.current = running;
+    onRunChangeRef.current?.(running);
+  }, [running]);
 
   const pending = drops.filter((drop) => !found.includes(drop.id));
   const currentId = run ? run.queue[step] : peek?.drop;
@@ -650,7 +671,10 @@ export function YearScan({
       // Into the cut: the scene joins the video, and the card lands in its slot.
       const land = contextSafe(async () => {
         openScene();
-        const slotCard = await whenRendered(`[data-seg="drop-${current.id}"] [data-seg-bar]`);
+        // Home is its segment of the timeline. Before the first scan is over there is no timeline: home is its badge.
+        const slotCard = await whenRendered(
+          gate ? `[data-find-badge="${current.id}"]` : `[data-seg="drop-${current.id}"] [data-seg-bar]`,
+        );
         const finish = () => {
           gsap.set(backdrop, { pointerEvents: "none" });
           hit.removeAttribute("data-hit");
@@ -875,6 +899,9 @@ export function YearScan({
   const left = run ? run.queue.length - step - 1 : 0;
 
   let headline = `Your year is hiding ${drops.length} ${drops.length === 1 ? "scene" : "scenes"}.`;
+  // Before the first scan the panel is the whole page, so it says where the video is, not only what is hidden.
+  const waiting = gate && !run && found.length === 0;
+  if (waiting) headline = "Your Wrapped is almost ready.";
   if (run) {
     if (run.replay) headline = "Scanning your year again.";
     else headline = left > 0 ? `Scanning your year. ${left} more after this one.` : "Scanning for the last one.";
@@ -896,7 +923,7 @@ export function YearScan({
       style={{ background: palette.levels[4], color: palette.bg }}
     >
       <ScanLine className="size-4" />
-      {found.length > 0 ? "Keep scanning" : "Scan my year"}
+      {found.length > 0 ? "Keep scanning" : gate ? "Find my scenes" : "Scan my year"}
     </button>
   );
   if (run) {
@@ -930,12 +957,30 @@ export function YearScan({
     );
   }
 
+  let subline = "Achievements you earned and a few easter eggs. Each one joins your video when the scan finds it.";
+  if (gate) {
+    const scenes = `${drops.length} ${drops.length === 1 ? "scene" : "scenes"}`;
+    subline = waiting
+      ? `Your year is hiding ${scenes} only you get. Find ${drops.length === 1 ? "it" : "them"} and your video plays.`
+      : "Achievements you earned and a few easter eggs. Your video plays when the scan is done.";
+  }
+  if (allFound) {
+    subline = gate
+      ? "They are in your video. Here it comes."
+      : "They are in your video now. Run the scan again to watch them come out.";
+  }
+
   const tone = current ? palette.rarity[current.rarity] : palette.fg;
 
   return (
     <div
       ref={rootRef}
-      className="relative overflow-hidden rounded-[28px] p-4 md:p-6"
+      data-scan-gate={gate ? "" : undefined}
+      // As the page, the panel fills the box the video is about to take and sets its year in the middle of it.
+      className={cn(
+        "relative overflow-hidden rounded-[28px] p-4 md:p-6",
+        gate && "flex h-full flex-col justify-center md:p-10",
+      )}
       style={{ background: palette.bg, color: palette.fg } as CSSProperties}
     >
       <div
@@ -946,17 +991,23 @@ export function YearScan({
       />
       <div className="relative z-10 mb-5 flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[clamp(1.25rem,1.8vw,1.625rem)] font-semibold leading-tight tracking-[-0.03em]">
+          <p
+            className={cn(
+              "font-semibold leading-tight tracking-[-0.03em]",
+              gate ? "text-[clamp(1.75rem,3vw,2.75rem)] tracking-[-0.04em]" : "text-[clamp(1.25rem,1.8vw,1.625rem)]",
+            )}
+          >
             {headline}
           </p>
-          <p className="mt-1 text-[14.5px]" style={{ color: palette.muted }}>
-            {allFound
-              ? "They are in your video now. Run the scan again to watch them come out."
-              : "Achievements you earned and a few easter eggs. Each one joins your video when the scan finds it."}
+          <p
+            className={cn("mt-1", gate ? "text-[16px] md:mt-2 md:text-[17px]" : "text-[14.5px]")}
+            style={{ color: palette.muted }}
+          >
+            {subline}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {actions}
+          {gate ? null : actions}
           {button}
         </div>
       </div>

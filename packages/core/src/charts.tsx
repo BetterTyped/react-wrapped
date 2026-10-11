@@ -763,7 +763,9 @@ function Days({ chart }: { chart: Extract<SceneChart, { type: "days" }> }) {
     <div className="wr-chart-days">
       {chart.days.map((day) => (
         <div key={`${day.label}-${day.sub}`} className="wr-chart-day" data-marked={day.marked ? "" : undefined}>
-          <i data-l={day.level}>{cellCount(day.count)}</i>
+          <i data-l={day.level} data-value={day.count}>
+            {cellCount(day.count)}
+          </i>
           <b>{day.label}</b>
           <small>{day.sub}</small>
         </div>

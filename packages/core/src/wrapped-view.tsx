@@ -1,5 +1,5 @@
 import { Check, Download, Link2, Square } from "lucide-react";
-import { type ReactNode, type RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { arrangeScenes, editsFor } from "./config";
 import { luckyCut } from "./cuts";
@@ -148,6 +148,9 @@ function ShareActions({
   );
 }
 
+/** How long the finished scan stays up before the video takes its place: the last find lands and is seen. */
+const GATE_BEAT = 900;
+
 /** Everything the view needs once the year is in. */
 interface LoadedProps {
   loading?: undefined;
@@ -173,6 +176,12 @@ interface LoadedProps {
     describeDay: (day: number) => string;
     actions?: ReactNode;
     sessionKey?: string | null;
+    /**
+     * The scan comes first. Until the creator has run it once, the scan is the page: "your Wrapped is almost ready",
+     * one button, and the video with everything around it only after. For someone's own year; an example that should
+     * play the moment its page opens leaves this out.
+     */
+    gate?: boolean;
   };
   /** What a viewer sees under the video, usually a way to make their own. */
   viewer?: ReactNode;
@@ -246,6 +255,63 @@ export function WrappedView(
     if (style && style !== editingLucky) cuts[key] = style;
     onConfigChange({ ...config, edits: Object.fromEntries([...kept, ...added]), cuts });
   };
+  // The scan comes first. A creator who has opened nothing yet gets the scan as the page; the video and everything
+  // around it take over once a scan has come to rest with something found. `scanning` keeps it the page while the
+  // scan it started is still going: the first find must not pull the layout out from under the ones after it.
+  const opening = loaded?.opening;
+  const found = opening?.found.length ?? 0;
+  const [scanning, setScanning] = useState(false);
+  // Which Wrapped the scan has been run for, so another year opened in the same view starts at its own gate.
+  const [passed, setPassed] = useState<string | null>(null);
+  const gated = Boolean(
+    loaded &&
+    editable &&
+    opening?.gate &&
+    opening.drops.length > 0 &&
+    passed !== loaded.seed &&
+    (found === 0 || scanning),
+  );
+  const foundRef = useRef(found);
+  foundRef.current = found;
+  const seedRef = useRef(loaded?.seed ?? null);
+  seedRef.current = loaded?.seed ?? null;
+  const beatRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (beatRef.current) clearTimeout(beatRef.current);
+    },
+    [],
+  );
+  const gatedRef = useRef(gated);
+  gatedRef.current = gated;
+  const onScanChange = (running: boolean) => {
+    // A scan run later, under the video, is only a scan: it never takes the page back.
+    if (!gatedRef.current) return;
+    if (beatRef.current) clearTimeout(beatRef.current);
+    beatRef.current = null;
+    if (running) {
+      setScanning(true);
+      return;
+    }
+    // Stopped with nothing found: the scan is still the page, ready to be run again.
+    if (foundRef.current === 0) {
+      setScanning(false);
+      return;
+    }
+    beatRef.current = setTimeout(() => {
+      setPassed(seedRef.current);
+      setScanning(false);
+    }, GATE_BEAT);
+  };
+  // The video takes the scan's place at the top of the view, so that is where the page should be looking. The
+  // browser would rather keep the scan in sight and scroll down after it.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const wasGatedRef = useRef(gated);
+  useLayoutEffect(() => {
+    if (wasGatedRef.current && !gated) rootRef.current?.scrollIntoView({ block: "start" });
+    wasGatedRef.current = gated;
+  }, [gated]);
+
   const keys = ordered.map((scene) => scene.key);
   const editing = {
     scenes: ordered,
@@ -268,40 +334,62 @@ export function WrappedView(
 
   return (
     <div
+      ref={rootRef}
       className={cn(
+        // Under the page's bar when the view is scrolled back to after the first scan.
+        "scroll-mt-24",
         // The creator's column is a track that opens: who the page belongs to is often known a beat after the page
         // is up, and a column that just appeared would shove the frame sideways. It eases in as well as out, because
         // the settings mount on the same frame and a curve that starts fast would spend that long frame jumping.
         // grid-cols-1: on a phone the one column is the screen. Left to size itself it grows to its widest panel and
         // runs off the right edge.
         "grid grid-cols-1 gap-y-3 lg:transition-[grid-template-columns,column-gap] lg:duration-700 lg:ease-[cubic-bezier(0.6,0,0.2,1)] motion-reduce:transition-none",
-        editable ? "lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-x-3" : "lg:grid-cols-[minmax(0,1fr)_0px] lg:gap-x-0",
+        editable && !gated
+          ? "lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-x-3"
+          : "lg:grid-cols-[minmax(0,1fr)_0px] lg:gap-x-0",
       )}
     >
-      <div inert={rendering} className={`${panel} flex min-h-[560px] flex-col ${rowHeight}`}>
-        {loaded ? (
-          <WrappedPlayer
-            ref={playerRef}
-            subject={loaded.subject}
-            seed={loaded.seed}
-            scenes={visible}
-            config={config}
-            autoplay={loaded.autoplay ?? true}
-            editing={editable ? editing : undefined}
-            className="flex-1"
-          />
-        ) : loading ? (
-          <>
-            <p role="status" className="sr-only">
-              {loading.lines[0]}
-            </p>
-            <WrappedPlayerLoading subject={loading.subject} lines={loading.lines} config={config} className="flex-1" />
-          </>
-        ) : null}
-      </div>
+      {/* While the scan is the page there is no video to show. The scan below keeps its place in the tree, so it is
+          the same scan, mid-run or not, when the video arrives above it. */}
+      {gated ? null : (
+        <div
+          inert={rendering}
+          className={cn(
+            panel,
+            "flex min-h-[560px] flex-col",
+            rowHeight,
+            passed !== null && "animate-in fade-in-0 slide-in-from-bottom-4 duration-700",
+          )}
+        >
+          {loaded ? (
+            <WrappedPlayer
+              ref={playerRef}
+              subject={loaded.subject}
+              seed={loaded.seed}
+              scenes={visible}
+              config={config}
+              autoplay={loaded.autoplay ?? true}
+              editing={editable ? editing : undefined}
+              className="flex-1"
+            />
+          ) : loading ? (
+            <>
+              <p role="status" className="sr-only">
+                {loading.lines[0]}
+              </p>
+              <WrappedPlayerLoading
+                subject={loading.subject}
+                lines={loading.lines}
+                config={config}
+                className="flex-1"
+              />
+            </>
+          ) : null}
+        </div>
+      )}
       {/* One pixel of room all round, so the clip that hides the opening column does not shave the panels' rings. */}
-      <div className={cn("-m-px overflow-hidden p-px", !editable && "max-lg:hidden")}>
-        {editable ? (
+      <div className={cn("-m-px overflow-hidden p-px", (!editable || gated) && "max-lg:hidden")}>
+        {editable && !gated ? (
           <div className={`flex min-h-0 flex-col gap-3 lg:w-[380px] ${rowHeight}`}>
             {loaded?.share ? (
               <ShareActions
@@ -329,7 +417,15 @@ export function WrappedView(
       {loaded && editable ? (
         <>
           {loaded.opening && loaded.opening.drops.length > 0 ? (
-            <div inert={rendering} className={cn("transition-opacity lg:col-span-2", rendering && "opacity-50")}>
+            <div
+              inert={rendering}
+              className={cn(
+                "transition-opacity lg:col-span-2",
+                rendering && "opacity-50",
+                // As the page, the scan takes the box the video is about to take.
+                gated && `min-h-[420px] ${rowHeight}`,
+              )}
+            >
               <YearScan
                 calendar={loaded.opening.calendar}
                 palette={resolvePalette(config)}
@@ -339,10 +435,12 @@ export function WrappedView(
                 describeDay={loaded.opening.describeDay}
                 actions={loaded.opening.actions}
                 sessionKey={loaded.opening.sessionKey}
+                gate={gated}
+                onRunChange={loaded.opening.gate ? onScanChange : undefined}
               />
             </div>
           ) : null}
-          {loaded.share?.graphics && loaded.share.graphics.length > 0 ? (
+          {!gated && loaded.share?.graphics && loaded.share.graphics.length > 0 ? (
             <div className="lg:col-span-2">
               <GraphicsGallery graphics={loaded.share.graphics} palette={resolvePalette(config)} />
             </div>

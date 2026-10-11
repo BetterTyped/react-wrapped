@@ -42,3 +42,5 @@ export { CutPreview, SceneThumb } from "./stage";
 export { TRANSITION_LABELS } from "./cuts";
 export { WRAPPED_PALETTES } from "./palettes";
 export { WRAPPED_FORMATS, WRAPPED_TRANSITIONS } from "./types";
+export { MARK_LAYERS, markOf, MARKS, type MarkId, type MarkLayer } from "./marks";
+export type { StageMark } from "./types";

@@ -20,6 +20,8 @@ const all = (root: Element, selector: string) => [...root.querySelectorAll<Piece
 const one = (root: Element, selector: string) => root.querySelector<Piece>(selector);
 const pair = (text: string | undefined) => (text ?? "0 0").split(" ").map(Number) as [number, number];
 const count = (value: number) => Math.round(value).toLocaleString("en-US");
+/** A number written on a piece as an attribute: where it stands, how wide it is. */
+const xOf = (piece: Piece, attribute: string) => Number(piece.getAttribute(attribute) ?? 0);
 
 /**
  * The moves every chart is put together from, on one timeline. Kept as methods so a call names what moves, how and
@@ -151,9 +153,6 @@ export function restIn(tl: gsap.core.Timeline, figure: HTMLElement, at: number) 
 }
 
 /* ---------- spark ---------- */
-
-/** A number written on a piece of a chart as an attribute: where along the chart it sits. */
-const xOf = (piece: Piece, attribute: string) => Number(piece.getAttribute(attribute) ?? 0);
 
 /**
  * The year is drawn left to right, and everything said about it turns up as the line gets there: the rule to cross
@@ -296,17 +295,47 @@ const gauge: Entrance = (tl, figure, at) => {
 
 /* ---------- days ---------- */
 
-/** One after another along the row: a day's tile comes up into its place, then its name and what day it was. */
+/**
+ * The days draw up along the row like a train, the first one home first. Each tile's number counts up as it stops,
+ * its date comes up under it, and once they are all in a ring closes in on each day that counts and locks.
+ */
 const days: Entrance = (tl, figure, at) => {
   const m = movesOn(tl);
   const tiles = all(figure, ".wr-chart-day");
   const step = Math.min(0.1, 0.7 / Math.max(1, tiles.length));
   for (const [index, tile] of tiles.entries()) {
     const start = at + index * step;
-    // Never past its own size: the tiles sit close, and one that grows touches the next.
-    m.from(one(tile, "i"), { y: 46, scale: 0.82, autoAlpha: 0, duration: 0.65, ease: "power3.out" }, start);
-    m.from(all(tile, "b, small"), { y: 18, autoAlpha: 0, duration: 0.45, ease: EASE_OUT, stagger: 0.07 }, start + 0.28);
+    const cell = one(tile, "i");
+    // Along the row and never bigger than itself: the tiles sit close, and one that grows touches the next.
+    m.from(cell, { x: 150 + index * 28, duration: 0.9, ease: "expo.out" }, start);
+    m.from(cell, { autoAlpha: 0, duration: 0.22, ease: "none" }, start);
+    if (cell) {
+      const to = Number(cell.dataset.value ?? 0);
+      // What the tile says in the end ("1.2K"): the count runs in whole numbers and lands on it.
+      const said = cell.textContent ?? "";
+      const box = { value: 0 };
+      tl.to(
+        box,
+        {
+          value: to,
+          duration: 0.7,
+          ease: "power2.out",
+          onUpdate: () => {
+            setText(cell, box.value >= to ? said : String(Math.round(box.value)));
+          },
+        },
+        start + 0.2,
+      );
+    }
+    m.from(one(tile, "b"), { y: 28, autoAlpha: 0, duration: 0.5, ease: "back.out(2.2)" }, start + 0.38);
+    m.from(one(tile, "small"), { y: 12, autoAlpha: 0, duration: 0.45, ease: EASE_OUT }, start + 0.5);
   }
+  // The ring starts wide and too thin to see, closes in on its day and locks. Only the ring moves, never the tile.
+  m.from(
+    all(figure, ".wr-chart-day[data-marked] i"),
+    { outlineOffset: 30, outlineWidth: 0, duration: 0.7, ease: "back.out(2.4)", stagger: 0.16 },
+    at + tiles.length * step + 0.8,
+  );
 };
 
 /* ---------- pixel area ---------- */
@@ -424,9 +453,9 @@ const river: Entrance = (tl, figure, at) => {
   const open = "inset(-60px -10% -60px -60px)";
   const streams = all(figure, "[data-chart-stream]");
   for (const [index, stream] of streams.entries()) {
-    tl.fromTo(stream, { clipPath: shut }, { clipPath: open, duration: 1.35, ease: "power3.inOut" }, at + index * 0.14);
+    tl.fromTo(stream, { clipPath: shut }, { clipPath: open, duration: 1.35, ease: "power3.inOut" }, at + index * 0.08);
   }
-  const drawn = at + (streams.length - 1) * 0.14 + 1.35;
+  const drawn = at + (streams.length - 1) * 0.08 + 1.35;
   m.labelsIn(all(figure, "[data-chart-tick-label]"), at + 0.3, 1);
   m.from(
     one(figure, "[data-chart-point]"),
@@ -582,21 +611,21 @@ const hours: Entrance = (tl, figure, at) => {
     { x: -18, autoAlpha: 0, duration: 0.45, ease: "back.out(2)", stagger: 0.05 },
     at,
   );
-  // One tween a row: a week of empty hours is 168 cells, and a tween each is slow to build for no gain.
-  for (let day = 0; day < 7; day += 1) {
+  // The empty week first, as its own wave from the top left corner, so the lit hours land on a grid that is there.
+  for (let hour = 0; hour < 24; hour += 1) {
     m.from(
-      all(figure, `[data-chart-slot][data-day="${day}"]`),
-      { y: 14, autoAlpha: 0, duration: 0.5, ease: EASE_OUT },
-      at + 0.05 + day * 0.05,
+      all(figure, `[data-chart-slot][data-hour="${hour}"]`),
+      { scale: 0.3, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.45, ease: "power3.out", stagger: 0.022 },
+      at + hour * 0.024,
     );
   }
   m.labelsIn(all(figure, "[data-chart-tick-label]"), at + 0.3, 0.6);
   const point = one(figure, "[data-chart-point]");
   const cell = { scale: 0.3, autoAlpha: 0, transformOrigin: "50% 50%", duration: 0.42, ease: "power3.out" };
-  let last = at + 0.4;
+  let last = at + 0.55;
   for (const piece of all(figure, "[data-chart-cell]")) {
     if (piece === point) continue;
-    const start = at + 0.4 + Number(piece.dataset.hour ?? 0) * 0.038 + Number(piece.dataset.day ?? 0) * 0.022;
+    const start = at + 0.55 + Number(piece.dataset.hour ?? 0) * 0.038 + Number(piece.dataset.day ?? 0) * 0.022;
     m.from(piece, cell, start);
     last = Math.max(last, start + 0.3);
   }

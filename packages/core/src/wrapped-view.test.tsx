@@ -1,10 +1,13 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { gsap } from "gsap";
+import { useState } from "react";
 
 import { DEFAULT_WRAPPED_CONFIG } from "./config";
 import { renderVideo, type StageTake } from "./export-video";
+import { PIXEL_ART } from "./scenes";
 import type { SceneInstance, WrappedConfig } from "./types";
 import { WrappedView } from "./wrapped-view";
+import type { HiddenDrop } from "./year-scan";
 
 vi.mock("./export-video", async (original) => ({
   ...(await original<typeof import("./export-video")>()),
@@ -155,5 +158,127 @@ describe("WrappedView download", () => {
       "This browser cannot make the video. Chrome, Edge and Safari can.",
     );
     expect(screen.getByRole("button", { name: "Download" })).toBeInTheDocument();
+  });
+});
+
+class NothingInView {
+  observe() {}
+  disconnect() {}
+  unobserve() {}
+}
+
+const DROPS: readonly HiddenDrop[] = [
+  {
+    id: "streak",
+    name: "Marathon",
+    rarity: "rare",
+    kind: "Achievement",
+    line: "41 days in a row.",
+    art: PIXEL_ART.question,
+  },
+  {
+    id: "night",
+    name: "Midnight Oil",
+    rarity: "epic",
+    kind: "Achievement",
+    line: "Most of it after dark.",
+    art: PIXEL_ART.question,
+  },
+];
+
+/** Someone's own Wrapped, with what they have opened kept the way a page keeps it. */
+function Own({ opened = [], gate = true }: { opened?: readonly string[]; gate?: boolean }) {
+  const [found, setFound] = useState(opened);
+  return (
+    <WrappedView
+      subject={{ handle: "octocat", name: null, avatarUrl: null, caption: "GitHub Wrapped", period: "2026" }}
+      seed="octocat"
+      scenes={scenes}
+      share={{ fileName: "octocat-github-wrapped.mp4" }}
+      opening={{
+        calendar: { lead: 2, levels: Array.from({ length: 365 }, (_unused, day) => day % 5) },
+        drops: DROPS,
+        found,
+        onOpen: (id) => setFound((now) => (now.includes(id) ? now : [...now, id])),
+        describeDay: (day) => `Day ${day}`,
+        gate,
+      }}
+      config={DEFAULT_WRAPPED_CONFIG}
+      onConfigChange={() => {}}
+      autoplay={false}
+    />
+  );
+}
+
+describe("WrappedView scan first", () => {
+  beforeEach(() => {
+    vi.stubGlobal("ResizeObserver", NoResizes);
+    vi.stubGlobal("IntersectionObserver", NothingInView);
+    vi.stubGlobal("matchMedia", () => ({ matches: false }));
+    Element.prototype.scrollIntoView = vi.fn<() => void>();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("opens on the scan alone when nothing has been found yet", () => {
+    // Act
+    const { container } = render(<Own />);
+
+    // Assert
+    expect(screen.getByText("Your Wrapped is almost ready.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Find my scenes" })).toBeInTheDocument();
+    expect(container.querySelector(".wr-stage")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Download" })).toBeNull();
+  });
+
+  it("goes straight to the video for someone who has already scanned", () => {
+    // Act
+    const { container } = render(<Own opened={["streak"]} />);
+
+    // Assert
+    expect(container.querySelector(".wr-stage")).not.toBeNull();
+    expect(screen.queryByText("Your Wrapped is almost ready.")).toBeNull();
+    expect(screen.getByRole("button", { name: "Keep scanning" })).toBeInTheDocument();
+  });
+
+  it("plays an example right away, its scan under the video", () => {
+    // Act
+    const { container } = render(<Own gate={false} />);
+
+    // Assert
+    expect(container.querySelector(".wr-stage")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Scan my year" })).toBeInTheDocument();
+  });
+
+  it("stays on the scan while it runs and hands over to the video once it has found everything", async () => {
+    // Arrange
+    const { container } = render(<Own />);
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "Find my scenes" }));
+    // The first find must not bring the video in under the ones still to come.
+    expect(container.querySelector(".wr-stage")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Find all" }));
+
+    // Assert
+    expect(screen.getByText("You found all 2.")).toBeInTheDocument();
+    await waitFor(() => expect(container.querySelector(".wr-stage")).not.toBeNull(), { timeout: 3000 });
+    expect(screen.getByRole("button", { name: "Download" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Scan again" })).toBeInTheDocument();
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
+  });
+
+  it("keeps the video up when a later scan is run under it", () => {
+    // Arrange
+    const { container } = render(<Own opened={["streak"]} />);
+
+    // Act
+    fireEvent.click(screen.getByRole("button", { name: "Keep scanning" }));
+
+    // Assert
+    expect(container.querySelector(".wr-stage")).not.toBeNull();
   });
 });
