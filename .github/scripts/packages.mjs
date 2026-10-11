@@ -53,6 +53,9 @@ function inPublishOrder(packages) {
   return ordered;
 }
 
+/** Results go to stdout, where the workflows read them. Everything said to a person goes to stderr. */
+const print = (line) => process.stdout.write(`${line}\n`);
+
 function fail(message) {
   // The first line shows up as an annotation on the run; the rest is for the log.
   console.error(`::error::${message.split("\n")[0]}`);
@@ -65,7 +68,7 @@ const publishable = inPublishOrder(all.filter((pkg) => pkg.manifest.private !== 
 const [command, argument] = process.argv.slice(2);
 
 if (command === "list") {
-  for (const pkg of publishable) console.log([pkg.dir, pkg.manifest.name, pkg.manifest.version].join("\t"));
+  for (const pkg of publishable) print([pkg.dir, pkg.manifest.name, pkg.manifest.version].join("\t"));
 } else if (command === "check") {
   const privateNames = new Set(all.filter((pkg) => pkg.manifest.private === true).map((pkg) => pkg.manifest.name));
   // A published package that needs a private one installs for nobody.
@@ -84,7 +87,7 @@ if (command === "list") {
     console.error("No published packages yet: every package.json in packages/ is private.");
   } else {
     console.error(`${publishable.length} published packages, all at ${[...versions][0]}.`);
-    console.log([...versions][0]);
+    print([...versions][0]);
   }
 } else if (command === "set-version") {
   if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(argument ?? "")) fail(`Not a version: "${argument ?? ""}"`);

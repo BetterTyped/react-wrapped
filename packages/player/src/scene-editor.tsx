@@ -4,9 +4,8 @@ import { useState } from "react";
 import {
   CutPreview,
   type SceneInstance,
-  TRANSITION_LABELS,
+  transitionList,
   WRAPPED_FORMATS,
-  WRAPPED_TRANSITIONS,
   type WrappedConfig,
   type WrappedTransition,
 } from "@react-wrapped/core";
@@ -30,8 +29,6 @@ export interface SceneCut {
   /** The scene it hands over to, for the preview. */
   next: SceneInstance;
 }
-
-const TRANSITION_OPTIONS = WRAPPED_TRANSITIONS.map((style) => ({ value: style, label: TRANSITION_LABELS[style] }));
 
 /** The preview is small enough to sit beside the chips, or above them when the video is wide. */
 const PREVIEW_WIDTH = { story: 112, square: 176, landscape: 288 } as const;
@@ -152,7 +149,13 @@ function SceneEditorForm({
                   width={PREVIEW_WIDTH[config.format]}
                 />
               </div>
-              <Chips label="Transition" value={style} options={TRANSITION_OPTIONS} onChange={setStyle} />
+              <Chips
+                label="Transition"
+                value={style}
+                // Read when the editor opens, so a transition added with `defineTransition` is offered too.
+                options={transitionList().map((transition) => ({ value: transition.id, label: transition.label }))}
+                onChange={setStyle}
+              />
             </div>
           </ModalField>
         ) : null}

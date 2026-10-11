@@ -17,7 +17,8 @@ are separate from here on: nothing is shared at build time, and changes are carr
 
 ## Where this copy already differs
 
-- No brand logos ship. The corner mark is path data the caller passes (`StageMark`).
+- The corner mark is path data the caller passes (`StageMark`). The ready-made marks live in a package of their own,
+  `@react-wrapped/marks`, so nobody gets a logo they did not ask for.
 - The line saying where a video is from is optional (`brand`), and off unless it is set.
 - A scene's fit-to-frame factor is a CSS variable (`--wr-fit`), read by one rule in the stylesheet.
 - The small UI pieces the engine borrowed from its host (switch, chips, dialog, pill buttons, class joiner, copy hook)

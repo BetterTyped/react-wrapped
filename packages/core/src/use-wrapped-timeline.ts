@@ -23,18 +23,6 @@ export interface SceneMark {
   time: number;
 }
 
-/** What the renderer and screenshots drive: `window.__wrapped.seek(t)` then grab the frame. */
-interface WrappedHandle {
-  duration: number;
-  seek: (seconds: number) => void;
-  scenes: readonly SceneMark[];
-}
-declare global {
-  interface Window {
-    __wrapped?: WrappedHandle;
-  }
-}
-
 /**
  * Builds the master timeline from the scenes and keeps it in step with the
  * config. The playhead is not React state: it moves sixty times a second, so the
@@ -237,15 +225,6 @@ export function useWrappedTimeline({
     paint();
     if (playingRef.current && master.progress() < 1) master.play();
 
-    window.__wrapped = {
-      duration: master.duration(),
-      scenes: nextMarks,
-      seek: (seconds) => {
-        master.pause();
-        master.time(seconds);
-        paint();
-      },
-    };
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- paint and setPlayingState are stable; speed has its own effect
   }, [scenes, config.format, config.cuts, seed]);
 
@@ -307,6 +286,19 @@ export function useWrappedTimeline({
   const restart = useCallback(() => {
     masterRef.current?.restart();
     setPlayingState(true);
+  }, [setPlayingState]);
+
+  const play = useCallback(() => {
+    const master = masterRef.current;
+    if (!master) return;
+    if (master.progress() >= 1) master.restart();
+    else master.play();
+    setPlayingState(true);
+  }, [setPlayingState]);
+
+  const pause = useCallback(() => {
+    masterRef.current?.pause();
+    setPlayingState(false);
   }, [setPlayingState]);
 
   /** Scrubbing from the timeline: jump to a moment and stay there. */
@@ -387,6 +379,8 @@ export function useWrappedTimeline({
     playing,
     marks,
     toggle,
+    play,
+    pause,
     restart,
     seekTime,
     step,

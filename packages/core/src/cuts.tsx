@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 import { createRng } from "./rng";
-import { WRAPPED_TRANSITIONS, type WrappedFormat, type WrappedTransition } from "./types";
+import { type BuiltInTransition, WRAPPED_TRANSITIONS, type WrappedFormat, type WrappedTransition } from "./types";
 
 /*
  * Cuts: how one scene hands over to the next. Most of them are covers: something in the palette's own colors takes the
@@ -12,10 +14,12 @@ import { WRAPPED_TRANSITIONS, type WrappedFormat, type WrappedTransition } from 
  * cut when the scenes around it are moved, switched off or found later.
  */
 export function luckyCut(seed: string, sceneKey: string): WrappedTransition {
-  return createRng(seed).fork("motion").fork(`${sceneKey}/exit`).pick(WRAPPED_TRANSITIONS);
+  // The built-in ones first and in their own order, so adding a transition never changes what an old link plays.
+  const pool = [...WRAPPED_TRANSITIONS, ...[...CUSTOM.values()].filter((spec) => spec.lucky).map((spec) => spec.id)];
+  return createRng(seed).fork("motion").fork(`${sceneKey}/exit`).pick(pool);
 }
 
-export const TRANSITION_LABELS: Record<WrappedTransition, string> = {
+export const TRANSITION_LABELS: Record<BuiltInTransition, string> = {
   layers: "Layers",
   slash: "Slash",
   arrow: "Arrow",
@@ -36,6 +40,65 @@ export const TRANSITION_LABELS: Record<WrappedTransition, string> = {
   drop: "Drop",
   zoom: "Zoom",
 };
+
+/* ---------- transitions of your own ---------- */
+
+/** What a transition is handed when it is put on the timeline. */
+export interface TransitionContext {
+  /** The scene that is leaving. The transition has to take it out of sight. */
+  root: HTMLElement;
+  /** What the transition drew for itself above the scenes (its `cover`), out of sight until it shows it. */
+  group: HTMLElement | null;
+}
+
+export interface TransitionSpec {
+  /** What a config names it by: `cuts: { total: "curtain" }`. Lower case, no spaces, not a built-in one's. */
+  id: string;
+  /** What the scene editor calls it. */
+  label: string;
+  /**
+   * Markup the transition draws above the scenes: three `<i />` for the layers of a cover, an SVG, anything. It is
+   * rendered once into every stage, hidden, inside an element with `data-cut` set to the id.
+   */
+  cover?: ReactNode | ((format: WrappedFormat) => ReactNode);
+  /**
+   * Puts the transition on the timeline. Add the label `HANDOVER` where the next scene should start; without it the
+   * next scene starts a beat before this ends. Only add tweens: the engine seeks and reverses this timeline.
+   */
+  play: (tl: gsap.core.Timeline, context: TransitionContext) => void;
+  /** Lets the video's seed pick it for scenes nobody chose a transition for. Off unless asked. */
+  lucky?: boolean;
+}
+
+const CUSTOM = new Map<string, TransitionSpec>();
+
+/**
+ * Adds a transition of your own. Call it once, where your app starts, before a stage is on the page: a stage draws
+ * every transition's cover when it mounts.
+ */
+export function defineTransition(spec: TransitionSpec): TransitionSpec {
+  if ((WRAPPED_TRANSITIONS as readonly string[]).includes(spec.id)) {
+    throw new Error(`"${spec.id}" is a built-in transition. Give yours another id.`);
+  }
+  if (!/^[a-z][a-z0-9-]*$/.test(spec.id)) {
+    throw new Error(
+      `A transition id is lower case letters, digits and hyphens, starting with a letter. Got "${spec.id}".`,
+    );
+  }
+  CUSTOM.set(spec.id, spec);
+  return spec;
+}
+
+/** Every transition a scene can be given: the built-in ones, then yours. */
+export function transitionList(): { id: WrappedTransition; label: string }[] {
+  return [
+    ...WRAPPED_TRANSITIONS.map((id) => ({ id, label: TRANSITION_LABELS[id] })),
+    ...[...CUSTOM.values()].map((spec) => ({ id: spec.id, label: spec.label })),
+  ];
+}
+
+export const isTransition = (id: string): id is WrappedTransition =>
+  (WRAPPED_TRANSITIONS as readonly string[]).includes(id) || CUSTOM.has(id);
 
 /**
  * The label a cut puts where the next scene should begin: under a closed cover, or as the last of the old scene
@@ -149,6 +212,13 @@ export function StageCover({ format }: { format: WrappedFormat }) {
       <div data-cut="flash">
         <i />
       </div>
+      {[...CUSTOM.values()].map((spec) =>
+        spec.cover ? (
+          <div key={spec.id} data-cut={spec.id} data-cut-custom>
+            {typeof spec.cover === "function" ? spec.cover(format) : spec.cover}
+          </div>
+        ) : null,
+      )}
     </div>
   );
 }
@@ -157,7 +227,8 @@ export function StageCover({ format }: { format: WrappedFormat }) {
 
 type CoverStyle = (typeof PANEL_CUTS)[number] | "brush" | "scan" | "flash";
 
-interface CoverMove {
+/** The three states of a cover's layers. `coverCut` plays through them. */
+export interface CoverMove {
   /** Where a layer waits out of sight. Also puts back anything the clearing changed the last time round. */
   hidden: gsap.TweenVars;
   /** The frame is covered. */
@@ -265,7 +336,16 @@ const COVER_MOVES: Record<CoverStyle, CoverMove> = {
 /** Layers follow each other by this much, so the edge of a cover is a band of colors and never one hard line. */
 const LAYER_GAP = 0.085;
 
-function coverCut(tl: gsap.core.Timeline, { root, group }: { root: HTMLElement; group: Element }, move: CoverMove) {
+/**
+ * Plays a cover: its layers come in one after another until the frame is covered, the old scene is taken out under
+ * them, and they clear in reverse order onto the next one. Every built-in cover is this with different states; a
+ * transition of your own can use it from its `play`.
+ */
+export function coverCut(
+  tl: gsap.core.Timeline,
+  { root, group }: { root: HTMLElement; group: Element },
+  move: CoverMove,
+) {
   const layers = [...group.children];
   const { duration = 0.5, ease = ["power2.in", "power2.out"] } = move;
 
@@ -302,6 +382,11 @@ export function exitScene(
   root: HTMLElement,
   { style, cover }: { style: WrappedTransition; cover: HTMLElement | null },
 ) {
+  const own = CUSTOM.get(style);
+  if (own) {
+    own.play(tl, { root, group: cover?.querySelector<HTMLElement>(`[data-cut="${own.id}"]`) ?? null });
+    return;
+  }
   switch (style) {
     case "lift":
       tl.to(root, { autoAlpha: 0, y: -60, scale: 0.97, filter: "blur(14px)", duration: 0.55, ease: "power3.in" });
@@ -341,7 +426,7 @@ export function exitScene(
         tl.to(root, { autoAlpha: 0, duration: 0.4 });
         return;
       }
-      coverCut(tl, { root, group }, COVER_MOVES[style]);
+      coverCut(tl, { root, group }, COVER_MOVES[style as CoverStyle]);
     }
   }
 }

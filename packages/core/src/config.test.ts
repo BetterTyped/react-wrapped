@@ -4,7 +4,7 @@ import {
   DEFAULT_WRAPPED_CONFIG,
   editsFor,
   searchFromConfig,
-  wrappedSearchSchema,
+  parseWrappedSearch,
 } from "./config";
 import type { WrappedConfig } from "./types";
 
@@ -26,7 +26,7 @@ describe("wrapped config in the URL", () => {
     };
 
     // Act
-    const back = configFromSearch(wrappedSearchSchema.parse(searchFromConfig(config)));
+    const back = configFromSearch(parseWrappedSearch(searchFromConfig(config)));
 
     // Assert
     expect(back).toEqual(config);
@@ -42,7 +42,7 @@ describe("wrapped config in the URL", () => {
 
   it("leaves a scene to its luck when the link names a transition that is gone", () => {
     // Act
-    const config = configFromSearch(wrappedSearchSchema.parse({ t: "total:ripple,busiest:wipe" }));
+    const config = configFromSearch(parseWrappedSearch({ t: "total:ripple,busiest:wipe" }));
 
     // Assert
     expect(config.cuts).toEqual({ busiest: "wipe" });
@@ -50,7 +50,7 @@ describe("wrapped config in the URL", () => {
 
   it("plays a link from when one transition was set for the whole video with each scene's own", () => {
     // Act
-    const config = configFromSearch(wrappedSearchSchema.parse({ t: "wipe" }));
+    const config = configFromSearch(parseWrappedSearch({ t: "wipe" }));
 
     // Assert
     expect(config.cuts).toEqual({});
@@ -58,9 +58,7 @@ describe("wrapped config in the URL", () => {
 
   it("plays a mangled link with defaults instead of failing", () => {
     // Act
-    const config = configFromSearch(
-      wrappedSearchSchema.parse({ p: "nope", a: "zzz", f: "vertical", s: "9", e: "{not json" }),
-    );
+    const config = configFromSearch(parseWrappedSearch({ p: "nope", a: "zzz", f: "vertical", s: "9", e: "{not json" }));
 
     // Assert
     expect(config).toEqual(DEFAULT_WRAPPED_CONFIG);
@@ -70,8 +68,8 @@ describe("wrapped config in the URL", () => {
 describe("themes and the light switch", () => {
   it("opens a link from before dark and light were one switch as what it was", () => {
     // Act
-    const light = configFromSearch(wrappedSearchSchema.parse({ p: "github-light" }));
-    const dark = configFromSearch(wrappedSearchSchema.parse({ p: "github-dark" }));
+    const light = configFromSearch(parseWrappedSearch({ p: "github-light" }));
+    const dark = configFromSearch(parseWrappedSearch({ p: "github-dark" }));
 
     // Assert
     expect(light).toMatchObject({ palette: "github", mode: "light" });
@@ -87,7 +85,7 @@ describe("themes and the light switch", () => {
 
     // Assert
     expect(search).toMatchObject({ p: "grape", m: "light" });
-    expect(configFromSearch(wrappedSearchSchema.parse(search))).toMatchObject({ palette: "grape", mode: "light" });
+    expect(configFromSearch(parseWrappedSearch(search))).toMatchObject({ palette: "grape", mode: "light" });
   });
 });
 

@@ -8,9 +8,22 @@ import {
   useOpenedDrops,
   type WrappedConfig,
   type WrappedGraphic,
+  type WrappedPlayerHandle,
   WrappedView,
 } from "@react-wrapped/kit";
 import { directSample, formatShort, sampleInsights, sampleTraits, sampleYear } from "@react-wrapped/sample";
+
+declare global {
+  interface Window {
+    /** The example's player, for the browser tests of this site: they seek it to a moment and look at the frame. */
+    __wrapped?: WrappedPlayerHandle | null;
+  }
+}
+
+/** Puts the example's player where the site's own browser tests can reach it. Not something the library does. */
+const exposePlayer = (handle: WrappedPlayerHandle | null) => {
+  window.__wrapped = handle;
+};
 
 /**
  * A whole Wrapped from one component: a made-up developer's year on a made-up platform, with a player, the settings,
@@ -56,6 +69,7 @@ export function FullWrapped({ gate = false }: { gate?: boolean }) {
 
   return (
     <WrappedView
+      playerRef={exposePlayer}
       subject={cut.subject}
       seed={cut.seed}
       scenes={cut.scenes}

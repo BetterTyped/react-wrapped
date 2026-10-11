@@ -1,12 +1,13 @@
-import { z } from "zod";
-
+import { isTransition } from "./cuts";
 import { currentWrappedPalette } from "./palette-data";
 import { CUSTOM_PALETTE, isPresetPalette } from "./palettes";
 import {
+  type CellShape,
   WRAPPED_FORMATS,
   WRAPPED_SPEEDS,
-  WRAPPED_TRANSITIONS,
   type WrappedConfig,
+  type WrappedFormat,
+  type WrappedSpeed,
   type WrappedTransition,
 } from "./types";
 
@@ -24,34 +25,51 @@ export const DEFAULT_WRAPPED_CONFIG: WrappedConfig = {
   grain: true,
 };
 
-/*
- * The config as URL search params, short keys so a shared link stays readable.
- * Every field falls back to its default on anything unexpected: a link someone
- * mangled while pasting should still play, not throw.
+/**
+ * The config as URL search params, short keys so a shared link stays readable: palette, accent, mode, format, cells,
+ * speed, transitions, hidden scenes, order, edits, grain.
  */
-export const wrappedSearchSchema = z.object({
-  p: z.string().max(24).optional().catch(undefined),
-  a: z
-    .string()
-    .regex(/^[0-9a-f]{6}$/i)
-    .optional()
-    .catch(undefined),
-  m: z.enum(["dark", "light"]).optional().catch(undefined),
-  f: z
-    .enum(Object.keys(WRAPPED_FORMATS) as [keyof typeof WRAPPED_FORMATS])
-    .optional()
-    .catch(undefined),
-  c: z.enum(["round", "square", "circle"]).optional().catch(undefined),
-  s: z.enum(WRAPPED_SPEEDS).optional().catch(undefined),
-  t: z.string().max(800).optional().catch(undefined),
-  h: z.string().max(240).optional().catch(undefined),
-  o: z.string().max(400).optional().catch(undefined),
-  e: z.string().max(3000).optional().catch(undefined),
-  g: z.literal(0).optional().catch(undefined),
-});
-export type WrappedSearch = z.infer<typeof wrappedSearchSchema>;
+export interface WrappedSearch {
+  p?: string;
+  a?: string;
+  m?: "dark" | "light";
+  f?: WrappedFormat;
+  c?: CellShape;
+  s?: WrappedSpeed;
+  t?: string;
+  h?: string;
+  o?: string;
+  e?: string;
+  g?: 0;
+}
 
-const editsSchema = z.record(z.string().max(80), z.string().max(240));
+const text = (value: unknown, max: number) => (typeof value === "string" && value.length <= max ? value : undefined);
+const oneOf = <T extends string>(value: unknown, allowed: readonly T[]) =>
+  allowed.find((candidate) => candidate === value);
+
+/**
+ * Reads a link's search params. Every field falls back to "not set" on anything unexpected: a link someone mangled
+ * while pasting should still play, not throw. Takes whatever a router hands over, so it works as a route's own
+ * search validator.
+ */
+export function parseWrappedSearch(input: object): WrappedSearch {
+  const search: Readonly<Record<string, unknown>> = { ...input };
+  const accent = text(search.a, 6);
+  return {
+    p: text(search.p, 24),
+    a: accent && /^[0-9a-f]{6}$/i.test(accent) ? accent : undefined,
+    m: oneOf(search.m, ["dark", "light"] as const),
+    f: oneOf(search.f, Object.keys(WRAPPED_FORMATS) as WrappedFormat[]),
+    c: oneOf(search.c, ["round", "square", "circle"] as const),
+    // A router may have read "1.5" as a number.
+    s: oneOf(typeof search.s === "number" ? String(search.s) : search.s, WRAPPED_SPEEDS),
+    t: text(search.t, 800),
+    h: text(search.h, 240),
+    o: text(search.o, 400),
+    e: text(search.e, 3000),
+    g: search.g === 0 || search.g === "0" ? 0 : undefined,
+  };
+}
 
 /** Edits travel as JSON in one param. Anything that is not a flat map of short strings is dropped. */
 function parseEdits(raw: string | undefined): Readonly<Record<string, string>> {
@@ -62,12 +80,11 @@ function parseEdits(raw: string | undefined): Readonly<Record<string, string>> {
   } catch {
     return {};
   }
-  const result = editsSchema.safeParse(parsed);
-  return result.success ? result.data : {};
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+  const entries = Object.entries(parsed);
+  const flat = entries.every(([key, value]) => key.length <= 80 && typeof value === "string" && value.length <= 240);
+  return flat ? (Object.fromEntries(entries) as Record<string, string>) : {};
 }
-
-const isTransition = (style: string): style is WrappedTransition =>
-  (WRAPPED_TRANSITIONS as readonly string[]).includes(style);
 
 /**
  * Picked transitions travel as "scene:style" pairs. A pair that names no transition is dropped, so the scene plays

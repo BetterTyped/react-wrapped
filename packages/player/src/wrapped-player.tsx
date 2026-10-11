@@ -6,6 +6,7 @@ import {
   LoadingStage,
   type LoadingSubject,
   type SceneInstance,
+  type SceneMark,
   type StageTake,
   useWrappedTimeline,
   WRAPPED_FORMATS,
@@ -98,8 +99,22 @@ export function WrappedPlayerLoading({
   );
 }
 
-/** What the player lends out: its stage and playhead, for making the video file. Null while there is no video. */
+/**
+ * A player, driven from outside: what `ref` on `WrappedPlayer` hands out. Each player has its own, so any number of
+ * them can share a page.
+ */
 export interface WrappedPlayerHandle {
+  play: () => void;
+  pause: () => void;
+  /** Plays from the first frame. */
+  restart: () => void;
+  /** Jumps to a moment, in seconds of the video at normal speed, and stays there. */
+  seek: (seconds: number) => void;
+  /** How long the video is, in seconds at normal speed. Zero while there is none. */
+  duration: () => number;
+  /** Where each scene starts, in play order. */
+  scenes: () => readonly SceneMark[];
+  /** Lends out the stage and the playhead, for making the video file. Null while there is no video. */
   take: () => StageTake | null;
 }
 
@@ -138,7 +153,7 @@ export function WrappedPlayer({
   const clockRef = useRef<HTMLSpanElement>(null);
   const { boxRef, scale, style } = useStageFit(config.format, fullscreen);
 
-  const { playing, marks, toggle, restart, seekTime, step, take, duration } = useWrappedTimeline({
+  const { playing, marks, toggle, play, pause, restart, seekTime, step, take, duration } = useWrappedTimeline({
     stageRef,
     scenes,
     config,
@@ -147,7 +162,14 @@ export function WrappedPlayer({
     clockRef,
     autoplay,
   });
-  useImperativeHandle(ref, () => ({ take }), [take]);
+  // Read through a ref: the handle is made once, and still answers with the scenes as they are now.
+  const marksRef = useRef(marks);
+  marksRef.current = marks;
+  useImperativeHandle(
+    ref,
+    () => ({ play, pause, restart, seek: seekTime, duration, scenes: () => marksRef.current, take }),
+    [play, pause, restart, seekTime, duration, take],
+  );
 
   useEffect(() => {
     const sync = () => setFullscreen(document.fullscreenElement === rootRef.current);

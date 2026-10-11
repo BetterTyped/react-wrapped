@@ -1,5 +1,15 @@
 import { Check, Download, Link2, Square } from "lucide-react";
-import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  type ReactNode,
+  type Ref,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   arrangeScenes,
@@ -223,6 +233,8 @@ export function WrappedView(
      * the share tools. Anyone else watching the link gets the video and `viewer` under it.
      */
     editable?: boolean;
+    /** The player's handle: play, pause, seek, and where each scene starts. Null while there is no video. */
+    playerRef?: Ref<WrappedPlayerHandle | null>;
   },
 ) {
   const { config, onConfigChange, editable = true } = props;
@@ -242,6 +254,15 @@ export function WrappedView(
   );
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const playerRef = useRef<WrappedPlayerHandle>(null);
+  // The player's handle, kept here for the download and handed on to whoever asked for it with `playerRef`.
+  const outerPlayerRef = useRef(props.playerRef);
+  outerPlayerRef.current = props.playerRef;
+  const setPlayer = useCallback((handle: WrappedPlayerHandle | null) => {
+    playerRef.current = handle;
+    const outer = outerPlayerRef.current;
+    if (typeof outer === "function") outer(handle);
+    else if (outer) outer.current = handle;
+  }, []);
   // While the video file is being made the stage is being filmed frame by frame: nothing else may move it.
   const [rendering, setRendering] = useState(false);
   const visible = useMemo(
@@ -368,7 +389,7 @@ export function WrappedView(
         >
           {loaded ? (
             <WrappedPlayer
-              ref={playerRef}
+              ref={setPlayer}
               subject={loaded.subject}
               seed={loaded.seed}
               scenes={visible}

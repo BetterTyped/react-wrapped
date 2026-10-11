@@ -10,7 +10,7 @@ import {
   type StageTake,
   type WrappedConfig,
 } from "@react-wrapped/core";
-import { renderVideo } from "@react-wrapped/player";
+import { renderVideo, type WrappedPlayerHandle } from "@react-wrapped/player";
 import type { HiddenDrop } from "@react-wrapped/scan";
 
 vi.mock("@react-wrapped/player", async (original) => ({
@@ -46,9 +46,13 @@ function scene(key: string): SceneInstance {
 
 const scenes = [scene("total"), scene("streak")];
 
+/** The player of the view on screen, the way a page holds it. */
+const viewPlayer: { current: WrappedPlayerHandle | null } = { current: null };
+
 function show(config: WrappedConfig = DEFAULT_WRAPPED_CONFIG) {
   return render(
     <WrappedView
+      playerRef={viewPlayer}
       subject={{ handle: "octocat", name: null, avatarUrl: null, caption: "GitHub Wrapped", period: "2026" }}
       seed="octocat"
       scenes={scenes}
@@ -121,7 +125,7 @@ describe("WrappedView download", () => {
     const take: StageTake = held.take();
 
     // Faster playback is a shorter file, not the same file played faster.
-    expect(take.seconds).toBeCloseTo((window.__wrapped?.duration ?? 0) / 1.5);
+    expect(take.seconds).toBeCloseTo((viewPlayer.current?.duration() ?? 0) / 1.5);
     expect(take.intact()).toBe(true);
   });
 
@@ -284,5 +288,50 @@ describe("WrappedView scan first", () => {
 
     // Assert
     expect(container.querySelector(".wr-stage")).not.toBeNull();
+  });
+});
+
+describe("WrappedView player handle", () => {
+  beforeEach(() => {
+    vi.stubGlobal("ResizeObserver", NoResizes);
+    vi.stubGlobal("IntersectionObserver", NothingInView);
+    vi.stubGlobal("matchMedia", () => ({ matches: false }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("gives each view on a page its own player to drive", () => {
+    // Arrange
+    const first: { current: WrappedPlayerHandle | null } = { current: null };
+    const second: { current: WrappedPlayerHandle | null } = { current: null };
+    const view = (ref: typeof first, list: readonly SceneInstance[]) => (
+      <WrappedView
+        playerRef={ref}
+        subject={{ handle: "ada", name: null, avatarUrl: null, caption: "Orbit Wrapped", period: "2026" }}
+        seed="ada"
+        scenes={list}
+        config={DEFAULT_WRAPPED_CONFIG}
+        onConfigChange={() => {}}
+        autoplay={false}
+      />
+    );
+    render(
+      <>
+        {view(first, scenes)}
+        {view(second, [scene("only")])}
+      </>,
+    );
+
+    // Act
+    first.current?.seek(4);
+
+    // Assert
+    expect(first.current?.scenes().map((mark) => mark.key)).toEqual(["total", "streak"]);
+    expect(second.current?.scenes().map((mark) => mark.key)).toEqual(["only"]);
+    expect(first.current?.duration()).toBeGreaterThan(second.current?.duration() ?? 0);
+    // Nothing is left on the page for two players to fight over.
+    expect("__wrapped" in window).toBe(false);
   });
 });

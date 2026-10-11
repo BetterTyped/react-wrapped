@@ -39,7 +39,9 @@ export const WRAPPED_TRANSITIONS = [
   "drop",
   "zoom",
 ] as const;
-export type WrappedTransition = (typeof WRAPPED_TRANSITIONS)[number];
+export type BuiltInTransition = (typeof WRAPPED_TRANSITIONS)[number];
+/** A transition by its id: one of the built-in ones, or one added with `defineTransition`. */
+export type WrappedTransition = BuiltInTransition | (string & {});
 
 /** A palette is the graph's five levels, the surfaces around them and what each rarity wears. Level 4 is the accent. */
 export type { WrappedPalette } from "./palette-data";
