@@ -82,8 +82,8 @@ describe("the cut a scene's luck picks", () => {
     const keys = ["opening", "total", "busiest", "streak", "languages", "repos", "persona", "weekdays"];
 
     // Act
-    const first = keys.map((key) => luckyCut("octocat/7", key));
-    const again = keys.toReversed().map((key) => luckyCut("octocat/7", key));
+    const first = keys.map((key) => luckyCut("ada/7", key));
+    const again = keys.toReversed().map((key) => luckyCut("ada/7", key));
 
     // Assert
     expect(again.toReversed()).toEqual(first);

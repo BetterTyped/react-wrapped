@@ -53,13 +53,9 @@ describe("frameMarkup", () => {
 
   it("swaps a picture for its inlined copy and leaves out one it could not read", () => {
     const stage = stageWith(
-      `<div class="wr-chrome"><img src="https://avatars.example/octocat.png" alt=""><img src="https://avatars.example/blocked.png" alt=""></div>`,
+      `<div class="wr-chrome"><img src="https://avatars.example/ada.png" alt=""><img src="https://avatars.example/blocked.png" alt=""></div>`,
     );
-    const markup = frameMarkup(
-      stage,
-      "",
-      new Map([["https://avatars.example/octocat.png", "data:image/png;base64,AAAA"]]),
-    );
+    const markup = frameMarkup(stage, "", new Map([["https://avatars.example/ada.png", "data:image/png;base64,AAAA"]]));
 
     expect(markup).toContain("data:image/png;base64,AAAA");
     // A picture cannot fetch anything: an address left in it would be a hole in the frame.

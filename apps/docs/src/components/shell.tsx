@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 
 import { SECTIONS } from "../registry/pages";
 import { hypeStack, SITE } from "../site";
@@ -54,14 +54,31 @@ function ThemeToggle() {
   );
 }
 
-/** The mark: five cells of a year, the last one lit. */
-function Mark() {
+/**
+ * The mark: a W drawn the way the library draws a chart, a glowing line that ends on its lit point, on a piece of
+ * the stage. Each one on a page needs its own gradient id, so the id is made here.
+ */
+export function Mark({ className = "d-mark" }: { className?: string }) {
+  const light = useId();
   return (
-    <svg className="d-mark" viewBox="0 0 28 28" aria-hidden>
-      <rect x="1" y="1" width="12" height="12" rx="3.2" opacity="0.28" />
-      <rect x="15" y="1" width="12" height="12" rx="3.2" opacity="0.55" />
-      <rect x="1" y="15" width="12" height="12" rx="3.2" opacity="0.8" />
-      <rect x="15" y="15" width="12" height="12" rx="3.2" />
+    <svg className={className} viewBox="0 0 64 64" aria-hidden>
+      <defs>
+        <radialGradient id={light} cx="0.2" cy="0.05" r="0.9">
+          <stop offset="0" stopColor="#1f7a3d" stopOpacity="0.75" />
+          <stop offset="0.6" stopColor="#1f7a3d" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="64" height="64" rx="15" fill="#0d1117" />
+      <rect width="64" height="64" rx="15" fill={`url(#${light})`} />
+      <path
+        d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5"
+        fill="none"
+        stroke="#39d353"
+        strokeWidth="6.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="52.5" cy="19.5" r="7.2" fill="#d2f26b" stroke="#0d1117" strokeWidth="2.6" />
     </svg>
   );
 }
@@ -86,7 +103,9 @@ function Navbar({ onMenu }: { onMenu: () => void }) {
         </button>
         <SiteLink path="/" className="d-brand" aria-label={`${SITE.title} home`}>
           <Mark />
-          <span>react-wrapped</span>
+          <span>
+            react<b>-</b>wrapped
+          </span>
         </SiteLink>
         <nav aria-label="Site">
           <SiteLink path="/docs/" aria-current={section === "docs" ? "page" : undefined}>

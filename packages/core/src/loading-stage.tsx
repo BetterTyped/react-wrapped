@@ -18,7 +18,7 @@ function isLight(colour: string): boolean {
 export interface LoadingSubject {
   /** Shown in the frame's corner the way the video shows it. Left out when the link does not say whose year it is. */
   handle?: string;
-  /** "GitHub Wrapped". */
+  /** What the video is called: "Orbit Wrapped". */
   caption: string;
   /** A picture that can be had before the year is. It fades in over the initials, and a failed one is dropped. */
   avatarUrl?: string;

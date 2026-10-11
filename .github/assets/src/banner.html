@@ -36,12 +36,7 @@
     background-size: 30px 30px, auto, auto; }
   .slide > * { position: relative; }
 
-  .mark { display: grid; grid-template-columns: repeat(2, 1fr); width: var(--s); height: var(--s); flex: none;
-    gap: calc(var(--s) * 0.1); padding: calc(var(--s) * 0.18); border-radius: calc(var(--s) * 0.26);
-    background: #10161d; box-shadow: inset 0 0 0 1.5px rgba(240,246,252,0.08), 0 18px 50px rgba(0,0,0,0.5), 0 0 70px -10px rgba(57,211,83,0.45); }
-  .mark i { border-radius: 27%; }
-  .mark i:nth-child(1) { background: var(--l1); } .mark i:nth-child(2) { background: var(--l2); }
-  .mark i:nth-child(3) { background: var(--l3); } .mark i:nth-child(4) { background: var(--l4); box-shadow: 0 0 22px rgba(57,211,83,0.65); }
+  .mark { width: var(--s); height: var(--s); flex: none; border-radius: 23%; box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 18px 40px -14px rgba(57,211,83,0.45); }
 
   .word { margin: 0; font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
   .word .dash { color: var(--l4); }
@@ -94,7 +89,7 @@
   <div class="year"><div class="graph" data-columns="20" data-seed="7" data-streak="10"></div></div>
   <div class="copy">
     <div class="lockup">
-      <div class="mark"><i></i><i></i><i></i><i></i></div>
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="ml1" cx="0.2" cy="0.05" r="0.9"><stop offset="0" stop-color="#1f7a3d" stop-opacity="0.75"/><stop offset="0.6" stop-color="#1f7a3d" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="15" fill="#161b22"/><rect width="64" height="64" rx="15" fill="url(#ml1)"/><path d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5" fill="none" stroke="#39d353" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="52.5" cy="19.5" r="7.2" fill="#d2f26b" stroke="#161b22" stroke-width="2.6"/></svg>
       <h1 class="word">react<span class="dash">-</span>wrapped</h1>
     </div>
     <p class="tag">Year in review videos, <b>in React</b></p>
@@ -112,7 +107,7 @@
 <section class="slide" id="social">
   <div class="copy">
     <div class="lockup">
-      <div class="mark"><i></i><i></i><i></i><i></i></div>
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="ml2" cx="0.2" cy="0.05" r="0.9"><stop offset="0" stop-color="#1f7a3d" stop-opacity="0.75"/><stop offset="0.6" stop-color="#1f7a3d" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" rx="15" fill="#161b22"/><rect width="64" height="64" rx="15" fill="url(#ml2)"/><path d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5" fill="none" stroke="#39d353" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="52.5" cy="19.5" r="7.2" fill="#d2f26b" stroke="#161b22" stroke-width="2.6"/></svg>
       <h1 class="word">react<span class="dash">-</span>wrapped</h1>
     </div>
     <p class="tag">Year in review videos, <b>in React</b></p>

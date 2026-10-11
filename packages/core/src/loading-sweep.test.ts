@@ -63,8 +63,8 @@ describe("beamFrames", () => {
 describe("placeholderYear", () => {
   it("draws the same year for the same person and a different one for someone else", () => {
     // Act
-    const first = placeholderYear("octocat");
-    const again = placeholderYear("octocat");
+    const first = placeholderYear("ada");
+    const again = placeholderYear("ada");
     const other = placeholderYear("torvalds");
 
     // Assert

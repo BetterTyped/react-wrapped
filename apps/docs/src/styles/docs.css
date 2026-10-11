@@ -22,9 +22,12 @@
   --d-dim: oklch(0.47 0.015 75);
   --d-faint: oklch(0.6 0.015 75);
   --d-line: oklch(0.9 0.01 75);
-  --d-brand: oklch(0.65 0.22 50);
-  --d-brand-ink: oklch(0.55 0.2 48);
-  --d-on-brand: oklch(0.985 0 0);
+  /* The library's own green: the lit end of the year grid. */
+  --d-brand: oklch(0.63 0.19 148);
+  --d-brand-ink: oklch(0.47 0.15 150);
+  --d-on-brand: oklch(0.99 0.01 150);
+  /* Hype Stack's orange, for the one link that goes there. */
+  --d-hype: oklch(0.65 0.22 50);
   --d-code: oklch(0.2 0.012 260);
   --d-code-ink: oklch(0.92 0.01 260);
   --d-radius: 28px;
@@ -42,9 +45,10 @@
   --d-dim: oklch(0.74 0.012 78);
   --d-faint: oklch(0.6 0.012 78);
   --d-line: oklch(0.3 0.008 70);
-  --d-brand: oklch(0.72 0.19 52);
-  --d-brand-ink: oklch(0.78 0.16 55);
-  --d-on-brand: oklch(0.16 0.01 75);
+  --d-brand: oklch(0.76 0.21 147);
+  --d-brand-ink: oklch(0.8 0.19 147);
+  --d-on-brand: oklch(0.16 0.03 150);
+  --d-hype: oklch(0.72 0.19 52);
   --d-code: oklch(0.15 0.008 260);
 }
 
@@ -146,9 +150,13 @@ body {
   white-space: nowrap;
 }
 .d-mark {
-  width: 22px;
-  height: 22px;
-  fill: var(--d-brand);
+  width: 30px;
+  height: 30px;
+  border-radius: 23%;
+}
+.d-brand b {
+  color: var(--d-brand);
+  font-weight: inherit;
 }
 .d-bar nav {
   display: flex;
@@ -247,8 +255,8 @@ body {
 .d-pill-brand {
   height: 38px;
   padding: 0 14px 0 16px;
-  background: var(--d-brand);
-  color: var(--d-on-brand) !important;
+  background: var(--d-hype);
+  color: oklch(0.985 0 0) !important;
   box-shadow: none;
   font-size: 14px;
 }

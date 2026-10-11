@@ -53,10 +53,10 @@ function show(config: WrappedConfig = DEFAULT_WRAPPED_CONFIG) {
   return render(
     <WrappedView
       playerRef={viewPlayer}
-      subject={{ handle: "octocat", name: null, avatarUrl: null, caption: "GitHub Wrapped", period: "2026" }}
-      seed="octocat"
+      subject={{ handle: "ada", name: null, avatarUrl: null, caption: "Orbit Wrapped", period: "2026" }}
+      seed="ada"
       scenes={scenes}
-      share={{ fileName: "octocat-github-wrapped.mp4" }}
+      share={{ fileName: "ada-orbit-wrapped.mp4" }}
       config={config}
       onConfigChange={() => {}}
       autoplay={false}
@@ -113,7 +113,7 @@ describe("WrappedView download", () => {
 
     await held.finish(new Blob(["video"], { type: "video/mp4" }));
 
-    expect(saved).toEqual([{ name: "octocat-github-wrapped.mp4", href: "blob:video" }]);
+    expect(saved).toEqual([{ name: "ada-orbit-wrapped.mp4", href: "blob:video" }]);
     expect(screen.getByRole("button", { name: "Download" })).toBeInTheDocument();
   });
 
@@ -199,10 +199,10 @@ function Own({ opened = [], gate = true }: { opened?: readonly string[]; gate?: 
   const [found, setFound] = useState(opened);
   return (
     <WrappedView
-      subject={{ handle: "octocat", name: null, avatarUrl: null, caption: "GitHub Wrapped", period: "2026" }}
-      seed="octocat"
+      subject={{ handle: "ada", name: null, avatarUrl: null, caption: "Orbit Wrapped", period: "2026" }}
+      seed="ada"
       scenes={scenes}
-      share={{ fileName: "octocat-github-wrapped.mp4" }}
+      share={{ fileName: "ada-orbit-wrapped.mp4" }}
       opening={{
         calendar: { lead: 2, levels: Array.from({ length: 365 }, (_unused, day) => day % 5) },
         drops: DROPS,

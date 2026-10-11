@@ -5,7 +5,7 @@ import type { Rarity } from "./rarity";
  * carries. Scenes use them, the scan uses them, the share card uses them.
  */
 
-/** A year as GitHub draws it: columns of seven, starting on a Sunday. Levels are 0 to 4, -1 is an empty slot. */
+/** A year as a contribution graph draws it: columns of seven, starting on a Sunday. Levels are 0 to 4, -1 is an empty slot. */
 export interface CalendarLevels {
   levels: readonly number[];
   /** Empty slots before the first day, so the first column lines up with its weekday. */
@@ -44,7 +44,7 @@ export type PixelArt = readonly string[];
 /** Something a person pulled, as the share card shows it. */
 export interface WrappedToken {
   name: string;
-  /** "Coder type", "Lucky drop". */
+  /** What kind of thing it is, as the card names it: "Achievement", "Easter egg". */
   kind: string;
   rarity: Rarity;
   art: PixelArt;

@@ -113,7 +113,7 @@ export interface WrappedSubject {
   handle: string;
   name: string | null;
   avatarUrl: string | null;
-  /** "GitHub Wrapped", "Stripe Wrapped". */
+  /** What the video is called: "Orbit Wrapped". */
   caption: string;
   /** The window the numbers cover, already formatted: "Oct 2025 to Oct 2026". */
   period: string;

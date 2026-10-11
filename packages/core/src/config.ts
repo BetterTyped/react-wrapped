@@ -12,7 +12,7 @@ import {
 } from "./types";
 
 export const DEFAULT_WRAPPED_CONFIG: WrappedConfig = {
-  palette: "github",
+  palette: "evergreen",
   accent: "#39d353",
   mode: "dark",
   format: "story",
@@ -101,12 +101,12 @@ function parseCuts(raw: string | undefined): Readonly<Record<string, WrappedTran
 }
 
 /**
- * `defaults` is what an empty link plays as. Every source but GitHub brings its own (its platform's colours), and
+ * `defaults` is what an empty link plays as. A source may bring its own (its platform's colours), and
  * must pass the same ones to `searchFromConfig`, so that "left out" means the same thing both ways.
  */
 export function configFromSearch(search: WrappedSearch, defaults = DEFAULT_WRAPPED_CONFIG): WrappedConfig {
   const d = defaults;
-  // A link from before dark and light became one switch ("github-light") still opens as what it was.
+  // A link that names a palette by an id it used to have still opens as what it was.
   const linked = search.p ? currentWrappedPalette(search.p, search.m) : null;
   const known = linked && (isPresetPalette(linked.palette) || linked.palette === CUSTOM_PALETTE);
   return {

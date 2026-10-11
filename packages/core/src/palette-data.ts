@@ -128,7 +128,7 @@ function lightFrom(dark: WrappedPalette): WrappedPalette {
 interface WrappedTheme {
   label: string;
   dark: WrappedPalette;
-  /** Only where the worked-out light side is not good enough (GitHub has its own; a multi-color ramp needs care). */
+  /** Only where the worked-out light side is not good enough (the default has its own; a multi-color ramp needs care). */
   light?: WrappedPalette;
 }
 
@@ -139,8 +139,8 @@ interface WrappedTheme {
  * hue for all four (no variety), and never a hue that fights the theme (purple or pink on a green year).
  */
 const THEMES = {
-  github: {
-    label: "GitHub",
+  evergreen: {
+    label: "Evergreen",
     dark: {
       bg: "#0d1117",
       card: "#151b23",
@@ -285,7 +285,7 @@ const THEMES = {
 
 export type WrappedPresetPaletteId = keyof typeof THEMES;
 export const WRAPPED_CUSTOM_PALETTE = "custom";
-export const WRAPPED_DEFAULT_PALETTE: WrappedPresetPaletteId = "github";
+export const WRAPPED_DEFAULT_PALETTE: WrappedPresetPaletteId = "evergreen";
 
 /** Every theme by id, as it looks in the dark: what a picker draws its swatches from. */
 export const WRAPPED_PALETTES: Record<WrappedPresetPaletteId, WrappedPalette & { label: string }> = Object.fromEntries(
@@ -301,13 +301,11 @@ export function wrappedThemePalette(id: WrappedPresetPaletteId, mode: WrappedMod
 }
 
 /**
- * Links made when dark and light were separate themes ("github-dark", "github-light", "dimmed") still open as what
- * they were.
+ * Ids a palette used to go by. A link or a saved config that still says one opens as what it was. The default green
+ * was first named after the contribution graph it comes from.
  */
-const RETIRED: Record<string, { palette: WrappedPresetPaletteId; mode: WrappedMode }> = {
-  "github-dark": { palette: "github", mode: "dark" },
-  "github-light": { palette: "github", mode: "light" },
-  dimmed: { palette: "github", mode: "dark" },
+const RETIRED: Record<string, { palette: WrappedPresetPaletteId; mode?: WrappedMode }> = {
+  github: { palette: "evergreen" },
 };
 
 /**
@@ -319,7 +317,7 @@ export function currentWrappedPalette(
   mode: WrappedMode | undefined,
 ): { palette: string; mode: WrappedMode | undefined } {
   const retired = RETIRED[palette];
-  return retired ?? { palette, mode };
+  return retired ? { palette: retired.palette, mode: retired.mode ?? mode } : { palette, mode };
 }
 
 /**

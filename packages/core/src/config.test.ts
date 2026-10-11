@@ -66,14 +66,14 @@ describe("wrapped config in the URL", () => {
 });
 
 describe("themes and the light switch", () => {
-  it("opens a link from before dark and light were one switch as what it was", () => {
+  it("opens a link that names a palette by an id it used to have", () => {
     // Act
-    const light = configFromSearch(parseWrappedSearch({ p: "github-light" }));
-    const dark = configFromSearch(parseWrappedSearch({ p: "github-dark" }));
+    const light = configFromSearch(parseWrappedSearch({ p: "github", m: "light" }));
+    const plain = configFromSearch(parseWrappedSearch({ p: "github" }));
 
     // Assert
-    expect(light).toMatchObject({ palette: "github", mode: "light" });
-    expect(dark).toMatchObject({ palette: "github", mode: "dark" });
+    expect(light).toMatchObject({ palette: "evergreen", mode: "light" });
+    expect(plain).toMatchObject({ palette: "evergreen", mode: "dark" });
   });
 
   it("carries light mode in the link for any theme, not only a custom color", () => {

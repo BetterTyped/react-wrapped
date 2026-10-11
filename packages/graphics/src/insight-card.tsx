@@ -12,7 +12,7 @@ import { paletteStyle, type Rarity, RARITY_LABELS, type WrappedPalette } from "@
  */
 export interface InsightCardSpec {
   handle: string;
-  /** "GitHub Wrapped, Oct 2025 to Oct 2026" */
+  /** "Orbit Wrapped, Oct 2025 to Oct 2026" */
   caption: string;
   /** What the card is called: the achievement's name, or what part of the year it shows. */
   name: string;

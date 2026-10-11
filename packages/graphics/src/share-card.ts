@@ -8,7 +8,7 @@ import { RARITY_LABELS, type WrappedPalette, type WrappedToken } from "@react-wr
 export interface ShareCardSpec {
   handle: string;
   avatarUrl: string | null;
-  /** "GitHub Wrapped" */
+  /** "Orbit Wrapped" */
   caption: string;
   /** "Oct 2025 to Oct 2026" */
   period: string;
@@ -113,7 +113,7 @@ export async function renderShareCard(spec: ShareCardSpec, palette: WrappedPalet
     context.globalAlpha = 1;
   }
 
-  // The year, as GitHub draws it.
+  // The year, as a contribution graph draws it.
   let y = PAD + 120;
   if (spec.graph) {
     const cell = 15;
