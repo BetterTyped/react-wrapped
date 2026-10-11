@@ -791,6 +791,19 @@ main:has(> .d-plain, > .d-hero) {
   background: var(--d-sunk);
 }
 
+.d-example {
+  margin-top: 28px;
+}
+.d-plain > .d-example + p {
+  margin-top: 28px;
+}
+.d-plain :where(p) a {
+  color: var(--d-brand-ink);
+  font-weight: 550;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .d-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);

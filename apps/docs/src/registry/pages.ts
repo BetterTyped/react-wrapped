@@ -258,7 +258,7 @@ const introduction: DocPage = {
       text: "All motion runs on [GSAP](https://gsap.com) timelines. That is what makes a video seekable, scrubbable from the timeline, and exportable frame by frame. GSAP is a peer dependency and you install it yourself.",
     },
   ],
-  related: ["/docs/installation/", "/docs/theming/", "/docs/charts/", "/docs/transitions/", "/designs/"],
+  related: ["/docs/installation/", "/docs/theming/", "/docs/charts/", "/docs/transitions/", "/examples/full-wrapped/"],
   updated: UPDATED,
 };
 
@@ -426,7 +426,11 @@ const BY_PATH = new Map(PAGES.map((page) => [page.path, page]));
 export const pageAt = (path: string) => BY_PATH.get(path);
 
 /** The pages that are not docs pages but still get linked to as "related". */
-const OTHER_TITLES: Readonly<Record<string, string>> = { "/designs/": "Designs", "/": "React Wrapped" };
+const OTHER_TITLES: Readonly<Record<string, string>> = {
+  "/": "React Wrapped",
+  "/designs/": "Designs",
+  "/examples/full-wrapped/": "Full Wrapped example",
+};
 
 export const titleOf = (path: string) => BY_PATH.get(path)?.title ?? OTHER_TITLES[path];
 

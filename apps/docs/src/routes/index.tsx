@@ -78,8 +78,8 @@ function Home() {
             <SiteLink path="/docs/" className="d-pill d-pill-solid">
               Get started
             </SiteLink>
-            <SiteLink path="/designs/" className="d-pill">
-              See every design
+            <SiteLink path="/examples/full-wrapped/" className="d-pill">
+              Play a full Wrapped
             </SiteLink>
           </div>
           <Code language="bash" code="pnpm add @react-wrapped/kit gsap" />

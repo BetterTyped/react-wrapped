@@ -26,6 +26,13 @@ export function SiteLink({ path, children, ...rest }: { path: string; children: 
       </Link>
     );
   }
+  if (bare === "/examples/full-wrapped/") {
+    return (
+      <Link to="/examples/full-wrapped/" hash={hash} activeOptions={EXACT} {...rest}>
+        {children}
+      </Link>
+    );
+  }
   if (bare === "/designs/") {
     return (
       <Link to="/designs/" hash={hash} activeOptions={EXACT} {...rest}>

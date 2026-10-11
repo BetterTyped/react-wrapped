@@ -17,6 +17,7 @@ export interface StaticFile {
 const OTHER_PAGES = [
   { path: "/", updated: "2026-10-11" },
   { path: "/designs/", updated: "2026-10-11" },
+  { path: "/examples/full-wrapped/", updated: "2026-10-11" },
 ] as const;
 
 const escapeXml = (text: string) => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
