@@ -3,8 +3,11 @@ import { type ReactNode, useEffect, useId, useState } from "react";
 
 import { SECTIONS } from "../registry/pages";
 import { hypeStack, SITE } from "../site";
+import { LIGHT_PROPERTIES, LOOK_KEY, PALETTE_LIGHTS } from "./look";
+import { useSiteMotion } from "./motion";
 import { Search } from "./search";
 import { SiteLink } from "./site-link";
+import { Spin } from "./spin";
 
 /*
  * The chrome around every page: the bar on top, the docs sidebar, the footer. Plain markup and the site's own
@@ -19,13 +22,15 @@ export function useSitePath() {
 }
 
 /**
- * Runs before the first paint: the page opens in the mode it was left in, or the system's, with no flash of the
- * other one. Kept as a string because it has to be in the HTML ahead of everything else.
+ * Runs before the first paint, so the page opens the way the reader left it with no flash of anything else: dark
+ * unless they chose light, and in the lights of the palette they last picked. It also tells the stylesheet that
+ * scripts run, which is what lets things start hidden and arrive. Kept as a string because it has to be in the HTML
+ * ahead of everything else.
  */
-export const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem("react-wrapped:docs:theme");var d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}})()`;
+export const THEME_SCRIPT = `(function(){var r=document.documentElement;r.classList.add("js");try{r.classList.toggle("dark",localStorage.getItem("react-wrapped:docs:theme")!=="light");var l=JSON.parse(localStorage.getItem(${JSON.stringify(LOOK_KEY)})||"null");var c=l&&${JSON.stringify(PALETTE_LIGHTS)}[l.palette];if(c)${JSON.stringify(LIGHT_PROPERTIES)}.forEach(function(n,i){r.style.setProperty(n,c[i])})}catch(e){}})()`;
 
 function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   useEffect(() => setDark(document.documentElement.classList.contains("dark")), []);
   const flip = () => {
     const next = !dark;
@@ -57,29 +62,30 @@ function ThemeToggle() {
 
 /**
  * The mark: a W drawn the way the library draws a chart, a glowing line that ends on its lit point, on a piece of
- * the stage. Each one on a page needs its own gradient id, so the id is made here.
+ * the stage. It is drawn in the palette the reader picked, like the rest of the site. Each one on a page needs its
+ * own gradient id, so the id is made here.
  */
 export function Mark({ className = "d-mark" }: { className?: string }) {
   const light = useId();
   return (
     <svg className={className} viewBox="0 0 64 64" aria-hidden>
       <defs>
-        <radialGradient id={light} cx="0.2" cy="0.05" r="0.9">
-          <stop offset="0" stopColor="#1f7a3d" stopOpacity="0.75" />
-          <stop offset="0.6" stopColor="#1f7a3d" stopOpacity="0" />
+        <radialGradient id={light} cx="0.2" cy="0.05" r="0.95">
+          <stop offset="0" stopOpacity="0.9" style={{ stopColor: "var(--d-g1)" }} />
+          <stop offset="0.65" stopOpacity="0" style={{ stopColor: "var(--d-g1)" }} />
         </radialGradient>
       </defs>
-      <rect width="64" height="64" rx="15" fill="#0d1117" />
+      <rect width="64" height="64" rx="15" fill="#090a0e" />
       <rect width="64" height="64" rx="15" fill={`url(#${light})`} />
       <path
         d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5"
         fill="none"
-        stroke="#39d353"
         strokeWidth="6.6"
         strokeLinecap="round"
         strokeLinejoin="round"
+        style={{ stroke: "var(--d-g3)" }}
       />
-      <circle cx="52.5" cy="19.5" r="7.2" fill="#d2f26b" stroke="#0d1117" strokeWidth="2.6" />
+      <circle cx="52.5" cy="19.5" r="7.2" stroke="#090a0e" strokeWidth="2.6" style={{ fill: "var(--d-hot)" }} />
     </svg>
   );
 }
@@ -132,6 +138,7 @@ function Navbar({ onMenu }: { onMenu: () => void }) {
         </nav>
         <div className="d-bar-end">
           <Search />
+          <Spin />
           <a
             className="d-icon-button"
             href={SITE.repo}
@@ -178,38 +185,94 @@ function Sidebar({ onPick }: { onPick?: () => void }) {
   );
 }
 
+const FOOT_DOCS = [
+  { path: "/docs/", label: "Introduction" },
+  { path: "/docs/installation/", label: "Installation" },
+  { path: "/docs/first-wrapped/", label: "Your first Wrapped" },
+  { path: "/docs/theming/", label: "Theming" },
+] as const;
+
+const FOOT_PARTS = [
+  { path: "/docs/scenes/", label: "Scenes" },
+  { path: "/docs/charts/", label: "Charts" },
+  { path: "/docs/transitions/", label: "Transitions" },
+  { path: "/designs/", label: "Designs" },
+] as const;
+
 function Footer() {
   return (
     <footer className="d-foot">
       <div className="d-foot-inner">
-        <p>
-          A free tool from{" "}
-          <a href={hypeStack("docs-footer")} target="_blank" rel="noopener">
-            Hype Stack
-          </a>
-          , the full stack React template. Made by{" "}
-          <a href={SITE.organization.url} target="_blank" rel="noreferrer">
-            BetterTyped
-          </a>
-          . MIT licensed.
-        </p>
-        <nav aria-label="Elsewhere">
-          <a href={hypeStack("docs-footer", "/wrapped")} target="_blank" rel="noopener">
-            See it live
-          </a>
-          <a href={SITE.repo} target="_blank" rel="noreferrer">
-            GitHub
-          </a>
-          <a href={SITE.discord} target="_blank" rel="noreferrer">
-            Discord
-          </a>
-          <a href={SITE.x} target="_blank" rel="noreferrer">
-            X
-          </a>
-          <a href={SITE.sponsor} target="_blank" rel="noreferrer">
-            Sponsor
-          </a>
+        <div className="d-foot-about">
+          <SiteLink path="/" className="d-brand" aria-label={`${SITE.title} home`}>
+            <Mark />
+            <span>
+              react<b>-</b>wrapped
+            </span>
+          </SiteLink>
+          <p>
+            A free tool from{" "}
+            <a href={hypeStack("docs-footer")} target="_blank" rel="noopener">
+              Hype Stack
+            </a>
+            , the full stack React template. Made by{" "}
+            <a href={SITE.organization.url} target="_blank" rel="noreferrer">
+              BetterTyped
+            </a>
+            .
+          </p>
+        </div>
+        <nav aria-label="Start here">
+          <h2>Start here</h2>
+          <ul>
+            {FOOT_DOCS.map((entry) => (
+              <li key={entry.path}>
+                <SiteLink path={entry.path}>{entry.label}</SiteLink>
+              </li>
+            ))}
+          </ul>
         </nav>
+        <nav aria-label="The parts">
+          <h2>The parts</h2>
+          <ul>
+            {FOOT_PARTS.map((entry) => (
+              <li key={entry.path}>
+                <SiteLink path={entry.path}>{entry.label}</SiteLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <nav aria-label="Elsewhere">
+          <h2>Elsewhere</h2>
+          <ul>
+            <li>
+              <a href={hypeStack("docs-footer", "/wrapped")} target="_blank" rel="noopener">
+                See it live
+              </a>
+            </li>
+            <li>
+              <a href={SITE.repo} target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href={SITE.discord} target="_blank" rel="noreferrer">
+                Discord
+              </a>
+            </li>
+            <li>
+              <a href={SITE.x} target="_blank" rel="noreferrer">
+                X
+              </a>
+            </li>
+            <li>
+              <a href={SITE.sponsor} target="_blank" rel="noreferrer">
+                Sponsor
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <p className="d-foot-legal">MIT licensed. Free to use in anything you build.</p>
       </div>
     </footer>
   );
@@ -219,6 +282,7 @@ function Footer() {
 function Chrome({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const path = useSitePath();
+  useSiteMotion(path);
   useEffect(() => setOpen(false), [path]);
   useEffect(() => {
     if (!open) return;
@@ -230,6 +294,13 @@ function Chrome({ children }: { children: ReactNode }) {
   }, [open]);
   return (
     <>
+      {/* The lights behind every page, in the palette the reader picked. */}
+      <div className="d-aurora" aria-hidden>
+        <i />
+        <i />
+        <i />
+        <b />
+      </div>
       <a className="d-skip" href="#content">
         Skip to content
       </a>

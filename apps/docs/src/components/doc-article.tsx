@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { anchorOf, type DocPage } from "../content/types";
 import { neighboursOf, SECTIONS, titleOf } from "../registry/pages";
 import { absoluteUrl } from "../site";
@@ -16,6 +18,47 @@ export function crumbsOf(page: DocPage) {
       : []),
     ...(page.path === "/docs/" ? [] : [{ label: page.title, path: page.path }]),
   ];
+}
+
+/**
+ * Which heading the reader is at: the last one that has passed the top of the window. The list beside the page
+ * lights that entry, so a long page always says where in it you are.
+ */
+function useHeadingInView(headings: readonly string[]) {
+  const [current, setCurrent] = useState<string | null>(null);
+  // The list is made afresh on every render; its anchors as one string only change when the page does.
+  const anchors = headings.map(anchorOf).join(" ");
+  useEffect(() => {
+    const nodes = anchors.split(" ").flatMap((anchor) => document.getElementById(anchor) ?? []);
+    if (nodes.length === 0) return;
+    const read = () => {
+      const passed = nodes.filter((node) => node.getBoundingClientRect().top < 140);
+      setCurrent(passed.at(-1)?.id ?? null);
+    };
+    read();
+    window.addEventListener("scroll", read, { passive: true });
+    return () => window.removeEventListener("scroll", read);
+  }, [anchors]);
+  return current;
+}
+
+/** The list of a page's headings, beside it on a wide screen. */
+function Contents({ headings }: { headings: readonly string[] }) {
+  const current = useHeadingInView(headings);
+  return (
+    <aside className="d-toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <ul>
+        {headings.map((heading) => (
+          <li key={heading}>
+            <a href={`#${anchorOf(heading)}`} aria-current={current === anchorOf(heading) ? "location" : undefined}>
+              {heading}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
 }
 
 /** One page of the docs: its trail, its title, what it is, its blocks, where to go next. */
@@ -62,7 +105,7 @@ export function DocArticle({ page }: { page: DocPage }) {
         ) : null}
         <nav className="d-pager" aria-label="Previous and next page">
           {previous ? (
-            <SiteLink path={previous.path} rel="prev">
+            <SiteLink path={previous.path} rel="prev" data-glow>
               <small>Previous</small>
               {previous.title}
             </SiteLink>
@@ -70,7 +113,7 @@ export function DocArticle({ page }: { page: DocPage }) {
             <span />
           )}
           {next ? (
-            <SiteLink path={next.path} rel="next">
+            <SiteLink path={next.path} rel="next" data-glow>
               <small>Next</small>
               {next.title}
             </SiteLink>
@@ -81,18 +124,7 @@ export function DocArticle({ page }: { page: DocPage }) {
           <a href={absoluteUrl(`${page.path}index.md`)}>Read this page as Markdown</a>.
         </p>
       </article>
-      {headings.length > 1 ? (
-        <aside className="d-toc" aria-label="On this page">
-          <h2>On this page</h2>
-          <ul>
-            {headings.map((heading) => (
-              <li key={heading}>
-                <a href={`#${anchorOf(heading)}`}>{heading}</a>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      ) : null}
+      {headings.length > 1 ? <Contents headings={headings} /> : null}
     </div>
   );
 }

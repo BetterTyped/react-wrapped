@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.5",
+    "@fontsource-variable/outfit": "^5.3.0",
     "@react-wrapped/charts": "workspace:*",
     "@react-wrapped/core": "workspace:*",
     "@react-wrapped/graphics": "workspace:*",

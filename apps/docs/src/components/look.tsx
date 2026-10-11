@@ -10,9 +10,25 @@ import { DEFAULT_WRAPPED_CONFIG, WRAPPED_FORMATS, WRAPPED_PALETTES, type Wrapped
 
 export type Look = Pick<WrappedConfig, "palette" | "mode" | "format">;
 
-// Square by default: a chart fills the frame, so it reads at the size of a docs page and of a small tile.
+// Square by default: a chart fills the frame, so it reads at the size of a docs page and of a small tile. The palette
+// is the library's own green, and the site itself is drawn in it until the reader picks another.
 const DEFAULT_LOOK: Look = { palette: DEFAULT_WRAPPED_CONFIG.palette, mode: "dark", format: "square" };
-const STORED = "react-wrapped:docs:look";
+export const LOOK_KEY = "react-wrapped:docs:look";
+const STORED = LOOK_KEY;
+
+/** The custom properties the site's lights and accents are drawn from, in the order of `PALETTE_LIGHTS`' colours. */
+export const LIGHT_PROPERTIES = ["--d-g1", "--d-g2", "--d-g3", "--d-hot"] as const;
+
+/**
+ * What the site wears for each palette: its three brightest steps and its epic colour. The page's lights, its accent
+ * and the mark are all drawn from these four, so picking a palette for the previews repaints the site around them.
+ */
+export const PALETTE_LIGHTS: Readonly<Record<string, readonly string[]>> = Object.fromEntries(
+  Object.entries(WRAPPED_PALETTES).map(([id, palette]) => [
+    id,
+    [palette.levels[2], palette.levels[3], palette.levels[4], palette.rarity.epic],
+  ]),
+);
 
 const LookContext = createContext<{ look: Look; setLook: (next: Look) => void }>({
   look: DEFAULT_LOOK,
@@ -37,6 +53,12 @@ export function LookProvider({ children }: { children: ReactNode }) {
       // Blocked storage: the default look.
     }
   }, []);
+  // The site wears the palette. The first page already has it (see THEME_SCRIPT); this follows every change.
+  useEffect(() => {
+    const lights = PALETTE_LIGHTS[look.palette];
+    if (!lights) return;
+    LIGHT_PROPERTIES.forEach((name, index) => document.documentElement.style.setProperty(name, lights[index]));
+  }, [look.palette]);
   const value = useMemo(
     () => ({
       look,
@@ -61,24 +83,35 @@ export const useLookConfig = (): WrappedConfig => {
   return useMemo(() => ({ ...DEFAULT_WRAPPED_CONFIG, ...look }), [look]);
 };
 
+/** The palettes as swatches. Picking one repaints every preview, and the site around them. */
+export function PaletteSwatches() {
+  const { look, setLook } = useLook();
+  return (
+    <div role="group" aria-label="Palette" className="d-look-swatches">
+      {Object.entries(WRAPPED_PALETTES).map(([id, palette]) => (
+        <button
+          key={id}
+          type="button"
+          title={palette.label}
+          aria-label={palette.label}
+          aria-pressed={look.palette === id}
+          onClick={() => setLook({ ...look, palette: id })}
+          style={{
+            background: `linear-gradient(140deg, ${palette.levels[4]}, ${palette.levels[3]})`,
+            color: palette.levels[3],
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /** Palette, dark or light, and format: what a reader can change about every preview on the site. */
-export function LookControls() {
+export function LookControls({ formats = true }: { formats?: boolean }) {
   const { look, setLook } = useLook();
   return (
     <div className="d-look">
-      <div role="group" aria-label="Palette" className="d-look-swatches">
-        {Object.entries(WRAPPED_PALETTES).map(([id, palette]) => (
-          <button
-            key={id}
-            type="button"
-            title={palette.label}
-            aria-label={palette.label}
-            aria-pressed={look.palette === id}
-            onClick={() => setLook({ ...look, palette: id })}
-            style={{ background: palette.levels[4] }}
-          />
-        ))}
-      </div>
+      <PaletteSwatches />
       <div role="group" aria-label="Dark or light" className="d-look-chips">
         {(["dark", "light"] as const).map((mode) => (
           <button key={mode} type="button" aria-pressed={look.mode === mode} onClick={() => setLook({ ...look, mode })}>
@@ -86,18 +119,20 @@ export function LookControls() {
           </button>
         ))}
       </div>
-      <div role="group" aria-label="Format" className="d-look-chips">
-        {Object.entries(WRAPPED_FORMATS).map(([id, format]) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={look.format === id}
-            onClick={() => setLook({ ...look, format: id as Look["format"] })}
-          >
-            {format.label}
-          </button>
-        ))}
-      </div>
+      {formats ? (
+        <div role="group" aria-label="Format" className="d-look-chips">
+          {Object.entries(WRAPPED_FORMATS).map(([id, format]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={look.format === id}
+              onClick={() => setLook({ ...look, format: id as Look["format"] })}
+            >
+              {format.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

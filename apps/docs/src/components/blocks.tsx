@@ -97,7 +97,7 @@ function BlockView({ block }: { block: Block }) {
         <ul className="d-cards">
           {block.items.map((item) => (
             <li key={item.path}>
-              <SiteLink path={item.path}>
+              <SiteLink path={item.path} data-glow>
                 {item.demo ? (
                   <span className="d-card-stage" aria-hidden>
                     <DemoStage demo={item.demo} max={360} />

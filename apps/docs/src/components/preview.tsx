@@ -1,4 +1,4 @@
-import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { type ReactNode, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { Demo } from "../content/types";
 import { PARTS } from "../demos";
@@ -15,6 +15,7 @@ import {
   type SceneInstance,
   SceneThumb,
   WRAPPED_FORMATS,
+  type WrappedConfig,
 } from "@react-wrapped/kit";
 
 /*
@@ -23,7 +24,7 @@ import {
  */
 
 // The look lives in its own file. It is handed on from here because the rest of the site has always found it here.
-export { LookControls, LookProvider, useLook, useLookConfig } from "./look";
+export { LookControls, LookProvider, PaletteSwatches, useLook, useLookConfig } from "./look";
 
 /**
  * The transitions the custom transition guide defines. Naming them here loads their file with the first page of the
@@ -102,6 +103,29 @@ export function DemoStage({ demo, max }: { demo: Demo; max?: number }) {
   const scene = sceneOf(demo);
   if (!scene) return null;
   return <Fit max={max}>{(width) => <SceneThumb scene={scene} config={config} width={width} loop />}</Fit>;
+}
+
+/**
+ * One live preview at a width of its own, always in the same format: for a row that has to keep its height, and a
+ * tile that must not grow when the reader picks a taller frame for the rest of the site.
+ */
+export function FixedStage({
+  demo,
+  width,
+  format = "square",
+}: {
+  demo: Demo;
+  width: number;
+  format?: WrappedConfig["format"];
+}) {
+  const look = useLookConfig();
+  const config = useMemo(() => ({ ...look, format }), [look, format]);
+  if (demo.type === "transition") {
+    if (!FIRST || !SECOND || !isTransition(demo.id)) return null;
+    return <CutPreview style={demo.id} first={FIRST} second={SECOND} config={config} width={width} />;
+  }
+  const scene = sceneOf(demo);
+  return scene ? <SceneThumb scene={scene} config={config} width={width} loop /> : null;
 }
 
 /**

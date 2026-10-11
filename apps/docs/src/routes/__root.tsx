@@ -15,7 +15,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#f1ebe2" },
+      { name: "theme-color", content: "#050806" },
       { name: "author", content: SITE.author.name },
     ],
     links: [
@@ -32,9 +32,9 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        {/* Before anything paints: dark or light, the way the reader left it. */}
+        {/* Before anything paints: dark or light and the palette, the way the reader left them. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <HeadContent />
       </head>

@@ -112,32 +112,86 @@ test.describe("on a phone", () => {
 });
 
 test.describe("the bar", () => {
-  test("the theme toggle flips dark mode and the choice survives a reload", async ({ page }) => {
-    // Arrange: a browser that asks for light, so the page opens light.
+  test("the site opens dark, and the theme toggle's choice survives a reload", async ({ page }) => {
+    // Arrange: even a browser that asks for light gets the night page until the reader says otherwise.
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto(at("/docs/"));
     await hydrated(page, ".d-bar");
     const html = page.locator("html");
-    await expect(html).not.toHaveClass(/(^|\s)dark(\s|$)/);
+    await expect(html).toHaveClass(/(^|\s)dark(\s|$)/);
 
     // Act
-    await page.getByRole("button", { name: "Use dark mode" }).click();
+    await page.getByRole("button", { name: "Use light mode" }).click();
 
     // Assert
-    await expect(html).toHaveClass(/(^|\s)dark(\s|$)/);
-    expect(await page.evaluate((key) => localStorage.getItem(key), THEME_KEY)).toBe("dark");
+    await expect(html).not.toHaveClass(/(^|\s)dark(\s|$)/);
+    expect(await page.evaluate((key) => localStorage.getItem(key), THEME_KEY)).toBe("light");
 
-    // Act: the same page again, and then back to light.
+    // Act: the same page again, and then back to dark.
     await page.reload();
     await hydrated(page, ".d-bar");
 
     // Assert
+    await expect(html).not.toHaveClass(/(^|\s)dark(\s|$)/);
+    await page.getByRole("button", { name: "Use dark mode" }).click();
     await expect(html).toHaveClass(/(^|\s)dark(\s|$)/);
-    await page.getByRole("button", { name: "Use light mode" }).click();
-    await expect(html).not.toHaveClass(/(^|\s)dark(\s|$)/);
-    expect(await page.evaluate((key) => localStorage.getItem(key), THEME_KEY)).toBe("light");
+    expect(await page.evaluate((key) => localStorage.getItem(key), THEME_KEY)).toBe("dark");
     await page.reload();
-    await expect(html).not.toHaveClass(/(^|\s)dark(\s|$)/);
+    await expect(html).toHaveClass(/(^|\s)dark(\s|$)/);
+  });
+
+  test("picking a palette repaints the site, and a reload keeps it", async ({ page }) => {
+    // Arrange
+    await page.goto(oneChartPage().path);
+    await hydrated(page, ".d-look");
+    const light = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--d-g2"));
+    const before = await light();
+
+    // Act
+    await page.getByRole("button", { name: "Grape" }).first().click();
+
+    // Assert: the page's own light is the palette's, not only the stage's.
+    await expect.poll(light).not.toBe(before);
+    const picked = await light();
+
+    // Act
+    await page.reload();
+
+    // Assert: there before React runs, so the page never flashes the default.
+    expect(await light()).toBe(picked);
+  });
+
+  test("Spin runs the reel and opens the page it lands on", async ({ page }) => {
+    // Arrange
+    await page.goto(at("/docs/"));
+    await hydrated(page, ".d-bar");
+
+    // Act
+    await page.getByRole("button", { name: "Spin: open a random page" }).click();
+    const reel = page.getByRole("dialog", { name: "Spin: a random page" });
+    await expect(reel).toBeVisible();
+    const open = reel.getByRole("button", { name: "Open it" });
+    await expect(open).toBeEnabled({ timeout: 10_000 });
+    const won = (await reel.locator(".d-spin-won strong").innerText()).replaceAll(/\s+/g, " ").trim();
+    await open.click();
+
+    // Assert: a chart, a scene or a transition, and the page is the one the reel named.
+    await expect(page).toHaveURL(/\/docs\/(charts|scenes|transitions)\/[a-z-]+\/$/);
+    await expect(reel).toBeHidden();
+    const [name] = won.split(" ");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(name);
+  });
+
+  test("a reel left alone opens its page by itself", async ({ page }) => {
+    // Arrange
+    await page.goto(at("/docs/"));
+    await hydrated(page, ".d-bar");
+
+    // Act
+    await page.getByRole("button", { name: "Spin: open a random page" }).click();
+
+    // Assert
+    await expect(page).toHaveURL(/\/docs\/(charts|scenes|transitions)\/[a-z-]+\/$/, { timeout: 15_000 });
   });
 
   test("the Hype Stack link says where the visitor came from", async ({ page }) => {

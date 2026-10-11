@@ -1,9 +1,12 @@
 /*
- * The docs site's own look. Plain CSS on its own tokens, in the manner of Hype Stack's storefront: a warm page, white
- * panels with soft rings, tight semibold headings, one orange. Nothing here styles the library: its components bring
- * their own stylesheet and are only ever placed, never restyled.
+ * The docs site's own look: a night page with light coming through it. Three soft lights sit behind everything and
+ * take their colours from the palette the reader picked for the previews, so the site wears what the library draws.
+ * Panels are glass over those lights, headings are set in Outfit, and the one solid thing on a page is the button
+ * that matters. Nothing here styles the library: its components bring their own stylesheet and are only ever
+ * placed, never restyled.
  */
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/outfit";
 
 @font-face {
   font-family: "JetBrains Mono Variable";
@@ -13,43 +16,102 @@
   src: url("/react-wrapped/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
 }
 
+/* The palette's colours are registered as colours, so a change of palette fades instead of snapping. */
+@property --d-g1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #006d32;
+}
+@property --d-g2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #26a641;
+}
+@property --d-g3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #39d353;
+}
+@property --d-hot {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c5e85b;
+}
+
 :root {
   color-scheme: light;
-  --d-page: oklch(0.938 0.016 78);
-  --d-panel: oklch(0.995 0.003 80);
-  --d-sunk: oklch(0.965 0.008 78);
-  --d-ink: oklch(0.16 0.01 75);
-  --d-dim: oklch(0.47 0.015 75);
-  --d-faint: oklch(0.6 0.015 75);
-  --d-line: oklch(0.9 0.01 75);
-  /* The library's own green: the lit end of the year grid. */
-  --d-brand: oklch(0.63 0.19 148);
-  --d-brand-ink: oklch(0.47 0.15 150);
-  --d-on-brand: oklch(0.99 0.01 150);
+  /* The picked palette: its three brightest steps and its epic colour. Set from `components/look.tsx`. */
+  --d-g1: #006d32;
+  --d-g2: #26a641;
+  --d-g3: #39d353;
+  --d-hot: #c5e85b;
+
+  /* The page is near white with a breath of the palette in it, so every palette sits on a page of its own tint. */
+  --d-page: color-mix(in oklch, var(--d-g2) 7%, #f5f6f8);
+  --d-solid: #ffffff;
+  --d-panel: rgb(255 255 255 / 0.66);
+  --d-panel-strong: rgb(255 255 255 / 0.82);
+  --d-sunk: rgb(20 26 44 / 0.055);
+  --d-ink: #101218;
+  --d-on-ink: #ffffff;
+  --d-dim: #525763;
+  --d-faint: #858a96;
+  --d-line: rgb(20 26 44 / 0.11);
+  --d-line-strong: rgb(20 26 44 / 0.2);
+  --d-sheen: rgb(255 255 255 / 0.9);
+  --d-shadow: rgb(20 26 44 / 0.22);
+  --d-light: 0.3;
+
+  --d-accent: color-mix(in oklch, var(--d-g2) 74%, #06120a);
+  --d-on-accent: #ffffff;
+  --d-grad-a: color-mix(in oklch, var(--d-g2) 82%, #06120a);
+  --d-grad-b: color-mix(in oklch, var(--d-g1) 90%, #06120a);
   /* Hype Stack's orange, for the one link that goes there. */
-  --d-hype: oklch(0.65 0.22 50);
-  --d-code: oklch(0.2 0.012 260);
-  --d-code-ink: oklch(0.92 0.01 260);
-  --d-radius: 28px;
+  --d-hype: oklch(0.66 0.21 48);
+  --d-code: #0b0c11;
+  --d-code-ink: #e8eaf0;
+
+  /* The names the interactive previews were written against. */
+  --d-brand: var(--d-accent);
+  --d-brand-ink: var(--d-accent);
+  --d-on-brand: var(--d-on-accent);
+
+  --d-radius: 30px;
   --d-font: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
+  --d-display: "Outfit Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --d-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
   --d-bar: 68px;
+  --d-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    --d-g1 0.9s,
+    --d-g2 0.9s,
+    --d-g3 0.9s,
+    --d-hot 0.9s;
 }
 
 .dark {
   color-scheme: dark;
-  --d-page: oklch(0.165 0.008 70);
-  --d-panel: oklch(0.21 0.008 70);
-  --d-sunk: oklch(0.25 0.008 70);
-  --d-ink: oklch(0.96 0.005 80);
-  --d-dim: oklch(0.74 0.012 78);
-  --d-faint: oklch(0.6 0.012 78);
-  --d-line: oklch(0.3 0.008 70);
-  --d-brand: oklch(0.76 0.21 147);
-  --d-brand-ink: oklch(0.8 0.19 147);
-  --d-on-brand: oklch(0.16 0.03 150);
-  --d-hype: oklch(0.72 0.19 52);
-  --d-code: oklch(0.15 0.008 260);
+  --d-page: color-mix(in oklch, var(--d-g1) 7%, #050608);
+  --d-solid: color-mix(in oklch, var(--d-g1) 9%, #0c0d12);
+  --d-panel: rgb(255 255 255 / 0.035);
+  --d-panel-strong: color-mix(in oklch, var(--d-solid) 74%, transparent);
+  --d-sunk: rgb(255 255 255 / 0.06);
+  --d-ink: #f4f6f8;
+  --d-on-ink: #090a0e;
+  --d-dim: #a9aeba;
+  --d-faint: #747986;
+  --d-line: rgb(255 255 255 / 0.085);
+  --d-line-strong: rgb(255 255 255 / 0.16);
+  --d-sheen: rgb(255 255 255 / 0.07);
+  --d-shadow: rgb(0 0 0 / 0.6);
+  --d-light: 0.5;
+
+  --d-accent: color-mix(in oklch, var(--d-g3) 86%, #ffffff);
+  --d-on-accent: #090a0e;
+  --d-grad-a: color-mix(in oklch, var(--d-g3) 80%, #ffffff);
+  --d-grad-b: var(--d-g2);
+  --d-hype: oklch(0.72 0.19 50);
+  --d-code: rgb(4 3 10 / 0.62);
 }
 
 /* The site's own small reset. The library does not lean on it: it resets its own roots (see its reset.css). */
@@ -76,14 +138,25 @@ html {
   line-height: 1.5;
   scroll-padding-top: calc(var(--d-bar) + 24px);
   -webkit-text-size-adjust: 100%;
+  background: var(--d-page);
 }
 
 body {
-  /* The library's chrome takes the site's green wherever it uses an accent: its own theming hook, used here. */
-  --wr-ui-primary: var(--d-brand);
-  --wr-ui-primary-fg: var(--d-on-brand);
+  /*
+   * The library's chrome, dressed for this site through its own theming hook: the accent wherever it uses one, and
+   * surfaces in the page's tones so its panels sit on the night page the way the site's own do.
+   */
+  --wr-ui-primary: var(--d-accent);
+  --wr-ui-primary-fg: var(--d-on-accent);
+  --wr-ui-fg: var(--d-ink);
+  --wr-ui-muted-fg: var(--d-dim);
+  --wr-ui-bg: #ffffff;
+  --wr-ui-card: #ffffff;
+  --wr-ui-muted: color-mix(in oklch, var(--d-g2) 5%, #f0f2f4);
+  --wr-ui-border: #e2e5ea;
+  --wr-ui-ring: #cdd2da;
+  position: relative;
   margin: 0;
-  background: var(--d-page);
   color: var(--d-ink);
   font-family: var(--d-font);
   font-size: 16px;
@@ -91,6 +164,81 @@ body {
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+}
+
+.dark body {
+  --wr-ui-bg: color-mix(in oklch, var(--d-g1) 9%, #0c0d12);
+  --wr-ui-card: color-mix(in oklch, var(--d-g1) 9%, #0f1015);
+  --wr-ui-muted: color-mix(in oklch, var(--d-g1) 12%, #1a1c24);
+  --wr-ui-border: color-mix(in oklch, var(--d-g1) 14%, #252831);
+  --wr-ui-ring: #3b3f4b;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--d-g2) 45%, transparent);
+}
+
+/* ---------- the lights behind the page ---------- */
+
+.d-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--d-page);
+}
+.d-aurora i {
+  position: absolute;
+  width: 78vmax;
+  height: 78vmax;
+  border-radius: 50%;
+  opacity: var(--d-light);
+  will-change: transform;
+}
+.d-aurora i:nth-child(1) {
+  top: -42vmax;
+  left: -18vmax;
+  background: radial-gradient(closest-side, var(--d-g1), transparent);
+  animation: d-drift-a 46s ease-in-out infinite alternate;
+}
+.d-aurora i:nth-child(2) {
+  top: -30vmax;
+  right: -34vmax;
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--d-g2) 70%, transparent), transparent);
+  animation: d-drift-b 58s ease-in-out infinite alternate;
+}
+.d-aurora i:nth-child(3) {
+  bottom: -52vmax;
+  left: 22vw;
+  width: 90vmax;
+  height: 90vmax;
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--d-hot) 42%, transparent), transparent);
+  animation: d-drift-c 64s ease-in-out infinite alternate;
+}
+/* A field of fine dots under the bar, fading out down the page: the grid a year is drawn on. */
+.d-aurora b {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, var(--d-line-strong) 1px, transparent 0);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(120% 70% at 50% 0%, #000 0%, transparent 72%);
+  opacity: 0.55;
+}
+@keyframes d-drift-a {
+  to {
+    transform: translate3d(14vw, 10vh, 0) scale(1.12);
+  }
+}
+@keyframes d-drift-b {
+  to {
+    transform: translate3d(-16vw, 18vh, 0) scale(0.92);
+  }
+}
+@keyframes d-drift-c {
+  to {
+    transform: translate3d(-18vw, -14vh, 0) scale(1.1);
+  }
 }
 
 .d-skip {
@@ -101,22 +249,73 @@ body {
   padding: 10px 16px;
   border-radius: 999px;
   background: var(--d-ink);
-  color: var(--d-panel);
+  color: var(--d-on-ink);
   font-weight: 600;
 }
 .d-skip:focus {
   top: 12px;
 }
 
-:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-hero, .d-band, .d-promo, .d-toc, .d-drawer) a {
+:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-hero, .d-band, .d-promo, .d-toc, .d-drawer, .d-spin) a {
   color: inherit;
   text-decoration: none;
 }
 
 :where(a, button):focus-visible {
-  outline: 2px solid var(--d-brand);
+  outline: 2px solid var(--d-accent);
   outline-offset: 2px;
   border-radius: 8px;
+}
+
+/* Words in the palette's own light. */
+.d-shine {
+  background: linear-gradient(96deg, var(--d-grad-a) 8%, var(--d-grad-b) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: normal;
+}
+
+/*
+ * A panel that lights up under the pointer. The site moves `--mx` and `--my` to where the pointer is (one listener,
+ * in `components/motion.tsx`); without it the light stays where it is and nothing is lost.
+ */
+[data-glow] {
+  position: relative;
+  isolation: isolate;
+}
+[data-glow]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 0%),
+    color-mix(in oklch, var(--d-g2) 26%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.35s;
+  pointer-events: none;
+}
+[data-glow]:hover::before,
+[data-glow]:focus-visible::before {
+  opacity: 1;
+}
+
+/* Things that arrive as the page is scrolled. Only once scripts run: without them everything simply stands. */
+.js [data-reveal] {
+  opacity: 0;
+  translate: 0 26px;
+  transition:
+    opacity 0.9s var(--d-ease),
+    translate 0.9s var(--d-ease);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.js [data-reveal].is-in {
+  opacity: 1;
+  translate: 0 0;
 }
 
 /* ---------- the bar ---------- */
@@ -136,29 +335,32 @@ body {
   margin: 0 auto;
   padding: 0 10px 0 18px;
   border-radius: 999px;
-  background: color-mix(in oklch, var(--d-panel) 86%, transparent);
+  background: color-mix(in oklch, var(--d-solid) 62%, transparent);
   box-shadow:
-    0 0 0 1px var(--d-line),
-    0 8px 30px -18px oklch(0.2 0.02 60 / 0.5);
-  backdrop-filter: blur(14px) saturate(1.3);
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen),
+    0 18px 40px -24px var(--d-shadow);
+  backdrop-filter: blur(18px) saturate(1.5);
 }
 .d-brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   margin-right: 14px;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.035em;
+  font-family: var(--d-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 .d-mark {
   width: 30px;
   height: 30px;
   border-radius: 23%;
+  box-shadow: 0 6px 18px -8px var(--d-g2);
 }
 .d-brand b {
-  color: var(--d-brand);
+  color: var(--d-accent);
   font-weight: inherit;
 }
 .d-bar nav {
@@ -199,6 +401,9 @@ body {
   background: none;
   color: var(--d-dim);
   cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .d-icon-button:hover {
   background: var(--d-sunk);
@@ -226,20 +431,35 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  height: 44px;
-  padding: 0 20px;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border: 0;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line-strong),
+    inset 0 1px 0 var(--d-sheen);
   background: var(--d-panel);
   color: var(--d-ink);
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
-  transition: transform 0.15s;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--d-ease),
+    box-shadow 0.25s,
+    background-color 0.2s;
 }
 .d-pill:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  background: var(--d-sunk);
+}
+.d-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+.d-pill:disabled {
+  opacity: 0.45;
+  pointer-events: none;
 }
 .d-pill svg {
   width: 15px;
@@ -252,16 +472,23 @@ body {
 }
 .d-pill-solid {
   background: var(--d-ink);
-  color: var(--d-panel) !important;
-  box-shadow: none;
+  color: var(--d-on-ink) !important;
+  box-shadow: 0 14px 34px -14px color-mix(in oklch, var(--d-g2) 80%, transparent);
+}
+.d-pill-solid:hover {
+  background: var(--d-ink);
+  box-shadow: 0 20px 44px -14px var(--d-g2);
 }
 .d-pill-brand {
   height: 38px;
   padding: 0 14px 0 16px;
   background: var(--d-hype);
   color: oklch(0.985 0 0) !important;
-  box-shadow: none;
+  box-shadow: 0 10px 26px -12px var(--d-hype);
   font-size: 14px;
+}
+.d-pill-brand:hover {
+  background: var(--d-hype);
 }
 
 /* ---------- search ---------- */
@@ -271,7 +498,7 @@ body {
   align-items: center;
   gap: 8px;
   height: 38px;
-  margin-right: 4px;
+  margin-right: 2px;
   padding: 0 10px 0 12px;
   border: 0;
   border-radius: 999px;
@@ -293,7 +520,7 @@ body {
   stroke-linejoin: round;
 }
 .d-search-button span {
-  min-width: 7.5em;
+  min-width: 6.5em;
   text-align: left;
 }
 .d-search-button kbd {
@@ -302,26 +529,44 @@ body {
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  background: var(--d-panel);
+  background: var(--d-sunk);
   box-shadow: 0 0 0 1px var(--d-line);
   font-family: var(--d-mono);
   font-size: 11.5px;
+}
+.d-search,
+.d-spin {
+  padding: 0;
+  border: 0;
+  border-radius: 28px;
+  background: color-mix(in oklch, var(--d-solid) 88%, transparent);
+  color: var(--d-ink);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line-strong),
+    inset 0 1px 0 var(--d-sheen),
+    0 50px 120px -30px var(--d-shadow),
+    0 0 90px -30px var(--d-g2);
+  backdrop-filter: blur(26px) saturate(1.4);
 }
 .d-search {
   width: min(92vw, 620px);
   max-height: min(78vh, 640px);
   margin: 12vh auto auto;
-  padding: 0;
-  border: 0;
-  border-radius: 24px;
-  background: var(--d-panel);
-  color: var(--d-ink);
-  box-shadow:
-    0 0 0 1px var(--d-line),
-    0 40px 90px -30px oklch(0.15 0.02 60 / 0.6);
 }
-.d-search::backdrop {
-  background: oklch(0.15 0.01 70 / 0.5);
+.d-search::backdrop,
+.d-spin::backdrop {
+  background: color-mix(in oklch, var(--d-page) 62%, transparent);
+  backdrop-filter: blur(6px);
+}
+.d-search[open],
+.d-spin[open] {
+  animation: d-pop 0.35s var(--d-ease);
+}
+@keyframes d-pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
 }
 .d-search input::-webkit-search-cancel-button {
   display: none;
@@ -356,20 +601,21 @@ body {
   width: 100%;
   padding: 10px 14px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   background: none;
   text-align: left;
   cursor: pointer;
 }
 .d-search li button[aria-current="true"] {
   background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
 }
 .d-search strong {
   font-weight: 650;
   letter-spacing: -0.015em;
 }
 .d-search small {
-  color: var(--d-faint);
+  color: var(--d-accent);
   font-size: 12.5px;
 }
 .d-search li span {
@@ -385,12 +631,223 @@ body {
   color: var(--d-dim);
 }
 
+/* ---------- the spin: a reel of pages that lands on one ---------- */
+
+.d-spin-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 14px 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--d-solid), var(--d-solid)) padding-box,
+    linear-gradient(120deg, var(--d-g3), var(--d-g2), var(--d-hot)) border-box;
+  border: 1.5px solid transparent;
+  color: var(--d-ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--d-ease),
+    box-shadow 0.25s;
+}
+.d-spin-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px -10px var(--d-g2);
+}
+.d-spin-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.6s var(--d-ease);
+}
+.d-spin-button:hover svg {
+  transform: rotate(180deg);
+}
+.d-spin {
+  width: min(94vw, 760px);
+  margin: 14vh auto auto;
+  overflow: hidden;
+}
+.d-spin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 20px 0 26px;
+}
+.d-spin-head h2 {
+  font-family: var(--d-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.d-spin-head p {
+  color: var(--d-dim);
+  font-size: 14px;
+}
+.d-reel {
+  position: relative;
+  height: 156px;
+  margin-top: 18px;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+}
+.d-reel-strip {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+.d-reel-card {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 150px;
+  height: 128px;
+  padding: 14px;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in oklch, var(--tone) 34%, transparent), transparent 62%),
+    var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
+  transition:
+    box-shadow 0.4s,
+    transform 0.4s var(--d-ease);
+}
+.d-reel-card[data-kind="chart"] {
+  --tone: var(--d-g3);
+}
+.d-reel-card[data-kind="scene"] {
+  --tone: var(--d-hot);
+}
+.d-reel-card[data-kind="transition"] {
+  --tone: var(--d-g2);
+}
+.d-reel-card svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: var(--tone);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.d-reel-card strong {
+  display: block;
+  overflow: hidden;
+  font-family: var(--d-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.d-reel-card small {
+  color: var(--d-faint);
+  font-size: 12.5px;
+}
+.d-reel-card[data-won] {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 0 0 1.5px var(--tone),
+    0 18px 50px -18px var(--tone);
+}
+/* Where the reel stops: a line of light down the middle. */
+.d-reel-pin {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: linear-gradient(transparent, var(--d-accent) 18%, var(--d-accent) 82%, transparent);
+  box-shadow: 0 0 18px 2px var(--d-g2);
+  opacity: 0.9;
+}
+.d-spin-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  min-height: 86px;
+  padding: 16px 20px 20px 26px;
+}
+.d-spin-won {
+  min-width: 0;
+  flex: 1 1 260px;
+}
+.d-spin-won strong {
+  display: block;
+  font-family: var(--d-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.d-spin-won > span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--d-dim);
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.d-spin-actions {
+  display: flex;
+  gap: 8px;
+}
+.d-spin-actions .d-pill {
+  height: 42px;
+  padding: 0 18px;
+  font-size: 14.5px;
+}
+/* The button that opens the page fills up while the reader decides, then opens it by itself. */
+.d-spin-go {
+  position: relative;
+  overflow: hidden;
+}
+.d-spin-go i {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--d-g2) 45%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.d-spin-go[data-counting] i {
+  animation: d-fill var(--d-spin-wait, 2.4s) linear forwards;
+}
+.d-spin-go span {
+  position: relative;
+}
+@keyframes d-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* ---------- docs layout ---------- */
 
 .d-docs {
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: 252px minmax(0, 1fr);
+  gap: 14px;
   max-width: 1432px;
   margin: 0 auto;
   padding: 16px 16px 0;
@@ -402,19 +859,25 @@ body {
   max-height: calc(100vh - var(--d-bar) - 24px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 14px 6px 24px 8px;
+  padding: 18px 8px 24px 10px;
+  border-radius: var(--d-radius);
+  background: var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
   scrollbar-width: thin;
+  scrollbar-color: var(--d-line-strong) transparent;
 }
 .d-side section + section {
   margin-top: 22px;
 }
 .d-side h2 {
   margin: 0 0 6px;
-  padding: 0 10px;
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  color: var(--d-ink);
+  padding: 0 12px;
+  color: var(--d-faint);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 .d-side ul {
   margin: 0;
@@ -423,18 +886,26 @@ body {
 }
 .d-side a {
   display: block;
-  padding: 5px 10px;
-  border-radius: 10px;
+  padding: 6px 12px;
+  border-radius: 12px;
   color: var(--d-dim);
   font-size: 14.5px;
   line-height: 1.4;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .d-side a:hover {
+  background: var(--d-sunk);
   color: var(--d-ink);
 }
 .d-side a[aria-current="page"] {
-  background: var(--d-panel);
-  box-shadow: 0 0 0 1px var(--d-line);
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklch, var(--d-g2) 30%, transparent),
+    color-mix(in oklch, var(--d-g1) 14%, transparent)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 42%, transparent);
   color: var(--d-ink);
   font-weight: 600;
 }
@@ -443,8 +914,10 @@ body {
   min-width: 0;
   padding: clamp(20px, 4vw, 56px);
   border-radius: var(--d-radius);
-  background: var(--d-panel);
-  box-shadow: 0 0 0 1px var(--d-line);
+  background: var(--d-panel-strong);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
 }
 .d-article-grid {
   display: grid;
@@ -470,7 +943,8 @@ body {
   position: absolute;
   inset: 0;
   border: 0;
-  background: oklch(0.15 0.01 70 / 0.5);
+  background: color-mix(in oklch, var(--d-page) 62%, transparent);
+  backdrop-filter: blur(6px);
   cursor: pointer;
 }
 .d-drawer-panel {
@@ -479,8 +953,17 @@ body {
   width: min(320px, 86vw);
   overflow-y: auto;
   padding: 24px 12px;
-  background: var(--d-page);
-  box-shadow: 0 0 0 1px var(--d-line);
+  background: var(--d-solid);
+  box-shadow:
+    inset -1px 0 0 var(--d-line),
+    30px 0 80px -30px var(--d-shadow);
+  animation: d-slide 0.35s var(--d-ease);
+}
+@keyframes d-slide {
+  from {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
 }
 
 /* ---------- article ---------- */
@@ -520,14 +1003,15 @@ body {
 .d-band > h2,
 .d-split > div > h2 {
   margin: 0;
+  font-family: var(--d-display);
   font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
   text-wrap: balance;
 }
 .d-article > h1,
 .d-plain > h1 {
-  font-size: clamp(2.25rem, 4.2vw, 3.25rem);
+  font-size: clamp(2.375rem, 4.4vw, 3.5rem);
 }
 .d-lead {
   margin: 18px 0 0;
@@ -537,13 +1021,13 @@ body {
   text-wrap: pretty;
 }
 .d-article > h2 {
-  margin-top: 56px;
-  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
-  letter-spacing: -0.035em;
+  margin-top: 60px;
+  font-size: clamp(1.5rem, 2.2vw, 1.9375rem);
+  letter-spacing: -0.03em;
 }
 .d-article > h2 a:hover::after {
   content: " #";
-  color: var(--d-faint);
+  color: var(--d-accent);
 }
 .d-article > h3 {
   margin-top: 32px;
@@ -554,15 +1038,29 @@ body {
   margin: 16px 0 0;
   text-wrap: pretty;
 }
+.d-article > p {
+  color: color-mix(in oklch, var(--d-ink) 86%, var(--d-dim));
+}
 .d-article > :where(ul, ol):not([class]) {
   padding-left: 1.2em;
+}
+.d-article > :where(ul, ol):not([class]) > li::marker {
+  color: var(--d-accent);
 }
 .d-article > :where(ul, ol):not([class]) > li + li,
 .d-steps li + li {
   margin-top: 6px;
 }
+.d-steps {
+  padding-left: 1.4em;
+}
+.d-steps > li::marker {
+  color: var(--d-accent);
+  font-family: var(--d-display);
+  font-weight: 600;
+}
 .d-article > :where(p, ul, ol, dl, aside, .d-table) a {
-  color: var(--d-brand-ink);
+  color: var(--d-accent);
   font-weight: 550;
   text-decoration: underline;
   text-decoration-color: color-mix(in oklch, currentColor 35%, transparent);
@@ -573,38 +1071,57 @@ body {
 }
 .d-article > :where(p, ul, ol, dl, aside, .d-table) code,
 .d-plain > p code,
-.d-split > div code {
-  padding: 0.14em 0.4em;
+.d-split > div > p code,
+.d-band-head code {
+  padding: 0.14em 0.42em;
   border-radius: 7px;
   background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
   font-family: var(--d-mono);
-  font-size: 0.875em;
+  font-size: 0.86em;
   overflow-wrap: anywhere;
 }
 
 .d-note {
   margin-top: 20px;
   padding: 14px 18px;
-  border-radius: 16px;
-  background: color-mix(in oklch, var(--d-brand) 9%, var(--d-panel));
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-brand) 26%, transparent);
+  border-radius: 18px;
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklch, var(--d-g2) 16%, transparent),
+    color-mix(in oklch, var(--d-g1) 6%, transparent)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 34%, transparent);
 }
 
 /* ---------- code ---------- */
 
 .d-code {
+  position: relative;
   margin: 20px 0 0;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 20px;
   background: var(--d-code);
   color: var(--d-code-ink);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.09),
+    0 30px 60px -40px var(--d-shadow);
+}
+/* A hairline of the palette's light along the top edge. */
+.d-code::before {
+  content: "";
+  position: absolute;
+  inset: 0 12% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--d-g3), var(--d-g2), transparent);
+  opacity: 0.7;
 }
 .d-code figcaption {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 8px 0 18px;
-  color: oklch(0.72 0.015 260);
+  color: #979ba8;
   font-family: var(--d-mono);
   font-size: 12.5px;
 }
@@ -613,13 +1130,16 @@ body {
   padding: 0 12px;
   border: 0;
   border-radius: 999px;
-  background: oklch(1 0 0 / 0.08);
+  background: rgb(255 255 255 / 0.08);
   color: inherit;
   font: 600 12.5px var(--d-font);
   cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .d-code figcaption button:hover {
-  background: oklch(1 0 0 / 0.16);
+  background: rgb(255 255 255 / 0.16);
   color: #fff;
 }
 .d-code pre {
@@ -630,28 +1150,30 @@ body {
   font-size: 13.5px;
   line-height: 1.65;
   tab-size: 2;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
 }
 .d-code [data-token="comment"] {
-  color: oklch(0.62 0.02 260);
+  color: #747986;
   font-style: italic;
 }
 .d-code [data-token="string"] {
-  color: oklch(0.82 0.13 150);
+  color: #9ee6b8;
 }
 .d-code [data-token="number"] {
-  color: oklch(0.82 0.13 70);
+  color: #ffc98a;
 }
 .d-code [data-token="keyword"] {
-  color: oklch(0.76 0.15 330);
+  color: #f0a3ff;
 }
 .d-code [data-token="tag"] {
-  color: oklch(0.78 0.13 25);
+  color: #ff9cb0;
 }
 .d-code [data-token="call"] {
-  color: oklch(0.8 0.12 240);
+  color: #9db8ff;
 }
 .d-code [data-token="property"] {
-  color: oklch(0.86 0.06 200);
+  color: #a8e9f5;
 }
 
 /* ---------- tables ---------- */
@@ -659,7 +1181,8 @@ body {
 .d-table {
   margin-top: 20px;
   overflow-x: auto;
-  border-radius: 18px;
+  border-radius: 20px;
+  background: var(--d-panel);
   box-shadow: inset 0 0 0 1px var(--d-line);
 }
 .d-table table {
@@ -685,6 +1208,12 @@ body {
 .d-table td:first-child {
   white-space: nowrap;
 }
+.d-table tbody tr {
+  transition: background-color 0.15s;
+}
+.d-table tbody tr:hover {
+  background: var(--d-sunk);
+}
 
 /* ---------- previews ---------- */
 
@@ -692,7 +1221,7 @@ body {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 .d-fit > * {
   position: absolute;
@@ -701,18 +1230,36 @@ body {
 .d-preview {
   margin: 28px 0 0;
 }
+/* The plate a stage stands on: the year's grid of dots, and the palette's light coming up from under the stage. */
 .d-preview-plate {
+  position: relative;
   display: grid;
   place-items: center;
-  padding: clamp(14px, 3vw, 32px);
-  border-radius: 22px;
+  overflow: hidden;
+  padding: clamp(16px, 4vw, 44px);
+  border-radius: 26px;
   background:
-    radial-gradient(120% 90% at 50% 0%, color-mix(in oklch, var(--d-brand) 7%, transparent), transparent 60%),
+    radial-gradient(70% 60% at 50% 108%, color-mix(in oklch, var(--d-g2) 46%, transparent), transparent 72%),
+    radial-gradient(60% 50% at 50% -10%, color-mix(in oklch, var(--d-g1) 26%, transparent), transparent 70%),
     var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
+}
+.d-preview-plate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, var(--d-line-strong) 1px, transparent 0);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(80% 80% at 50% 50%, #000, transparent);
+  opacity: 0.6;
 }
 .d-preview-plate > .d-fit {
-  box-shadow: 0 30px 60px -30px oklch(0.15 0.02 60 / 0.55);
+  box-shadow:
+    0 40px 80px -36px var(--d-shadow),
+    0 0 0 1px var(--d-line),
+    0 0 90px -30px var(--d-g2);
 }
 .d-preview figcaption {
   display: flex;
@@ -720,7 +1267,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px 20px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 .d-preview figcaption p {
   margin: 0;
@@ -737,7 +1284,7 @@ body {
 .d-look-swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
 }
 .d-look-swatches button {
   width: 22px;
@@ -745,13 +1292,18 @@ body {
   padding: 0;
   border: 0;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.14);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.16);
   cursor: pointer;
+  transition: transform 0.25s var(--d-ease);
+}
+.d-look-swatches button:hover {
+  transform: scale(1.18);
 }
 .d-look-swatches button[aria-pressed="true"] {
   box-shadow:
-    0 0 0 2px var(--d-panel),
-    0 0 0 4px var(--d-ink);
+    0 0 0 2px var(--d-solid),
+    0 0 0 4px var(--d-ink),
+    0 0 18px 2px currentColor;
 }
 .d-look-chips {
   display: flex;
@@ -759,6 +1311,7 @@ body {
   padding: 3px;
   border-radius: 999px;
   background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
 }
 .d-look-chips button {
   height: 28px;
@@ -769,10 +1322,16 @@ body {
   color: var(--d-dim);
   font: 600 13px var(--d-font);
   cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.d-look-chips button:hover {
+  color: var(--d-ink);
 }
 .d-look-chips button[aria-pressed="true"] {
   background: var(--d-ink);
-  color: var(--d-panel);
+  color: var(--d-on-ink);
 }
 
 /* ---------- cards and shelves ---------- */
@@ -792,9 +1351,6 @@ body {
   gap: 12px;
   margin-top: 24px !important;
 }
-.d-cards-wide {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
 .d-cards li {
   margin: 0 !important;
 }
@@ -804,20 +1360,25 @@ body {
   flex-direction: column;
   gap: 3px;
   height: 100%;
-  padding: 10px 10px 14px;
-  border-radius: 20px;
-  background: var(--d-sunk);
+  padding: 10px 10px 16px;
+  border-radius: 24px;
+  background: var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
   color: var(--d-ink) !important;
   font-weight: 400 !important;
   text-decoration: none !important;
   transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    transform 0.35s var(--d-ease),
+    box-shadow 0.35s;
 }
 .d-cards a:hover,
 .d-shelf a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 0 1px var(--d-line);
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
+    0 26px 50px -28px var(--d-g2);
 }
 .d-card-stage {
   display: grid;
@@ -826,14 +1387,15 @@ body {
 }
 .d-cards strong,
 .d-shelf strong {
-  padding: 0 6px;
-  font-size: 15.5px;
-  font-weight: 650;
+  padding: 0 8px;
+  font-family: var(--d-display);
+  font-size: 17px;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 .d-cards a > span:not(.d-card-stage),
 .d-shelf a > span {
-  padding: 0 6px;
+  padding: 0 8px;
   color: var(--d-dim);
   font-size: 14px;
   line-height: 1.45;
@@ -864,42 +1426,59 @@ body {
   padding: 0 16px;
   border-radius: 999px;
   background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
   color: var(--d-ink) !important;
   font-size: 14.5px;
   font-weight: 600 !important;
   text-decoration: none !important;
+  transition:
+    transform 0.25s var(--d-ease),
+    box-shadow 0.25s;
 }
 .d-related a:hover {
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 55%, transparent);
 }
 
 .d-pager {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 56px;
+  margin-top: 60px;
 }
 .d-pager a {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 16px 20px;
-  border-radius: 20px;
-  box-shadow: inset 0 0 0 1px var(--d-line);
-  font-weight: 650;
+  padding: 18px 22px;
+  border-radius: 22px;
+  background: var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
+  font-family: var(--d-display);
+  font-size: 1.125rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
+  transition:
+    transform 0.3s var(--d-ease),
+    box-shadow 0.3s;
 }
 .d-pager a[rel="next"] {
   grid-column: 2;
   text-align: right;
 }
 .d-pager a:hover {
-  background: var(--d-sunk);
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
+    0 24px 46px -28px var(--d-g2);
 }
 .d-pager small {
-  color: var(--d-faint);
+  color: var(--d-accent);
+  font-family: var(--d-font);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 550;
   letter-spacing: 0;
 }
 .d-meta {
@@ -908,11 +1487,19 @@ body {
   font-size: 13.5px;
 }
 
+.d-faq > div {
+  padding: 16px 20px;
+  border-radius: 18px;
+  background: var(--d-panel);
+  box-shadow: inset 0 0 0 1px var(--d-line);
+}
 .d-faq > div + div {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 .d-faq dt {
-  font-weight: 650;
+  font-family: var(--d-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
   letter-spacing: -0.015em;
 }
 .d-faq dd {
@@ -928,9 +1515,11 @@ body {
   max-width: 1400px;
   margin: 16px auto 0;
   padding: clamp(24px, 4.5vw, 64px);
-  border-radius: var(--d-radius);
+  border-radius: 36px;
   background: var(--d-panel);
-  box-shadow: 0 0 0 1px var(--d-line);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
 }
 main:has(> .d-plain, > .d-hero, > .d-example) {
   padding: 0 16px;
@@ -943,7 +1532,7 @@ main:has(> .d-plain, > .d-hero, > .d-example) {
   font-size: clamp(1.5rem, 2.2vw, 2rem);
 }
 .d-plain > h2 small {
-  color: var(--d-faint);
+  color: var(--d-accent);
   font-size: 1em;
   font-weight: 600;
 }
@@ -953,6 +1542,7 @@ main:has(> .d-plain, > .d-hero, > .d-example) {
   padding: 10px 14px;
   border-radius: 999px;
   background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
 }
 
 .d-example {
@@ -963,20 +1553,29 @@ main:has(> .d-example) > .d-plain:last-child {
   margin-top: 12px;
 }
 .d-plain > p a {
-  color: var(--d-brand-ink);
+  color: var(--d-accent);
   font-weight: 550;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
+/* The hero: a dark room with the palette's light rising behind the player. */
 .d-hero {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
   align-items: center;
   gap: clamp(24px, 4vw, 64px);
   overflow: hidden;
   background:
-    radial-gradient(60% 70% at 100% 0%, color-mix(in oklch, var(--d-brand) 14%, transparent), transparent 70%),
+    radial-gradient(
+      58% 82% at 78% 112%,
+      color-mix(in oklch, var(--d-g3) 62%, transparent) 0%,
+      color-mix(in oklch, var(--d-g2) 54%, transparent) 26%,
+      color-mix(in oklch, var(--d-g1) 40%, transparent) 50%,
+      transparent 76%
+    ),
+    radial-gradient(40% 50% at 0% 0%, color-mix(in oklch, var(--d-g1) 22%, transparent), transparent 70%),
     var(--d-panel);
 }
 .d-hero-kicker {
@@ -984,10 +1583,11 @@ main:has(> .d-example) > .d-plain:last-child {
   flex-wrap: wrap;
   align-items: center;
   gap: 0 6px;
-  margin: 0 0 22px;
+  margin: 0 0 24px;
   padding: 7px 14px 7px 12px;
   border-radius: 18px;
   background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
   color: var(--d-dim);
   font-size: 14px;
   font-weight: 500;
@@ -1004,21 +1604,24 @@ main:has(> .d-example) > .d-plain:last-child {
   height: 8px;
   margin-right: 2px;
   border-radius: 999px;
-  background: var(--d-brand);
-  box-shadow: 0 0 0 4px color-mix(in oklch, var(--d-brand) 22%, transparent);
+  background: var(--d-accent);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--d-accent) 22%, transparent);
+  animation: d-pulse 2.4s ease-in-out infinite;
+}
+@keyframes d-pulse {
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in oklch, var(--d-accent) 0%, transparent);
+  }
 }
 .d-hero-copy > h1 {
-  font-size: clamp(2.6rem, 5.8vw, 5rem);
-  letter-spacing: -0.055em;
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
   line-height: 0.96;
 }
-.d-hero-copy > h1 em {
-  color: var(--d-brand);
-  font-style: normal;
-}
 .d-hero-lead {
-  max-width: 54ch;
-  margin: 24px 0 0;
+  max-width: 52ch;
+  margin: 26px 0 0;
   color: var(--d-dim);
   font-size: clamp(1.0625rem, 1.35vw, 1.25rem);
   line-height: 1.5;
@@ -1028,13 +1631,72 @@ main:has(> .d-example) > .d-plain:last-child {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 28px;
+  margin-top: 30px;
 }
-.d-hero .d-code {
-  max-width: 420px;
-  margin-top: 28px;
+/* The hero's words arrive one after another, with or without scripts. */
+.d-hero-copy > * {
+  animation: d-rise 1s var(--d-ease) both;
+}
+.d-hero-copy > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+.d-hero-copy > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+.d-hero-copy > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+.d-hero-copy > :nth-child(5) {
+  animation-delay: 0.32s;
+}
+@keyframes d-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+/* The one command, as a line to copy and nothing more. */
+.d-command {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  margin-top: 26px;
+  padding: 5px 5px 5px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--d-code);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  color: var(--d-code-ink);
+  font-family: var(--d-mono);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.d-command code {
+  overflow: hidden;
+  font: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.d-command code::before {
+  content: "$ ";
+  color: var(--d-g3);
+}
+.d-command span {
+  display: grid;
+  place-items: center;
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  font: 600 12.5px var(--d-font);
+  transition: background-color 0.15s;
+}
+.d-command:hover span {
+  background: rgb(255 255 255 / 0.2);
 }
 .d-hero-stage {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -1043,6 +1705,8 @@ main:has(> .d-example) > .d-plain:last-child {
 }
 /* The room the player fits its frame into. A fixed height, so the page does not move when the player arrives. */
 .d-hero-player {
+  position: relative;
+  z-index: 1;
   display: flex;
   height: clamp(520px, 74vh, 720px);
 }
@@ -1050,10 +1714,48 @@ main:has(> .d-example) > .d-plain:last-child {
   flex: 1;
 }
 .d-hero-note {
+  position: relative;
+  z-index: 1;
   margin: 0;
-  color: var(--d-faint);
+  color: color-mix(in oklch, var(--d-ink) 70%, transparent);
   font-size: 13.5px;
   text-align: center;
+}
+/* Three small stages floating beside the player: the same scenes, playing at the size of a card. */
+.d-float {
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px var(--d-line-strong),
+    0 30px 60px -20px var(--d-shadow),
+    0 0 60px -20px var(--d-g2);
+  pointer-events: none;
+  animation: d-bob 8s ease-in-out infinite alternate;
+}
+.d-float-a {
+  top: 7%;
+  left: -3%;
+  rotate: -8deg;
+}
+.d-float-b {
+  right: -2%;
+  bottom: 24%;
+  rotate: 7deg;
+  animation-delay: -4s;
+}
+.d-float-c {
+  bottom: 15%;
+  left: -7%;
+  rotate: 5deg;
+  animation-delay: -2s;
+  animation-duration: 10s;
+}
+@keyframes d-bob {
+  to {
+    translate: 0 -16px;
+  }
 }
 
 .d-facts {
@@ -1066,27 +1768,28 @@ main:has(> .d-example) > .d-plain:last-child {
 .d-facts p {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
-  padding: clamp(18px, 2.4vw, 28px);
-  border-radius: 24px;
+  padding: clamp(18px, 2.4vw, 30px);
+  border-radius: 28px;
   background: var(--d-panel);
-  box-shadow: 0 0 0 1px var(--d-line);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
 }
 .d-facts strong {
-  font-size: clamp(2.25rem, 4.4vw, 3.5rem);
-  font-weight: 650;
-  letter-spacing: -0.06em;
+  align-self: flex-start;
+  font-family: var(--d-display);
+  font-size: clamp(2.5rem, 4.6vw, 3.875rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
   line-height: 0.9;
   font-variant-numeric: tabular-nums;
 }
-.d-facts span {
+.d-facts p > span {
   color: var(--d-dim);
   font-size: 14.5px;
   line-height: 1.35;
-}
-main:has(> .d-facts) > .d-facts {
-  margin-top: 12px;
 }
 
 .d-band {
@@ -1097,11 +1800,25 @@ main:has(> .d-facts) > .d-facts {
 .d-split > div > h2,
 .d-promo h2 {
   margin: 0;
-  font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+  font-family: var(--d-display);
+  font-size: clamp(2rem, 3.6vw, 3.125rem);
   font-weight: 600;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
   line-height: 1.02;
   text-wrap: balance;
+}
+.d-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px !important;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
+  color: var(--d-accent) !important;
+  font-size: 13px !important;
+  font-weight: 600;
 }
 .d-band-head {
   display: flex;
@@ -1123,18 +1840,10 @@ main:has(> .d-facts) > .d-facts {
   line-height: 1.55;
   text-wrap: pretty;
 }
-.d-band-head code,
-.d-split > div code {
-  padding: 0.14em 0.4em;
-  border-radius: 7px;
-  background: var(--d-sunk);
-  font-family: var(--d-mono);
-  font-size: 0.875em;
-}
 .d-band-more {
   display: flex;
   justify-content: center;
-  margin: 24px 0 0;
+  margin: 28px 0 0;
 }
 .d-split {
   display: grid;
@@ -1145,8 +1854,163 @@ main:has(> .d-facts) > .d-facts {
 .d-split .d-code {
   margin: 0;
 }
+/* Code on one side, what it plays on the other. */
+.d-made {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.d-made .d-code {
+  min-width: 0;
+}
+.d-made .d-code pre {
+  font-size: 12.5px;
+}
+.d-made-player {
+  display: flex;
+  width: 250px;
+  height: 500px;
+}
+.d-made-player > * {
+  flex: 1;
+}
+/* The small player keeps its buttons and its clock, and leaves its timeline to the big one above. */
+.d-made-quiet {
+  display: none;
+}
 
-.d-wall {
+/* Two rows of live charts that slide past each other as the page is scrolled. */
+.d-rails {
+  display: grid;
+  gap: 12px;
+  margin: 32px calc(clamp(24px, 4.5vw, 64px) * -1) 0;
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.d-rail {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 6px clamp(24px, 4.5vw, 64px);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+.d-rail::-webkit-scrollbar {
+  display: none;
+}
+.d-rail li {
+  flex: none;
+}
+.d-rail a {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 10px 14px;
+  border-radius: 24px;
+  background: var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
+  transition:
+    transform 0.35s var(--d-ease),
+    box-shadow 0.35s;
+}
+.d-rail a:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
+    0 26px 50px -28px var(--d-g2);
+}
+.d-rail-stage {
+  display: block;
+  overflow: hidden;
+  border-radius: 16px;
+}
+.d-rail strong {
+  padding: 0 8px;
+  font-family: var(--d-display);
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* One stage, and every transition a tap away. */
+.d-cuts {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+}
+.d-cuts > div:first-child > h2 {
+  margin: 0;
+  font-family: var(--d-display);
+  font-size: clamp(2rem, 3.6vw, 3.125rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.d-cuts > div:first-child > p {
+  max-width: 54ch;
+  margin: 14px 0 0;
+  color: var(--d-dim);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+.d-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 24px;
+}
+.d-chips button {
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
+  color: var(--d-dim);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+.d-chips button:hover {
+  color: var(--d-ink);
+}
+.d-chips button[aria-pressed="true"] {
+  background: linear-gradient(110deg, var(--d-g2), var(--d-g1));
+  box-shadow: 0 10px 26px -12px var(--d-g2);
+  color: #fff;
+}
+.d-cuts-stage {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.d-cuts-stage .d-preview-plate {
+  width: 100%;
+}
+.d-cuts-stage p {
+  color: var(--d-dim);
+  font-size: 14.5px;
+  text-align: center;
+  text-wrap: balance;
+}
+.d-cuts-stage p a {
+  color: var(--d-accent);
+  font-weight: 600;
+}
+
+/* The parts, in tiles of different sizes: the first one is the big picture. */
+.d-bento {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
@@ -1154,29 +2018,112 @@ main:has(> .d-facts) > .d-facts {
   padding: 0;
   list-style: none;
 }
-.d-wall a {
+.d-bento > li:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.d-bento a {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px 10px 14px;
-  border-radius: 20px;
-  background: var(--d-sunk);
+  gap: 4px;
+  height: 100%;
+  padding: 10px 10px 18px;
+  border-radius: 26px;
+  background: var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
   transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    transform 0.35s var(--d-ease),
+    box-shadow 0.35s;
 }
-.d-wall a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 0 1px var(--d-line);
+.d-bento a:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
+    0 26px 50px -28px var(--d-g2);
 }
-.d-wall .d-fit {
-  margin: 0 auto;
+.d-bento .d-card-stage {
+  flex: 1;
+  margin-bottom: 10px;
 }
-.d-wall strong {
-  padding: 0 6px;
-  font-size: 15px;
-  font-weight: 650;
+/* The big tile gives its stage a plate to stand on, like a preview on a docs page. */
+.d-bento > li:first-child .d-card-stage {
+  padding: clamp(14px, 2.4vw, 32px);
+  border-radius: 18px;
+  background:
+    radial-gradient(70% 60% at 50% 108%, color-mix(in oklch, var(--d-g2) 44%, transparent), transparent 72%),
+    var(--d-sunk);
+  box-shadow: inset 0 0 0 1px var(--d-line);
+}
+.d-bento > li:first-child .d-fit {
+  box-shadow:
+    0 30px 60px -30px var(--d-shadow),
+    0 0 80px -30px var(--d-g2);
+}
+.d-bento strong {
+  padding: 0 10px;
+  font-family: var(--d-display);
+  font-size: 1.1875rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
+}
+.d-bento > li:first-child strong {
+  font-size: 1.5rem;
+}
+.d-bento a > span:not(.d-card-stage) {
+  padding: 0 10px;
+  color: var(--d-dim);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+/* The palettes, as the one control that repaints the whole site. */
+.d-wear {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 40px;
+  margin-top: 12px;
+  padding: clamp(20px, 3vw, 34px);
+  border-radius: 26px;
+  background:
+    linear-gradient(
+      100deg,
+      color-mix(in oklch, var(--d-g1) 30%, transparent),
+      color-mix(in oklch, var(--d-g2) 16%, transparent) 55%,
+      color-mix(in oklch, var(--d-hot) 14%, transparent)
+    ),
+    var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line-strong),
+    inset 0 1px 0 var(--d-sheen);
+}
+.d-wear h3 {
+  font-family: var(--d-display);
+  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.d-wear p {
+  max-width: 46ch;
+  margin-top: 6px;
+  color: var(--d-dim);
+  font-size: 15px;
+}
+.d-wear p a {
+  color: var(--d-accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.d-wear .d-look-swatches {
+  gap: 10px;
+}
+.d-wear .d-look-swatches button {
+  width: 36px;
+  height: 36px;
 }
 
 .d-packages {
@@ -1191,11 +2138,12 @@ main:has(> .d-facts) > .d-facts {
   display: grid;
   grid-template-columns: minmax(0, 13.5em) minmax(0, 1fr);
   gap: 4px 16px;
-  padding: 11px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--d-line);
   font-size: 14.5px;
 }
 .d-packages code {
+  color: var(--d-accent);
   font-family: var(--d-mono);
   font-size: 13px;
   font-weight: 600;
@@ -1206,6 +2154,7 @@ main:has(> .d-facts) > .d-facts {
 
 /* The one place the site sells something: where the library runs for real. In Hype Stack's own colour. */
 .d-promo {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1213,15 +2162,27 @@ main:has(> .d-facts) > .d-facts {
   gap: 24px 48px;
   max-width: 1400px;
   margin: 12px auto 0;
-  padding: clamp(24px, 4.5vw, 56px);
-  border-radius: var(--d-radius);
+  padding: clamp(28px, 5vw, 72px);
+  overflow: hidden;
+  border-radius: 36px;
   background:
-    radial-gradient(70% 120% at 100% 0%, color-mix(in oklch, var(--d-hype) 26%, transparent), transparent 70%),
+    radial-gradient(
+      70% 140% at 100% 100%,
+      color-mix(in oklch, var(--d-hype) 62%, transparent),
+      color-mix(in oklch, var(--d-hot) 22%, transparent) 42%,
+      transparent 72%
+    ),
+    radial-gradient(50% 90% at 0% 0%, color-mix(in oklch, var(--d-g1) 30%, transparent), transparent 70%),
     var(--d-panel);
-  box-shadow: 0 0 0 1px var(--d-line);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line-strong),
+    inset 0 1px 0 var(--d-sheen);
 }
 .d-promo > div:first-child {
   max-width: 60ch;
+}
+.d-promo p {
+  color: color-mix(in oklch, var(--d-ink) 78%, transparent);
 }
 .d-promo-actions {
   display: flex;
@@ -1229,44 +2190,71 @@ main:has(> .d-facts) > .d-facts {
   gap: 10px;
 }
 .d-pill-hype {
-  background: var(--d-hype);
-  color: oklch(0.985 0 0) !important;
-  box-shadow: none;
+  background: var(--d-ink);
+  color: var(--d-on-ink) !important;
+  box-shadow: 0 18px 40px -16px var(--d-hype);
+}
+.d-pill-hype:hover {
+  background: var(--d-ink);
 }
 
 /* ---------- footer ---------- */
 
 .d-foot {
-  padding: 28px 16px 36px;
+  padding: 12px 16px 28px;
 }
 .d-foot-inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  gap: 28px 32px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: clamp(24px, 4vw, 48px);
+  border-radius: 36px;
+  background: var(--d-panel);
+  box-shadow:
+    inset 0 0 0 1px var(--d-line),
+    inset 0 1px 0 var(--d-sheen);
   color: var(--d-dim);
   font-size: 14.5px;
 }
+.d-foot-about .d-brand {
+  margin: 0 0 12px;
+  color: var(--d-ink);
+}
 .d-foot p {
+  max-width: 40ch;
   margin: 0;
 }
 .d-foot p a {
   color: var(--d-ink);
   font-weight: 600;
 }
-.d-foot nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 20px;
+.d-foot nav h2 {
+  margin: 0 0 10px;
+  color: var(--d-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.d-foot nav ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.d-foot a {
+  transition: color 0.15s;
 }
 .d-foot a:hover {
   color: var(--d-ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+}
+.d-foot-legal {
+  grid-column: 1 / -1;
+  padding-top: 20px;
+  border-top: 1px solid var(--d-line);
+  color: var(--d-faint);
+  font-size: 13.5px;
 }
 
 /* ---------- wider and narrower ---------- */
@@ -1283,23 +2271,47 @@ main:has(> .d-facts) > .d-facts {
     font-size: 14px;
   }
   .d-toc h2 {
-    margin: 0 0 8px;
-    font-size: 13px;
-    font-weight: 650;
-    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    color: var(--d-faint);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   .d-toc ul {
     margin: 0;
     padding: 0;
+    border-left: 1px solid var(--d-line);
     list-style: none;
   }
   .d-toc a {
     display: block;
-    padding: 4px 0;
+    margin-left: -1px;
+    padding: 4px 0 4px 14px;
+    border-left: 1px solid transparent;
     color: var(--d-dim);
+    transition:
+      color 0.2s,
+      border-color 0.2s;
   }
   .d-toc a:hover {
     color: var(--d-ink);
+  }
+  .d-toc a[aria-current="location"] {
+    border-left-color: var(--d-accent);
+    color: var(--d-accent);
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 1180px) {
+  .d-float {
+    display: none;
+  }
+  .d-made {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d-made-player {
+    justify-self: center;
   }
 }
 
@@ -1317,27 +2329,31 @@ main:has(> .d-facts) > .d-facts {
     display: none;
   }
   .d-search-button span,
-  .d-search-button kbd {
+  .d-search-button kbd,
+  .d-spin-button span {
     display: none;
   }
-  .d-search-button {
+  .d-search-button,
+  .d-spin-button {
     width: 38px;
     padding: 0;
     justify-content: center;
+  }
+  .d-search-button {
     background: none;
   }
   .d-bar-end {
-    gap: 0;
+    gap: 2px;
   }
   .d-hero,
-  .d-split {
+  .d-split,
+  .d-cuts {
     grid-template-columns: minmax(0, 1fr);
   }
-  .d-facts,
-  .d-wall {
+  .d-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .d-cards-wide {
+  .d-bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .d-packages {
@@ -1346,15 +2362,24 @@ main:has(> .d-facts) > .d-facts {
   .d-hero-player {
     height: clamp(480px, 70vh, 620px);
   }
+  .d-foot-inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .d-foot-about {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 560px) {
   .d-bar nav {
     display: none;
   }
+  /* On a phone the mark stands for the name: the bar has six things to hold. */
   .d-brand {
     margin-right: 0;
-    font-size: 15.5px;
+  }
+  .d-bar .d-brand span {
+    display: none;
   }
   .d-bar-inner {
     padding-left: 12px;
@@ -1362,20 +2387,12 @@ main:has(> .d-facts) > .d-facts {
   .d-bar-end > a.d-icon-button {
     display: none;
   }
-  /* On a phone the bar holds five things. The link to Hype Stack keeps its words and gives up its arrow. */
+  /* On a phone the bar holds six things. The link to Hype Stack keeps its words and gives up its arrow. */
   .d-pill-brand {
-    padding: 0 13px;
+    padding: 0 12px;
   }
   .d-pill-brand svg {
     display: none;
-  }
-  .d-brand {
-    gap: 8px;
-    min-width: 0;
-  }
-  .d-mark {
-    width: 26px;
-    height: 26px;
   }
   .d-pager {
     grid-template-columns: minmax(0, 1fr);
@@ -1383,16 +2400,43 @@ main:has(> .d-facts) > .d-facts {
   .d-packages li {
     grid-template-columns: minmax(0, 1fr);
   }
-  .d-cards-wide {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .d-pager a[rel="next"] {
     grid-column: 1;
+  }
+  .d-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d-bento > li:first-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .d-foot-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .d-spin-head p {
+    display: none;
+  }
+  .d-reel-card {
+    width: 128px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+  /* The site's own loops stand still. The library's stages keep theirs: playing is what they are for. */
+  .d-aurora i,
+  .d-hero-copy > *,
+  .d-float,
+  .d-dot,
+  .d-search[open],
+  .d-spin[open],
+  .d-drawer-panel {
+    animation: none !important;
+  }
+  .js [data-reveal] {
+    opacity: 1;
+    translate: 0 0;
   }
 }
