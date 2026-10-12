@@ -1,0 +1,4 @@
+# Agent skills (see skills-lock.json). Nothing under these folders is a project of this monorepo: .agents holds the
+# skills and .claude links to the same files for Claude Code.
+.claude
+.agents

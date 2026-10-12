@@ -27,6 +27,8 @@
     "**/routeTree.gen.ts",
     "/coverage",
     "/.nx/cache",
-    "/.nx/workspace-data"
+    "/.nx/workspace-data",
+    "/.agents",
+    "/.claude"
   ]
 }
