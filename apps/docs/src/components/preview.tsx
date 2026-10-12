@@ -39,10 +39,19 @@ const WIDEST = { story: 340, square: 520, landscape: 720 } as const;
  * Sizes a stage to the room it has. The box keeps the format's shape from the first paint, so nothing below it
  * moves when the stage inside is measured and drawn to fit.
  */
-function Fit({ max, children }: { max?: number; children: (width: number) => ReactNode }) {
+function Fit({
+  max,
+  format: held,
+  children,
+}: {
+  max?: number;
+  format?: WrappedConfig["format"];
+  children: (width: number) => ReactNode;
+}) {
   const { look } = useLook();
-  const format = WRAPPED_FORMATS[look.format];
-  const widest = Math.min(max ?? Infinity, WIDEST[look.format]);
+  const id = held ?? look.format;
+  const format = WRAPPED_FORMATS[id];
+  const widest = Math.min(max ?? Infinity, WIDEST[id]);
   const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(widest);
   useLayoutEffect(() => {
@@ -88,38 +97,62 @@ export function sceneOf(demo: Demo): SceneInstance | undefined {
   return undefined;
 }
 
-/** One live preview, the size of the room it is given. A part is a whole component and is not drawn this small. */
-export function DemoStage({ demo, max }: { demo: Demo; max?: number }) {
-  const config = useLookConfig();
+/**
+ * One live preview, the size of the room it is given. A part is a whole component and is not drawn this small.
+ * `format` holds it to one shape, for a grid whose cells must stay the same whatever the reader picked elsewhere.
+ */
+export function DemoStage({
+  demo,
+  max,
+  format,
+  palette,
+}: {
+  demo: Demo;
+  max?: number;
+  format?: WrappedConfig["format"];
+  /** Holds the preview to one palette, for a wall that shows the palettes side by side. */
+  palette?: string;
+}) {
+  const look = useLookConfig();
+  const config = useMemo(
+    () => ({ ...look, format: format ?? look.format, palette: palette ?? look.palette }),
+    [look, format, palette],
+  );
   if (demo.type === "transition") {
     if (!FIRST || !SECOND || !isTransition(demo.id)) return null;
     const style = demo.id;
     return (
-      <Fit max={max}>
+      <Fit max={max} format={format}>
         {(width) => <CutPreview style={style} first={FIRST} second={SECOND} config={config} width={width} />}
       </Fit>
     );
   }
   const scene = sceneOf(demo);
   if (!scene) return null;
-  return <Fit max={max}>{(width) => <SceneThumb scene={scene} config={config} width={width} loop />}</Fit>;
+  return (
+    <Fit max={max} format={format}>
+      {(width) => <SceneThumb scene={scene} config={config} width={width} loop />}
+    </Fit>
+  );
 }
 
 /**
- * One live preview at a width of its own, always in the same format: for a row that has to keep its height, and a
- * tile that must not grow when the reader picks a taller frame for the rest of the site.
+ * One live preview at a width of its own, in a format and a palette of its own: for the hero, where five scenes
+ * stand side by side in five palettes and none of them follows the reader's pick.
  */
 export function FixedStage({
   demo,
   width,
   format = "square",
+  palette,
 }: {
   demo: Demo;
   width: number;
   format?: WrappedConfig["format"];
+  palette?: string;
 }) {
   const look = useLookConfig();
-  const config = useMemo(() => ({ ...look, format }), [look, format]);
+  const config = useMemo(() => ({ ...look, format, palette: palette ?? look.palette }), [look, format, palette]);
   if (demo.type === "transition") {
     if (!FIRST || !SECOND || !isTransition(demo.id)) return null;
     return <CutPreview style={demo.id} first={FIRST} second={SECOND} config={config} width={width} />;

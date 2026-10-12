@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { anchorOf, type DocPage } from "../content/types";
 import { neighboursOf, SECTIONS, titleOf } from "../registry/pages";
-import { absoluteUrl } from "../site";
+import { absoluteUrl, hypeStack, SITE } from "../site";
 import { Blocks } from "./blocks";
 import { Inline } from "./inline";
 import { SiteLink } from "./site-link";
@@ -58,6 +58,28 @@ function Contents({ headings }: { headings: readonly string[] }) {
         ))}
       </ul>
     </aside>
+  );
+}
+
+/**
+ * The card beside every docs page that sends a reader on to Hype Stack. The library is a free tool from it, and
+ * this is the one place a docs page says so out loud.
+ */
+function HypeStackCard() {
+  return (
+    <a className="d-ad" href={hypeStack("docs-sidebar")} target="_blank" rel="noopener">
+      <span className="d-ad-art" aria-hidden>
+        <img src={`${SITE.base}hype-stack.png`} alt="" width={56} height={56} loading="lazy" />
+      </span>
+      <span className="d-ad-body">
+        <strong>Build your SaaS on Hype Stack</strong>
+        <span className="d-ad-text">
+          Free React and Hono template. One CLI command writes auth, billing and teams into your own repo.
+        </span>
+        <span className="d-ad-go">Explore the stack</span>
+        <small>MIT template. Paid packs optional.</small>
+      </span>
+    </a>
   );
 }
 
@@ -124,7 +146,10 @@ export function DocArticle({ page }: { page: DocPage }) {
           <a href={absoluteUrl(`${page.path}index.md`)}>Read this page as Markdown</a>.
         </p>
       </article>
-      {headings.length > 1 ? <Contents headings={headings} /> : null}
+      <div className="d-rail">
+        {headings.length > 1 ? <Contents headings={headings} /> : null}
+        <HypeStackCard />
+      </div>
     </div>
   );
 }

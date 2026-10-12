@@ -1,22 +1,12 @@
 /*
- * The docs site's own look: a night page with light coming through it. Three soft lights sit behind everything and
- * take their colours from the palette the reader picked for the previews, so the site wears what the library draws.
- * Panels are glass over those lights, headings are set in Outfit, and the one solid thing on a page is the button
- * that matters. Nothing here styles the library: its components bring their own stylesheet and are only ever
- * placed, never restyled.
+ * The docs site's own look: a black page, white type, hairlines where other sites put boxes. The only colour on a
+ * page is what the library draws, and the light each stage gives off under itself. Nothing here styles the library:
+ * its components bring their own stylesheet and are only ever placed, never restyled.
  */
-@import "@fontsource-variable/inter";
-@import "@fontsource-variable/outfit";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
-@font-face {
-  font-family: "JetBrains Mono Variable";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 100 800;
-  src: url("/react-wrapped/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
-}
-
-/* The palette's colours are registered as colours, so a change of palette fades instead of snapping. */
+/* The picked palette's colours are registered as colours, so the light under a stage fades when the palette does. */
 @property --d-g1 {
   syntax: "<color>";
   inherits: true;
@@ -46,41 +36,33 @@
   --d-g3: #39d353;
   --d-hot: #c5e85b;
 
-  /* The page is near white with a breath of the palette in it, so every palette sits on a page of its own tint. */
-  --d-page: color-mix(in oklch, var(--d-g2) 7%, #f5f6f8);
+  --d-page: #ffffff;
   --d-solid: #ffffff;
-  --d-panel: rgb(255 255 255 / 0.66);
-  --d-panel-strong: rgb(255 255 255 / 0.82);
-  --d-sunk: rgb(20 26 44 / 0.055);
-  --d-ink: #101218;
+  --d-panel: #ffffff;
+  --d-sunk: #f4f4f4;
+  --d-ink: #000000;
   --d-on-ink: #ffffff;
-  --d-dim: #525763;
-  --d-faint: #858a96;
-  --d-line: rgb(20 26 44 / 0.11);
-  --d-line-strong: rgb(20 26 44 / 0.2);
-  --d-sheen: rgb(255 255 255 / 0.9);
-  --d-shadow: rgb(20 26 44 / 0.22);
-  --d-light: 0.3;
-
-  --d-accent: color-mix(in oklch, var(--d-g2) 74%, #06120a);
-  --d-on-accent: #ffffff;
-  --d-grad-a: color-mix(in oklch, var(--d-g2) 82%, #06120a);
-  --d-grad-b: color-mix(in oklch, var(--d-g1) 90%, #06120a);
-  /* Hype Stack's orange, for the one link that goes there. */
-  --d-hype: oklch(0.66 0.21 48);
-  --d-code: #0b0c11;
-  --d-code-ink: #e8eaf0;
+  --d-dim: #5e5e5e;
+  --d-faint: #9a9a9a;
+  --d-line: #e8e8e8;
+  --d-line-strong: #d2d2d2;
+  --d-glow: 0.3;
+  --d-code: #0a0a0a;
+  --d-code-ink: #ededed;
+  --d-code-line: #232323;
 
   /* The names the interactive previews were written against. */
-  --d-brand: var(--d-accent);
-  --d-brand-ink: var(--d-accent);
-  --d-on-brand: var(--d-on-accent);
+  --d-accent: var(--d-ink);
+  --d-on-accent: var(--d-on-ink);
+  --d-brand: var(--d-ink);
+  --d-brand-ink: var(--d-ink);
+  --d-on-brand: var(--d-on-ink);
 
-  --d-radius: 30px;
-  --d-font: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
-  --d-display: "Outfit Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --d-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --d-bar: 68px;
+  --d-font: "Geist Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --d-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --d-bar: 64px;
+  --d-wrap: 1200px;
+  --d-gutter: 24px;
   --d-ease: cubic-bezier(0.22, 1, 0.36, 1);
   transition:
     --d-g1 0.9s,
@@ -91,27 +73,17 @@
 
 .dark {
   color-scheme: dark;
-  --d-page: color-mix(in oklch, var(--d-g1) 7%, #050608);
-  --d-solid: color-mix(in oklch, var(--d-g1) 9%, #0c0d12);
-  --d-panel: rgb(255 255 255 / 0.035);
-  --d-panel-strong: color-mix(in oklch, var(--d-solid) 74%, transparent);
-  --d-sunk: rgb(255 255 255 / 0.06);
-  --d-ink: #f4f6f8;
-  --d-on-ink: #090a0e;
-  --d-dim: #a9aeba;
-  --d-faint: #747986;
-  --d-line: rgb(255 255 255 / 0.085);
-  --d-line-strong: rgb(255 255 255 / 0.16);
-  --d-sheen: rgb(255 255 255 / 0.07);
-  --d-shadow: rgb(0 0 0 / 0.6);
-  --d-light: 0.5;
-
-  --d-accent: color-mix(in oklch, var(--d-g3) 86%, #ffffff);
-  --d-on-accent: #090a0e;
-  --d-grad-a: color-mix(in oklch, var(--d-g3) 80%, #ffffff);
-  --d-grad-b: var(--d-g2);
-  --d-hype: oklch(0.72 0.19 50);
-  --d-code: rgb(4 3 10 / 0.62);
+  --d-page: #000000;
+  --d-solid: #0a0a0a;
+  --d-panel: #0a0a0a;
+  --d-sunk: #141414;
+  --d-ink: #ffffff;
+  --d-on-ink: #000000;
+  --d-dim: #a0a0a0;
+  --d-faint: #6b6b6b;
+  --d-line: #1a1a1a;
+  --d-line-strong: #2c2c2c;
+  --d-glow: 0.42;
 }
 
 /* The site's own small reset. The library does not lean on it: it resets its own roots (see its reset.css). */
@@ -143,102 +115,31 @@ html {
 
 body {
   /*
-   * The library's chrome, dressed for this site through its own theming hook: the accent wherever it uses one, and
-   * surfaces in the page's tones so its panels sit on the night page the way the site's own do.
+   * The library's chrome, dressed for this site through its own theming hook: black and white like the page, so the
+   * colour stays where it belongs, on the stage.
    */
-  --wr-ui-primary: var(--d-accent);
-  --wr-ui-primary-fg: var(--d-on-accent);
+  --wr-ui-primary: var(--d-ink);
+  --wr-ui-primary-fg: var(--d-on-ink);
   --wr-ui-fg: var(--d-ink);
   --wr-ui-muted-fg: var(--d-dim);
-  --wr-ui-bg: #ffffff;
-  --wr-ui-card: #ffffff;
-  --wr-ui-muted: color-mix(in oklch, var(--d-g2) 5%, #f0f2f4);
-  --wr-ui-border: #e2e5ea;
-  --wr-ui-ring: #cdd2da;
-  position: relative;
+  --wr-ui-bg: var(--d-solid);
+  --wr-ui-card: var(--d-solid);
+  --wr-ui-muted: var(--d-sunk);
+  --wr-ui-border: var(--d-line-strong);
+  --wr-ui-ring: var(--d-faint);
   margin: 0;
+  background: var(--d-page);
   color: var(--d-ink);
   font-family: var(--d-font);
   font-size: 16px;
   line-height: 1.6;
-  font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
 
-.dark body {
-  --wr-ui-bg: color-mix(in oklch, var(--d-g1) 9%, #0c0d12);
-  --wr-ui-card: color-mix(in oklch, var(--d-g1) 9%, #0f1015);
-  --wr-ui-muted: color-mix(in oklch, var(--d-g1) 12%, #1a1c24);
-  --wr-ui-border: color-mix(in oklch, var(--d-g1) 14%, #252831);
-  --wr-ui-ring: #3b3f4b;
-}
-
 ::selection {
-  background: color-mix(in oklch, var(--d-g2) 45%, transparent);
-}
-
-/* ---------- the lights behind the page ---------- */
-
-.d-aurora {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-  background: var(--d-page);
-}
-.d-aurora i {
-  position: absolute;
-  width: 78vmax;
-  height: 78vmax;
-  border-radius: 50%;
-  opacity: var(--d-light);
-  will-change: transform;
-}
-.d-aurora i:nth-child(1) {
-  top: -42vmax;
-  left: -18vmax;
-  background: radial-gradient(closest-side, var(--d-g1), transparent);
-  animation: d-drift-a 46s ease-in-out infinite alternate;
-}
-.d-aurora i:nth-child(2) {
-  top: -30vmax;
-  right: -34vmax;
-  background: radial-gradient(closest-side, color-mix(in oklch, var(--d-g2) 70%, transparent), transparent);
-  animation: d-drift-b 58s ease-in-out infinite alternate;
-}
-.d-aurora i:nth-child(3) {
-  bottom: -52vmax;
-  left: 22vw;
-  width: 90vmax;
-  height: 90vmax;
-  background: radial-gradient(closest-side, color-mix(in oklch, var(--d-hot) 42%, transparent), transparent);
-  animation: d-drift-c 64s ease-in-out infinite alternate;
-}
-/* A field of fine dots under the bar, fading out down the page: the grid a year is drawn on. */
-.d-aurora b {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, var(--d-line-strong) 1px, transparent 0);
-  background-size: 28px 28px;
-  mask-image: radial-gradient(120% 70% at 50% 0%, #000 0%, transparent 72%);
-  opacity: 0.55;
-}
-@keyframes d-drift-a {
-  to {
-    transform: translate3d(14vw, 10vh, 0) scale(1.12);
-  }
-}
-@keyframes d-drift-b {
-  to {
-    transform: translate3d(-16vw, 18vh, 0) scale(0.92);
-  }
-}
-@keyframes d-drift-c {
-  to {
-    transform: translate3d(-18vw, -14vh, 0) scale(1.1);
-  }
+  background: var(--d-ink);
+  color: var(--d-on-ink);
 }
 
 .d-skip {
@@ -247,7 +148,7 @@ body {
   top: -80px;
   z-index: 100;
   padding: 10px 16px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--d-ink);
   color: var(--d-on-ink);
   font-weight: 600;
@@ -256,28 +157,33 @@ body {
   top: 12px;
 }
 
-:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-hero, .d-band, .d-promo, .d-toc, .d-drawer, .d-spin) a {
+:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-home, .d-rail, .d-drawer, .d-spin) a {
   color: inherit;
   text-decoration: none;
 }
 
 :where(a, button):focus-visible {
-  outline: 2px solid var(--d-accent);
+  outline: 2px solid var(--d-ink);
   outline-offset: 2px;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
-/* Words in the palette's own light. */
-.d-shine {
-  background: linear-gradient(96deg, var(--d-grad-a) 8%, var(--d-grad-b) 92%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-style: normal;
+/* The second half of a heading, set back: the site's one typographic move. */
+.d-mute {
+  color: var(--d-faint);
+}
+
+/* A small label in the mono face, above a heading or beside a number. */
+.d-eyebrow {
+  margin: 0;
+  color: var(--d-faint);
+  font: 500 12.5px var(--d-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /*
- * A panel that lights up under the pointer. The site moves `--mx` and `--my` to where the pointer is (one listener,
+ * A cell that lights up under the pointer. The site moves `--mx` and `--my` to where the pointer is (one listener,
  * in `components/motion.tsx`); without it the light stays where it is and nothing is lost.
  */
 [data-glow] {
@@ -291,12 +197,12 @@ body {
   z-index: -1;
   border-radius: inherit;
   background: radial-gradient(
-    340px circle at var(--mx, 50%) var(--my, 0%),
-    color-mix(in oklch, var(--d-g2) 26%, transparent),
+    380px circle at var(--mx, 50%) var(--my, 0%),
+    var(--spot, color-mix(in oklch, var(--d-ink) 8%, transparent)),
     transparent 70%
   );
   opacity: 0;
-  transition: opacity 0.35s;
+  transition: opacity 0.3s;
   pointer-events: none;
 }
 [data-glow]:hover::before,
@@ -307,11 +213,11 @@ body {
 /* Things that arrive as the page is scrolled. Only once scripts run: without them everything simply stands. */
 .js [data-reveal] {
   opacity: 0;
-  translate: 0 26px;
+  translate: 0 20px;
   transition:
-    opacity 0.9s var(--d-ease),
-    translate 0.9s var(--d-ease);
-  transition-delay: calc(var(--i, 0) * 70ms);
+    opacity 0.8s var(--d-ease),
+    translate 0.8s var(--d-ease);
+  transition-delay: calc(var(--i, 0) * 60ms);
 }
 .js [data-reveal].is-in {
   opacity: 1;
@@ -324,80 +230,64 @@ body {
   position: sticky;
   top: 0;
   z-index: 40;
-  padding: 10px 16px 0;
+  border-bottom: 1px solid var(--d-line);
+  background: color-mix(in oklch, var(--d-page) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
 }
 .d-bar-inner {
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 1400px;
-  height: calc(var(--d-bar) - 14px);
+  max-width: calc(1352px + var(--d-gutter) * 2);
+  height: var(--d-bar);
   margin: 0 auto;
-  padding: 0 10px 0 18px;
-  border-radius: 999px;
-  background: color-mix(in oklch, var(--d-solid) 62%, transparent);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen),
-    0 18px 40px -24px var(--d-shadow);
-  backdrop-filter: blur(18px) saturate(1.5);
+  padding: 0 var(--d-gutter);
 }
 .d-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-right: 14px;
-  font-family: var(--d-display);
-  font-size: 18px;
+  gap: 9px;
+  margin-right: 22px;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   white-space: nowrap;
 }
 .d-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 23%;
-  box-shadow: 0 6px 18px -8px var(--d-g2);
-}
-.d-brand b {
-  color: var(--d-accent);
-  font-weight: inherit;
+  width: 22px;
+  height: 22px;
 }
 .d-bar nav {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .d-bar nav a {
-  padding: 7px 12px;
-  border-radius: 999px;
+  padding: 6px 10px;
+  border-radius: 8px;
   color: var(--d-dim);
-  font-size: 14.5px;
-  font-weight: 550;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
+  font-size: 14px;
+  transition: color 0.15s;
 }
 .d-bar nav a:hover,
 .d-bar nav a[aria-current="page"] {
-  background: var(--d-sunk);
   color: var(--d-ink);
 }
 .d-bar-end {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-left: auto;
 }
 .d-icon-button {
   display: inline-grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px;
   background: none;
   color: var(--d-dim);
   cursor: pointer;
@@ -410,11 +300,11 @@ body {
   color: var(--d-ink);
 }
 .d-icon-button svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -427,68 +317,44 @@ body {
   margin-left: -8px;
 }
 
+/* A button. Outlined by default; the one that matters on a page is solid. */
 .d-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 46px;
-  padding: 0 22px;
-  border: 0;
-  border-radius: 999px;
-  box-shadow:
-    inset 0 0 0 1px var(--d-line-strong),
-    inset 0 1px 0 var(--d-sheen);
-  background: var(--d-panel);
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 10px;
+  background: none;
   color: var(--d-ink);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    transform 0.25s var(--d-ease),
-    box-shadow 0.25s,
-    background-color 0.2s;
+    background-color 0.2s,
+    border-color 0.2s,
+    opacity 0.2s;
 }
 .d-pill:hover {
-  transform: translateY(-2px);
+  border-color: var(--d-faint);
   background: var(--d-sunk);
 }
-.d-pill:active {
-  transform: translateY(0) scale(0.98);
-}
 .d-pill:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   pointer-events: none;
 }
-.d-pill svg {
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 .d-pill-solid {
+  border-color: var(--d-ink);
   background: var(--d-ink);
   color: var(--d-on-ink) !important;
-  box-shadow: 0 14px 34px -14px color-mix(in oklch, var(--d-g2) 80%, transparent);
 }
 .d-pill-solid:hover {
+  border-color: var(--d-ink);
   background: var(--d-ink);
-  box-shadow: 0 20px 44px -14px var(--d-g2);
-}
-.d-pill-brand {
-  height: 38px;
-  padding: 0 14px 0 16px;
-  background: var(--d-hype);
-  color: oklch(0.985 0 0) !important;
-  box-shadow: 0 10px 26px -12px var(--d-hype);
-  font-size: 14px;
-}
-.d-pill-brand:hover {
-  background: var(--d-hype);
+  opacity: 0.86;
 }
 
 /* ---------- search ---------- */
@@ -497,22 +363,27 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 38px;
-  margin-right: 2px;
-  padding: 0 10px 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--d-sunk);
-  color: var(--d-dim);
-  font-size: 14px;
+  width: 230px;
+  height: 34px;
+  margin-right: 4px;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 8px;
+  background: none;
+  color: var(--d-faint);
+  font-size: 13.5px;
   cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 .d-search-button:hover {
+  border-color: var(--d-faint);
   color: var(--d-ink);
 }
 .d-search-button svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -520,33 +391,27 @@ body {
   stroke-linejoin: round;
 }
 .d-search-button span {
-  min-width: 6.5em;
+  flex: 1;
   text-align: left;
 }
 .d-search-button kbd {
   display: grid;
   place-items: center;
-  width: 20px;
+  min-width: 20px;
   height: 20px;
-  border-radius: 6px;
-  background: var(--d-sunk);
-  box-shadow: 0 0 0 1px var(--d-line);
-  font-family: var(--d-mono);
-  font-size: 11.5px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 5px;
+  color: var(--d-dim);
+  font: 11px var(--d-mono);
 }
 .d-search,
 .d-spin {
   padding: 0;
-  border: 0;
-  border-radius: 28px;
-  background: color-mix(in oklch, var(--d-solid) 88%, transparent);
+  border: 1px solid var(--d-line-strong);
+  border-radius: 14px;
+  background: var(--d-solid);
   color: var(--d-ink);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line-strong),
-    inset 0 1px 0 var(--d-sheen),
-    0 50px 120px -30px var(--d-shadow),
-    0 0 90px -30px var(--d-g2);
-  backdrop-filter: blur(26px) saturate(1.4);
+  box-shadow: 0 40px 100px -20px rgb(0 0 0 / 0.7);
 }
 .d-search {
   width: min(92vw, 620px);
@@ -555,17 +420,17 @@ body {
 }
 .d-search::backdrop,
 .d-spin::backdrop {
-  background: color-mix(in oklch, var(--d-page) 62%, transparent);
-  backdrop-filter: blur(6px);
+  background: color-mix(in oklch, var(--d-page) 70%, transparent);
+  backdrop-filter: blur(4px);
 }
 .d-search[open],
 .d-spin[open] {
-  animation: d-pop 0.35s var(--d-ease);
+  animation: d-pop 0.3s var(--d-ease);
 }
 @keyframes d-pop {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.97);
+    transform: translateY(10px) scale(0.98);
   }
 }
 .d-search input::-webkit-search-cancel-button {
@@ -578,19 +443,19 @@ body {
 }
 .d-search input {
   width: 100%;
-  padding: 20px 24px;
+  padding: 18px 20px;
   border: 0;
   border-bottom: 1px solid var(--d-line);
   outline: none;
   background: none;
-  font-size: 17px;
+  font-size: 16px;
 }
 .d-search input::placeholder {
   color: var(--d-faint);
 }
 .d-search ul {
   margin: 0;
-  padding: 8px;
+  padding: 6px;
   overflow-y: auto;
   list-style: none;
 }
@@ -601,22 +466,21 @@ body {
   width: 100%;
   padding: 10px 14px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 8px;
   background: none;
   text-align: left;
   cursor: pointer;
 }
 .d-search li button[aria-current="true"] {
   background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
 }
 .d-search strong {
-  font-weight: 650;
-  letter-spacing: -0.015em;
+  font-weight: 550;
+  letter-spacing: -0.01em;
 }
 .d-search small {
-  color: var(--d-accent);
-  font-size: 12.5px;
+  color: var(--d-faint);
+  font: 12px var(--d-mono);
 }
 .d-search li span {
   grid-column: 1 / -1;
@@ -634,33 +498,29 @@ body {
 /* ---------- the spin: a reel of pages that lands on one ---------- */
 
 .d-spin-button {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  height: 38px;
-  padding: 0 14px 0 11px;
-  border: 0;
-  border-radius: 999px;
-  background:
-    linear-gradient(var(--d-solid), var(--d-solid)) padding-box,
-    linear-gradient(120deg, var(--d-g3), var(--d-g2), var(--d-hot)) border-box;
-  border: 1.5px solid transparent;
+  height: 34px;
+  padding: 0 12px 0 9px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 8px;
+  background: none;
   color: var(--d-ink);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13.5px;
+  font-weight: 500;
   cursor: pointer;
   transition:
-    transform 0.25s var(--d-ease),
-    box-shadow 0.25s;
+    border-color 0.15s,
+    background-color 0.15s;
 }
 .d-spin-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 30px -10px var(--d-g2);
+  border-color: var(--d-faint);
+  background: var(--d-sunk);
 }
 .d-spin-button svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -678,31 +538,31 @@ body {
 }
 .d-spin-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 20px 0 26px;
+  padding: 20px 22px 0;
 }
 .d-spin-head h2 {
-  font-family: var(--d-display);
-  font-size: 1.375rem;
+  font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 .d-spin-head p {
-  color: var(--d-dim);
-  font-size: 14px;
+  color: var(--d-faint);
+  font: 12.5px var(--d-mono);
 }
 .d-reel {
   position: relative;
-  height: 156px;
+  height: 150px;
   margin-top: 18px;
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+  border-block: 1px solid var(--d-line);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
 }
 .d-reel-strip {
   position: absolute;
-  top: 14px;
+  top: 12px;
   left: 50%;
   display: flex;
   gap: 12px;
@@ -717,68 +577,61 @@ body {
   flex-direction: column;
   justify-content: space-between;
   width: 150px;
-  height: 128px;
+  height: 124px;
   padding: 14px;
-  border-radius: 20px;
-  background:
-    radial-gradient(120% 90% at 0% 0%, color-mix(in oklch, var(--tone) 34%, transparent), transparent 62%),
-    var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  border: 1px solid var(--d-line-strong);
+  border-radius: 10px;
+  background: var(--d-page);
   transition:
-    box-shadow 0.4s,
-    transform 0.4s var(--d-ease);
-}
-.d-reel-card[data-kind="chart"] {
-  --tone: var(--d-g3);
-}
-.d-reel-card[data-kind="scene"] {
-  --tone: var(--d-hot);
-}
-.d-reel-card[data-kind="transition"] {
-  --tone: var(--d-g2);
+    border-color 0.4s,
+    background-color 0.4s,
+    color 0.4s;
 }
 .d-reel-card svg {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   fill: none;
-  stroke: var(--tone);
-  stroke-width: 1.9;
+  stroke: var(--d-dim);
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .d-reel-card strong {
   display: block;
   overflow: hidden;
-  font-family: var(--d-display);
-  font-size: 17px;
+  font-size: 15.5px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .d-reel-card small {
   color: var(--d-faint);
-  font-size: 12.5px;
+  font: 11.5px var(--d-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .d-reel-card[data-won] {
-  transform: scale(1.06);
-  box-shadow:
-    inset 0 0 0 1.5px var(--tone),
-    0 18px 50px -18px var(--tone);
+  border-color: var(--d-ink);
+  background: var(--d-ink);
+  color: var(--d-on-ink);
 }
-/* Where the reel stops: a line of light down the middle. */
+.d-reel-card[data-won] svg {
+  stroke: var(--d-on-ink);
+}
+.d-reel-card[data-won] small {
+  color: color-mix(in oklch, var(--d-on-ink) 60%, transparent);
+}
+/* Where the reel stops: one line down the middle. */
 .d-reel-pin {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 2px;
-  margin-left: -1px;
-  border-radius: 2px;
-  background: linear-gradient(transparent, var(--d-accent) 18%, var(--d-accent) 82%, transparent);
-  box-shadow: 0 0 18px 2px var(--d-g2);
-  opacity: 0.9;
+  width: 1px;
+  background: #fff;
+  mix-blend-mode: difference;
 }
 .d-spin-foot {
   display: flex;
@@ -786,8 +639,8 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px 20px;
-  min-height: 86px;
-  padding: 16px 20px 20px 26px;
+  min-height: 84px;
+  padding: 16px 22px 20px;
 }
 .d-spin-won {
   min-width: 0;
@@ -795,8 +648,7 @@ body {
 }
 .d-spin-won strong {
   display: block;
-  font-family: var(--d-display);
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -814,8 +666,8 @@ body {
   gap: 8px;
 }
 .d-spin-actions .d-pill {
-  height: 42px;
-  padding: 0 18px;
+  height: 40px;
+  padding: 0 16px;
   font-size: 14.5px;
 }
 /* The button that opens the page fills up while the reader decides, then opens it by itself. */
@@ -826,7 +678,7 @@ body {
 .d-spin-go i {
   position: absolute;
   inset: 0;
-  background: color-mix(in oklch, var(--d-g2) 45%, transparent);
+  background: color-mix(in oklch, var(--d-on-ink) 22%, transparent);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -846,38 +698,33 @@ body {
 
 .d-docs {
   display: grid;
-  grid-template-columns: 252px minmax(0, 1fr);
-  gap: 14px;
-  max-width: 1432px;
+  grid-template-columns: 232px minmax(0, 1fr);
+  max-width: calc(1352px + var(--d-gutter) * 2);
   margin: 0 auto;
-  padding: 16px 16px 0;
+  padding: 0 var(--d-gutter);
 }
 .d-side-rail {
   position: sticky;
-  top: calc(var(--d-bar) + 12px);
+  top: var(--d-bar);
   align-self: start;
-  max-height: calc(100vh - var(--d-bar) - 24px);
+  max-height: calc(100vh - var(--d-bar));
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 18px 8px 24px 10px;
-  border-radius: var(--d-radius);
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+  padding: 32px 20px 48px 0;
+  border-right: 1px solid var(--d-line);
   scrollbar-width: thin;
   scrollbar-color: var(--d-line-strong) transparent;
 }
 .d-side section + section {
-  margin-top: 22px;
+  margin-top: 26px;
 }
 .d-side h2 {
   margin: 0 0 6px;
-  padding: 0 12px;
-  color: var(--d-faint);
-  font-size: 12.5px;
+  padding: 0 10px;
+  color: var(--d-ink);
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 .d-side ul {
   margin: 0;
@@ -886,52 +733,115 @@ body {
 }
 .d-side a {
   display: block;
-  padding: 6px 12px;
-  border-radius: 12px;
+  padding: 5px 10px;
+  border-radius: 8px;
   color: var(--d-dim);
-  font-size: 14.5px;
-  line-height: 1.4;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
+  font-size: 14px;
+  line-height: 1.45;
+  transition: color 0.15s;
 }
 .d-side a:hover {
-  background: var(--d-sunk);
   color: var(--d-ink);
 }
 .d-side a[aria-current="page"] {
-  background: linear-gradient(
-    100deg,
-    color-mix(in oklch, var(--d-g2) 30%, transparent),
-    color-mix(in oklch, var(--d-g1) 14%, transparent)
-  );
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 42%, transparent);
+  background: var(--d-sunk);
   color: var(--d-ink);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .d-docs-main {
   min-width: 0;
-  padding: clamp(20px, 4vw, 56px);
-  border-radius: var(--d-radius);
-  background: var(--d-panel-strong);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+  padding: 48px 0 0 clamp(20px, 4vw, 64px);
 }
 .d-article-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 48px;
-  max-width: 1040px;
-  margin: 0 auto;
+  gap: 56px;
 }
 .d-article {
   min-width: 0;
   max-width: 780px;
 }
+/* Beside the page: where you are in it, and where the library comes from. Under the page on a narrow screen. */
+.d-rail {
+  display: grid;
+  gap: 28px;
+  max-width: 360px;
+}
 .d-toc {
   display: none;
+}
+
+/* The card that sends a reader on to Hype Stack: the one thing on a docs page that sells. */
+.d-ad {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 14px;
+  background: var(--d-solid);
+  transition: border-color 0.2s;
+}
+.d-ad:hover {
+  border-color: var(--d-faint);
+}
+.d-ad-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 112px;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 90% at 28% 40%, rgb(255 138 30 / 0.34), transparent 70%),
+    radial-gradient(60% 90% at 74% 62%, rgb(48 130 255 / 0.34), transparent 70%), #0b0d14;
+}
+.d-ad-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 55%, var(--d-solid));
+}
+.d-ad-art img {
+  position: relative;
+  z-index: 1;
+  width: 56px;
+  height: 56px;
+  filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.5));
+  transition: transform 0.4s var(--d-ease);
+}
+.d-ad:hover .d-ad-art img {
+  transform: scale(1.08) rotate(-4deg);
+}
+.d-ad-body {
+  display: grid;
+  gap: 8px;
+  padding: 4px 16px 16px;
+}
+.d-ad strong {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.d-ad-text {
+  color: var(--d-dim);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.d-ad-go {
+  display: grid;
+  place-items: center;
+  height: 40px;
+  margin-top: 6px;
+  border-radius: 9px;
+  background: var(--d-ink);
+  color: var(--d-on-ink);
+  font-size: 14px;
+  font-weight: 550;
+}
+.d-ad small {
+  color: var(--d-faint);
+  font-size: 12px;
+  text-align: center;
 }
 
 .d-drawer {
@@ -943,8 +853,8 @@ body {
   position: absolute;
   inset: 0;
   border: 0;
-  background: color-mix(in oklch, var(--d-page) 62%, transparent);
-  backdrop-filter: blur(6px);
+  background: color-mix(in oklch, var(--d-page) 70%, transparent);
+  backdrop-filter: blur(4px);
   cursor: pointer;
 }
 .d-drawer-panel {
@@ -952,16 +862,14 @@ body {
   inset: 0 auto 0 0;
   width: min(320px, 86vw);
   overflow-y: auto;
-  padding: 24px 12px;
-  background: var(--d-solid);
-  box-shadow:
-    inset -1px 0 0 var(--d-line),
-    30px 0 80px -30px var(--d-shadow);
-  animation: d-slide 0.35s var(--d-ease);
+  padding: 24px 14px;
+  border-right: 1px solid var(--d-line-strong);
+  background: var(--d-page);
+  animation: d-slide 0.3s var(--d-ease);
 }
 @keyframes d-slide {
   from {
-    transform: translateX(-24px);
+    transform: translateX(-20px);
     opacity: 0;
   }
 }
@@ -971,16 +879,16 @@ body {
 .d-crumbs ol {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 18px;
+  gap: 8px;
+  margin: 0 0 20px;
   padding: 0;
   list-style: none;
   color: var(--d-faint);
-  font-size: 14px;
+  font: 12.5px var(--d-mono);
 }
 .d-crumbs li + li::before {
   content: "/";
-  margin-right: 6px;
+  margin-right: 8px;
   opacity: 0.6;
 }
 .d-article .d-crumbs a {
@@ -998,54 +906,56 @@ body {
  * library's own headings.
  */
 .d-article > :where(h1, h2, h3),
-.d-plain > :where(h1, h2),
-.d-hero-copy > h1,
-.d-band > h2,
-.d-split > div > h2 {
+.d-plain > :where(h1, h2) {
   margin: 0;
-  font-family: var(--d-display);
   font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.04;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 .d-article > h1,
 .d-plain > h1 {
-  font-size: clamp(2.375rem, 4.4vw, 3.5rem);
+  font-size: clamp(2.25rem, 4.4vw, 3.5rem);
+  letter-spacing: -0.045em;
 }
 .d-lead {
+  max-width: 64ch;
   margin: 18px 0 0;
   color: var(--d-dim);
   font-size: clamp(1.0625rem, 1.3vw, 1.1875rem);
   line-height: 1.55;
+  letter-spacing: -0.01em;
   text-wrap: pretty;
 }
 .d-article > h2 {
-  margin-top: 60px;
-  font-size: clamp(1.5rem, 2.2vw, 1.9375rem);
-  letter-spacing: -0.03em;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--d-line);
+  font-size: clamp(1.5rem, 2.1vw, 1.75rem);
+  letter-spacing: -0.035em;
 }
 .d-article > h2 a:hover::after {
   content: " #";
-  color: var(--d-accent);
+  color: var(--d-faint);
 }
 .d-article > h3 {
   margin-top: 32px;
-  font-size: 1.1875rem;
+  font-size: 1.125rem;
   letter-spacing: -0.02em;
 }
 .d-article > :where(p, ul, ol, dl) {
   margin: 16px 0 0;
   text-wrap: pretty;
 }
-.d-article > p {
-  color: color-mix(in oklch, var(--d-ink) 86%, var(--d-dim));
+.d-article > :where(p:not(.d-lead, .d-meta), ul, ol) {
+  color: color-mix(in oklch, var(--d-ink) 82%, var(--d-page));
 }
 .d-article > :where(ul, ol):not([class]) {
   padding-left: 1.2em;
 }
-.d-article > :where(ul, ol):not([class]) > li::marker {
-  color: var(--d-accent);
+.d-article > :where(ul, ol):not([class]) > li::marker,
+.d-steps > li::marker {
+  color: var(--d-faint);
 }
 .d-article > :where(ul, ol):not([class]) > li + li,
 .d-steps li + li {
@@ -1055,28 +965,29 @@ body {
   padding-left: 1.4em;
 }
 .d-steps > li::marker {
-  color: var(--d-accent);
-  font-family: var(--d-display);
-  font-weight: 600;
+  font-family: var(--d-mono);
+  font-size: 0.875em;
 }
-.d-article > :where(p, ul, ol, dl, aside, .d-table) a {
-  color: var(--d-accent);
-  font-weight: 550;
+.d-article > :where(p, ul, ol, dl, aside, .d-table) a,
+.d-plain > p a:not(.d-pill) {
+  color: var(--d-ink);
+  font-weight: 500;
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklch, currentColor 35%, transparent);
+  text-decoration-color: var(--d-faint);
   text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
 }
-.d-article > :where(p, ul, ol, dl, aside, .d-table) a:hover {
+.d-article > :where(p, ul, ol, dl, aside, .d-table) a:hover,
+.d-plain > p a:not(.d-pill):hover {
   text-decoration-color: currentColor;
 }
 .d-article > :where(p, ul, ol, dl, aside, .d-table) code,
 .d-plain > p code,
-.d-split > div > p code,
-.d-band-head code {
-  padding: 0.14em 0.42em;
-  border-radius: 7px;
+.d-head code {
+  padding: 0.12em 0.4em;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 6px;
   background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
   font-family: var(--d-mono);
   font-size: 0.86em;
   overflow-wrap: anywhere;
@@ -1085,95 +996,80 @@ body {
 .d-note {
   margin-top: 20px;
   padding: 14px 18px;
-  border-radius: 18px;
-  background: linear-gradient(
-    100deg,
-    color-mix(in oklch, var(--d-g2) 16%, transparent),
-    color-mix(in oklch, var(--d-g1) 6%, transparent)
-  );
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 34%, transparent);
+  border: 1px solid var(--d-line-strong);
+  border-radius: 10px;
+  background: var(--d-sunk);
 }
 
 /* ---------- code ---------- */
 
 .d-code {
-  position: relative;
   margin: 20px 0 0;
   overflow: hidden;
-  border-radius: 20px;
+  border: 1px solid var(--d-code-line);
+  border-radius: 12px;
   background: var(--d-code);
   color: var(--d-code-ink);
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.09),
-    0 30px 60px -40px var(--d-shadow);
-}
-/* A hairline of the palette's light along the top edge. */
-.d-code::before {
-  content: "";
-  position: absolute;
-  inset: 0 12% auto;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--d-g3), var(--d-g2), transparent);
-  opacity: 0.7;
 }
 .d-code figcaption {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 8px 0 18px;
-  color: #979ba8;
+  padding: 6px 6px 6px 16px;
+  border-bottom: 1px solid var(--d-code-line);
+  color: #8a8a8a;
   font-family: var(--d-mono);
   font-size: 12.5px;
 }
 .d-code figcaption button {
-  height: 30px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.08);
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--d-code-line);
+  border-radius: 7px;
+  background: none;
   color: inherit;
-  font: 600 12.5px var(--d-font);
+  font: 500 12.5px var(--d-font);
   cursor: pointer;
   transition:
-    background-color 0.15s,
+    border-color 0.15s,
     color 0.15s;
 }
 .d-code figcaption button:hover {
-  background: rgb(255 255 255 / 0.16);
+  border-color: #555;
   color: #fff;
 }
 .d-code pre {
   margin: 0;
-  padding: 10px 18px 18px;
+  padding: 16px 18px 18px;
   overflow-x: auto;
   font-family: var(--d-mono);
-  font-size: 13.5px;
-  line-height: 1.65;
+  font-size: 13px;
+  line-height: 1.7;
   tab-size: 2;
   scrollbar-width: thin;
-  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+  scrollbar-color: #333 transparent;
 }
 .d-code [data-token="comment"] {
-  color: #747986;
+  color: #6f6f6f;
   font-style: italic;
 }
 .d-code [data-token="string"] {
-  color: #9ee6b8;
+  color: #7ee0a0;
 }
 .d-code [data-token="number"] {
-  color: #ffc98a;
+  color: #f5b97a;
 }
 .d-code [data-token="keyword"] {
-  color: #f0a3ff;
+  color: #f08ac2;
 }
 .d-code [data-token="tag"] {
-  color: #ff9cb0;
+  color: #f08ac2;
 }
 .d-code [data-token="call"] {
-  color: #9db8ff;
+  color: #8fb4ff;
 }
 .d-code [data-token="property"] {
-  color: #a8e9f5;
+  color: #b9c4d6;
 }
 
 /* ---------- tables ---------- */
@@ -1181,9 +1077,8 @@ body {
 .d-table {
   margin-top: 20px;
   overflow-x: auto;
-  border-radius: 20px;
-  background: var(--d-panel);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  border: 1px solid var(--d-line);
+  border-radius: 12px;
 }
 .d-table table {
   width: 100%;
@@ -1192,12 +1087,12 @@ body {
   line-height: 1.5;
 }
 .d-table th {
-  padding: 12px 16px;
-  background: var(--d-sunk);
-  color: var(--d-dim);
-  font-size: 13px;
-  font-weight: 600;
+  padding: 11px 16px;
+  color: var(--d-faint);
+  font: 500 12.5px var(--d-mono);
+  letter-spacing: 0.03em;
   text-align: left;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 .d-table td {
@@ -1208,12 +1103,6 @@ body {
 .d-table td:first-child {
   white-space: nowrap;
 }
-.d-table tbody tr {
-  transition: background-color 0.15s;
-}
-.d-table tbody tr:hover {
-  background: var(--d-sunk);
-}
 
 /* ---------- previews ---------- */
 
@@ -1221,7 +1110,7 @@ body {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 .d-fit > * {
   position: absolute;
@@ -1230,36 +1119,27 @@ body {
 .d-preview {
   margin: 28px 0 0;
 }
-/* The plate a stage stands on: the year's grid of dots, and the palette's light coming up from under the stage. */
+/* The plate a stage stands on: black, with the light the stage gives off under it. */
 .d-preview-plate {
   position: relative;
   display: grid;
   place-items: center;
   overflow: hidden;
-  padding: clamp(16px, 4vw, 44px);
-  border-radius: 26px;
-  background:
-    radial-gradient(70% 60% at 50% 108%, color-mix(in oklch, var(--d-g2) 46%, transparent), transparent 72%),
-    radial-gradient(60% 50% at 50% -10%, color-mix(in oklch, var(--d-g1) 26%, transparent), transparent 70%),
-    var(--d-sunk);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+  padding: clamp(16px, 4vw, 48px);
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
+  background: var(--d-page);
 }
 .d-preview-plate::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, var(--d-line-strong) 1px, transparent 0);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(80% 80% at 50% 50%, #000, transparent);
-  opacity: 0.6;
+  inset: 12% 8% -18%;
+  background: radial-gradient(closest-side, var(--d-g2), transparent);
+  opacity: var(--d-glow);
+  pointer-events: none;
 }
 .d-preview-plate > .d-fit {
-  box-shadow:
-    0 40px 80px -36px var(--d-shadow),
-    0 0 0 1px var(--d-line),
-    0 0 90px -30px var(--d-g2);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--d-ink) 9%, transparent);
 }
 .d-preview figcaption {
   display: flex;
@@ -1272,7 +1152,7 @@ body {
 .d-preview figcaption p {
   margin: 0;
   color: var(--d-dim);
-  font-size: 14.5px;
+  font-size: 14px;
 }
 
 .d-look {
@@ -1287,44 +1167,41 @@ body {
   gap: 7px;
 }
 .d-look-swatches button {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border: 0;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.16);
   cursor: pointer;
-  transition: transform 0.25s var(--d-ease);
+  transition: transform 0.2s var(--d-ease);
 }
 .d-look-swatches button:hover {
-  transform: scale(1.18);
+  transform: scale(1.15);
 }
 .d-look-swatches button[aria-pressed="true"] {
   box-shadow:
-    0 0 0 2px var(--d-solid),
-    0 0 0 4px var(--d-ink),
-    0 0 18px 2px currentColor;
+    0 0 0 2px var(--d-page),
+    0 0 0 3.5px var(--d-ink);
 }
 .d-look-chips {
   display: flex;
   gap: 2px;
-  padding: 3px;
-  border-radius: 999px;
-  background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  padding: 2px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 9px;
 }
 .d-look-chips button {
-  height: 28px;
-  padding: 0 11px;
+  height: 26px;
+  padding: 0 10px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 6px;
   background: none;
   color: var(--d-dim);
-  font: 600 13px var(--d-font);
+  font: 500 12.5px var(--d-font);
   cursor: pointer;
   transition:
-    background-color 0.2s,
-    color 0.2s;
+    background-color 0.15s,
+    color 0.15s;
 }
 .d-look-chips button:hover {
   color: var(--d-ink);
@@ -1338,9 +1215,7 @@ body {
 
 .d-cards,
 .d-shelf,
-.d-index,
-.d-related,
-.d-plain-list {
+.d-related {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1360,42 +1235,33 @@ body {
   flex-direction: column;
   gap: 3px;
   height: 100%;
-  padding: 10px 10px 16px;
-  border-radius: 24px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+  padding: 12px 12px 16px;
+  border: 1px solid var(--d-line);
+  border-radius: 14px;
   color: var(--d-ink) !important;
   font-weight: 400 !important;
   text-decoration: none !important;
-  transition:
-    transform 0.35s var(--d-ease),
-    box-shadow 0.35s;
+  transition: border-color 0.2s;
 }
 .d-cards a:hover,
 .d-shelf a:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
-    0 26px 50px -28px var(--d-g2);
+  border-color: var(--d-faint);
 }
 .d-card-stage {
   display: grid;
   place-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .d-cards strong,
 .d-shelf strong {
-  padding: 0 8px;
-  font-family: var(--d-display);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  padding: 0 4px;
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -0.015em;
 }
 .d-cards a > span:not(.d-card-stage),
 .d-shelf a > span {
-  padding: 0 8px;
+  padding: 0 4px;
   color: var(--d-dim);
   font-size: 14px;
   line-height: 1.45;
@@ -1407,7 +1273,7 @@ body {
   margin-top: 20px;
 }
 .d-shelf a > .d-fit {
-  margin: 0 auto 8px;
+  margin: 0 auto 10px;
 }
 
 .d-related {
@@ -1422,64 +1288,50 @@ body {
 .d-related a {
   display: inline-flex;
   align-items: center;
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 999px;
-  background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 8px;
   color: var(--d-ink) !important;
-  font-size: 14.5px;
-  font-weight: 600 !important;
+  font-size: 14px;
+  font-weight: 500 !important;
   text-decoration: none !important;
-  transition:
-    transform 0.25s var(--d-ease),
-    box-shadow 0.25s;
+  transition: border-color 0.2s;
 }
 .d-related a:hover {
-  transform: translateY(-2px);
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 55%, transparent);
+  border-color: var(--d-faint);
 }
 
 .d-pager {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 60px;
+  margin-top: 64px;
 }
 .d-pager a {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 18px 22px;
-  border-radius: 22px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
-  font-family: var(--d-display);
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  transition:
-    transform 0.3s var(--d-ease),
-    box-shadow 0.3s;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--d-line);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 550;
+  letter-spacing: -0.015em;
+  transition: border-color 0.2s;
 }
 .d-pager a[rel="next"] {
   grid-column: 2;
   text-align: right;
 }
 .d-pager a:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
-    0 24px 46px -28px var(--d-g2);
+  border-color: var(--d-faint);
 }
 .d-pager small {
-  color: var(--d-accent);
-  font-family: var(--d-font);
-  font-size: 13px;
-  font-weight: 550;
-  letter-spacing: 0;
+  color: var(--d-faint);
+  font: 12px var(--d-mono);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 .d-meta {
   margin-top: 28px !important;
@@ -1488,18 +1340,11 @@ body {
 }
 
 .d-faq > div {
-  padding: 16px 20px;
-  border-radius: 18px;
-  background: var(--d-panel);
-  box-shadow: inset 0 0 0 1px var(--d-line);
-}
-.d-faq > div + div {
-  margin-top: 10px;
+  padding: 18px 0;
+  border-top: 1px solid var(--d-line);
 }
 .d-faq dt {
-  font-family: var(--d-display);
-  font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 550;
   letter-spacing: -0.015em;
 }
 .d-faq dd {
@@ -1509,168 +1354,148 @@ body {
 
 /* ---------- pages outside the docs ---------- */
 
-.d-plain,
-.d-hero,
-.d-band {
-  max-width: 1400px;
-  margin: 16px auto 0;
-  padding: clamp(24px, 4.5vw, 64px);
-  border-radius: 36px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+main:has(> .d-plain, > .d-home, > .d-example) {
+  padding: 0 var(--d-gutter);
+  /* The light under a stage reaches past it, and on a phone past the page: it is cut at the window's edge. */
+  overflow-x: clip;
 }
-main:has(> .d-plain, > .d-hero, > .d-example) {
-  padding: 0 16px;
+.d-plain {
+  max-width: var(--d-wrap);
+  margin: 0 auto;
+  padding: 72px 0 0;
 }
 .d-plain > p {
   max-width: 62ch;
 }
+.d-plain > p:not(.d-lead) {
+  margin-top: 16px;
+  color: var(--d-dim);
+}
 .d-plain > h2 {
-  margin-top: 64px;
+  margin-top: 72px;
+  padding-top: 32px;
+  border-top: 1px solid var(--d-line);
   font-size: clamp(1.5rem, 2.2vw, 2rem);
 }
 .d-plain > h2 small {
-  color: var(--d-accent);
-  font-size: 1em;
-  font-weight: 600;
+  margin-left: 6px;
+  color: var(--d-faint);
+  font: 500 0.5em var(--d-mono);
+  vertical-align: middle;
 }
 .d-look-row {
   display: inline-flex;
   margin-top: 28px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
 }
-
 .d-example {
-  max-width: 1400px;
-  margin: 12px auto 0;
+  max-width: var(--d-wrap);
+  margin: 40px auto 0;
 }
 main:has(> .d-example) > .d-plain:last-child {
-  margin-top: 12px;
-}
-.d-plain > p a {
-  color: var(--d-accent);
-  font-weight: 550;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  padding-top: 40px;
 }
 
-/* The hero: a dark room with the palette's light rising behind the player. */
+/* ---------- the home page ---------- */
+
+.d-home {
+  max-width: var(--d-wrap);
+  margin: 0 auto;
+}
+
 .d-hero {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-  align-items: center;
-  gap: clamp(24px, 4vw, 64px);
-  overflow: hidden;
-  background:
-    radial-gradient(
-      58% 82% at 78% 112%,
-      color-mix(in oklch, var(--d-g3) 62%, transparent) 0%,
-      color-mix(in oklch, var(--d-g2) 54%, transparent) 26%,
-      color-mix(in oklch, var(--d-g1) 40%, transparent) 50%,
-      transparent 76%
-    ),
-    radial-gradient(40% 50% at 0% 0%, color-mix(in oklch, var(--d-g1) 22%, transparent), transparent 70%),
-    var(--d-panel);
+  padding-top: clamp(48px, 6vw, 80px);
+  text-align: center;
+}
+/* The hero's words arrive one after another, with or without scripts. */
+.d-hero-copy > * {
+  animation: d-rise 0.9s var(--d-ease) both;
+}
+.d-hero-copy > :nth-child(2) {
+  animation-delay: 0.06s;
+}
+.d-hero-copy > :nth-child(3) {
+  animation-delay: 0.12s;
+}
+.d-hero-copy > :nth-child(4) {
+  animation-delay: 0.18s;
+}
+@keyframes d-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
 }
 .d-hero-kicker {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 6px;
-  margin: 0 0 24px;
-  padding: 7px 14px 7px 12px;
-  border-radius: 18px;
-  background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  justify-content: center;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 5px 12px 5px 6px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 999px;
   color: var(--d-dim);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+}
+.d-hero-kicker b {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--d-ink);
+  color: var(--d-on-ink);
+  font-size: 11.5px;
+  font-weight: 600;
 }
 .d-hero-kicker a {
   color: var(--d-ink);
-  font-weight: 650;
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklch, currentColor 30%, transparent);
+  text-decoration-color: var(--d-faint);
   text-underline-offset: 3px;
 }
-.d-dot {
-  width: 8px;
-  height: 8px;
-  margin-right: 2px;
-  border-radius: 999px;
-  background: var(--d-accent);
-  box-shadow: 0 0 0 4px color-mix(in oklch, var(--d-accent) 22%, transparent);
-  animation: d-pulse 2.4s ease-in-out infinite;
-}
-@keyframes d-pulse {
-  50% {
-    box-shadow: 0 0 0 8px color-mix(in oklch, var(--d-accent) 0%, transparent);
-  }
-}
 .d-hero-copy > h1 {
-  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  margin: 24px 0 0;
+  font-size: clamp(2.75rem, 6.6vw, 5.25rem);
   font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 0.96;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+.d-hero-copy > h1 span {
+  display: block;
 }
 .d-hero-lead {
-  max-width: 52ch;
-  margin: 26px 0 0;
+  max-width: 37em;
+  margin: 22px auto 0;
   color: var(--d-dim);
-  font-size: clamp(1.0625rem, 1.35vw, 1.25rem);
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
   line-height: 1.5;
+  letter-spacing: -0.01em;
   text-wrap: pretty;
 }
 .d-hero-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   margin-top: 30px;
-}
-/* The hero's words arrive one after another, with or without scripts. */
-.d-hero-copy > * {
-  animation: d-rise 1s var(--d-ease) both;
-}
-.d-hero-copy > :nth-child(2) {
-  animation-delay: 0.08s;
-}
-.d-hero-copy > :nth-child(3) {
-  animation-delay: 0.16s;
-}
-.d-hero-copy > :nth-child(4) {
-  animation-delay: 0.24s;
-}
-.d-hero-copy > :nth-child(5) {
-  animation-delay: 0.32s;
-}
-@keyframes d-rise {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
 }
 /* The one command, as a line to copy and nothing more. */
 .d-command {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   max-width: 100%;
-  margin-top: 26px;
-  padding: 5px 5px 5px 18px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--d-code);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
-  color: var(--d-code-ink);
-  font-family: var(--d-mono);
-  font-size: 13.5px;
+  height: 44px;
+  padding: 0 14px 0 16px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 10px;
+  background: none;
+  color: var(--d-ink);
+  font: 14px var(--d-mono);
   cursor: pointer;
+  transition: border-color 0.2s;
+}
+.d-command:hover {
+  border-color: var(--d-faint);
 }
 .d-command code {
   overflow: hidden;
@@ -1678,200 +1503,158 @@ main:has(> .d-example) > .d-plain:last-child {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.d-command code::before {
-  content: "$ ";
-  color: var(--d-g3);
-}
 .d-command span {
-  display: grid;
-  place-items: center;
-  height: 32px;
-  padding: 0 13px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.1);
-  font: 600 12.5px var(--d-font);
-  transition: background-color 0.15s;
+  color: var(--d-faint);
+  font: 500 12.5px var(--d-font);
 }
-.d-command:hover span {
-  background: rgb(255 255 255 / 0.2);
-}
-.d-hero-stage {
+
+/*
+ * The fan: the player in the middle, playing the whole sample year, and four scenes beside it in four other
+ * palettes. Each one stands on its own light, and that light is the only colour on the page.
+ */
+.d-fan {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-  min-width: 0;
+  justify-content: center;
+  margin-top: clamp(40px, 5vw, 60px);
 }
-/* The room the player fits its frame into. A fixed height, so the page does not move when the player arrives. */
-.d-hero-player {
+.d-fan-player {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
-  height: clamp(520px, 74vh, 720px);
+  width: min(600px, 100%);
+  height: 600px;
 }
-.d-hero-player > * {
+.d-fan-player > * {
   flex: 1;
 }
-.d-hero-note {
-  position: relative;
-  z-index: 1;
-  margin: 0;
-  color: color-mix(in oklch, var(--d-ink) 70%, transparent);
-  font-size: 13.5px;
-  text-align: center;
-}
-/* Three small stages floating beside the player: the same scenes, playing at the size of a card. */
-.d-float {
+.d-fan-player::before,
+.d-fan-card::before {
+  content: "";
   position: absolute;
-  z-index: 2;
-  overflow: hidden;
-  border-radius: 20px;
-  box-shadow:
-    0 0 0 1px var(--d-line-strong),
-    0 30px 60px -20px var(--d-shadow),
-    0 0 60px -20px var(--d-g2);
+  inset: 4% -34% -8%;
+  z-index: -1;
+  background: radial-gradient(closest-side, var(--glow, var(--d-g2)), transparent);
+  opacity: var(--d-glow);
   pointer-events: none;
-  animation: d-bob 8s ease-in-out infinite alternate;
 }
-.d-float-a {
-  top: 7%;
-  left: -3%;
-  rotate: -8deg;
+.d-fan-player::before {
+  inset: 6% 8% 6%;
 }
-.d-float-b {
-  right: -2%;
-  bottom: 24%;
-  rotate: 7deg;
-  animation-delay: -4s;
+.d-fan-card {
+  position: absolute;
+  top: var(--top);
+  left: 50%;
+  margin-left: var(--x);
+  opacity: var(--o);
+  pointer-events: none;
 }
-.d-float-c {
-  bottom: 15%;
-  left: -7%;
-  rotate: 5deg;
-  animation-delay: -2s;
-  animation-duration: 10s;
-}
-@keyframes d-bob {
-  to {
-    translate: 0 -16px;
-  }
+.d-hero-note {
+  margin: 18px 0 0;
+  color: var(--d-faint);
+  font: 12.5px var(--d-mono);
+  text-align: center;
 }
 
 .d-facts {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  max-width: 1400px;
-  margin: 12px auto 0;
+  margin-top: clamp(56px, 8vw, 96px);
+  border-block: 1px solid var(--d-line);
 }
 .d-facts p {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   margin: 0;
-  padding: clamp(18px, 2.4vw, 30px);
-  border-radius: 28px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+  padding: 34px 20px 34px 28px;
+  border-left: 1px solid var(--d-line);
+}
+.d-facts p:first-child {
+  padding-left: 0;
+  border-left: 0;
 }
 .d-facts strong {
-  align-self: flex-start;
-  font-family: var(--d-display);
-  font-size: clamp(2.5rem, 4.6vw, 3.875rem);
+  font-size: clamp(2.25rem, 3.6vw, 2.875rem);
   font-weight: 600;
   letter-spacing: -0.04em;
-  line-height: 0.9;
-  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 .d-facts p > span {
   color: var(--d-dim);
   font-size: 14.5px;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .d-band {
-  margin-top: 12px;
+  padding-top: clamp(80px, 10vw, 128px);
 }
-.d-band > h2,
-.d-band-head h2,
-.d-split > div > h2,
-.d-promo h2 {
-  margin: 0;
-  font-family: var(--d-display);
-  font-size: clamp(2rem, 3.6vw, 3.125rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-.d-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 16px !important;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
-  color: var(--d-accent) !important;
-  font-size: 13px !important;
-  font-weight: 600;
-}
-.d-band-head {
+.d-head {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: 20px 40px;
+  margin-bottom: 44px;
 }
-.d-band-head > div {
-  max-width: 62ch;
-}
-.d-band-head p,
-.d-split > div > p,
-.d-promo p {
-  max-width: 58ch;
+.d-head h2,
+.d-promo h2 {
   margin: 14px 0 0;
+  font-size: clamp(2rem, 4.2vw, 3.375rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.03;
+}
+.d-head h2 span {
+  display: block;
+}
+.d-head > div > p:not(.d-eyebrow),
+.d-promo p:not(.d-eyebrow) {
+  max-width: 52ch;
+  margin: 16px 0 0;
   color: var(--d-dim);
   font-size: 1.0625rem;
   line-height: 1.55;
+  letter-spacing: -0.005em;
   text-wrap: pretty;
 }
-.d-band-more {
-  display: flex;
-  justify-content: center;
-  margin: 28px 0 0;
+.d-more {
+  color: var(--d-ink);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: opacity 0.15s;
 }
-.d-split {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: center;
-  gap: clamp(24px, 4vw, 64px);
+.d-more:hover {
+  opacity: 0.65;
 }
-.d-split .d-code {
-  margin: 0;
-}
-/* Code on one side, what it plays on the other. */
+
+/* The code, and beside it what the code plays. */
 .d-made {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 14px;
+  gap: clamp(16px, 4vw, 56px);
   min-width: 0;
 }
 .d-made .d-code {
   min-width: 0;
-}
-.d-made .d-code pre {
-  font-size: 12.5px;
+  margin: 0;
 }
 .d-made-player {
+  position: relative;
   display: flex;
-  width: 250px;
-  height: 500px;
+  width: 270px;
+  height: 540px;
+}
+.d-made-player::before {
+  content: "";
+  position: absolute;
+  inset: 4% -30% -4%;
+  z-index: -1;
+  background: radial-gradient(closest-side, var(--d-g2), transparent);
+  opacity: var(--d-glow);
+  pointer-events: none;
 }
 .d-made-player > * {
   flex: 1;
@@ -1881,364 +1664,218 @@ main:has(> .d-example) > .d-plain:last-child {
   display: none;
 }
 
-/* Two rows of live charts that slide past each other as the page is scrolled. */
-.d-rails {
+/* A grid drawn with hairlines: a cell per thing, no boxes. */
+.d-grid {
   display: grid;
-  gap: 12px;
-  margin: 32px calc(clamp(24px, 4.5vw, 64px) * -1) 0;
-  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-}
-.d-rail {
-  display: flex;
-  gap: 12px;
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
   margin: 0;
-  padding: 6px clamp(24px, 4.5vw, 64px);
-  overflow-x: auto;
+  padding: 0;
+  border-top: 1px solid var(--d-line);
+  border-left: 1px solid var(--d-line);
   list-style: none;
-  scrollbar-width: none;
 }
-.d-rail::-webkit-scrollbar {
-  display: none;
+.d-grid > li {
+  border-right: 1px solid var(--d-line);
+  border-bottom: 1px solid var(--d-line);
 }
-.d-rail li {
-  flex: none;
-}
-.d-rail a {
+.d-grid a {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px 10px 14px;
-  border-radius: 24px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
-  transition:
-    transform 0.35s var(--d-ease),
-    box-shadow 0.35s;
+  height: 100%;
+  padding: clamp(14px, 1.8vw, 22px);
 }
-.d-rail a:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
-    0 26px 50px -28px var(--d-g2);
+.d-grid-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
-.d-rail-stage {
-  display: block;
-  overflow: hidden;
-  border-radius: 16px;
+.d-grid-name small {
+  color: var(--d-faint);
+  font: 12.5px var(--d-mono);
 }
-.d-rail strong {
-  padding: 0 8px;
-  font-family: var(--d-display);
-  font-size: 16.5px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+.d-grid-text {
+  margin-top: 6px;
+  color: var(--d-dim);
+  font-size: 14.5px;
+  line-height: 1.5;
 }
 
-/* One stage, and every transition a tap away. */
+/* Every transition a tap away on one side, the stage it plays on on the other. */
 .d-cuts {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  align-items: center;
-  gap: clamp(24px, 4vw, 64px);
-}
-.d-cuts > div:first-child > h2 {
-  margin: 0;
-  font-family: var(--d-display);
-  font-size: clamp(2rem, 3.6vw, 3.125rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-.d-cuts > div:first-child > p {
-  max-width: 54ch;
-  margin: 14px 0 0;
-  color: var(--d-dim);
-  font-size: 1.0625rem;
-  line-height: 1.55;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: clamp(24px, 5vw, 72px);
 }
 .d-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 24px;
 }
 .d-chips button {
-  height: 34px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 8px;
+  background: none;
   color: var(--d-dim);
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition:
-    background-color 0.2s,
-    color 0.2s,
-    box-shadow 0.2s;
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 .d-chips button:hover {
+  border-color: var(--d-faint);
   color: var(--d-ink);
 }
 .d-chips button[aria-pressed="true"] {
-  background: linear-gradient(110deg, var(--d-g2), var(--d-g1));
-  box-shadow: 0 10px 26px -12px var(--d-g2);
-  color: #fff;
+  border-color: var(--d-ink);
+  background: var(--d-ink);
+  color: var(--d-on-ink);
 }
-.d-cuts-stage {
-  display: grid;
-  justify-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-.d-cuts-stage .d-preview-plate {
-  width: 100%;
-}
-.d-cuts-stage p {
+.d-cuts-says {
+  max-width: 46ch;
+  min-height: 6em;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--d-line);
   color: var(--d-dim);
-  font-size: 14.5px;
-  text-align: center;
-  text-wrap: balance;
+  font-size: 15px;
+  line-height: 1.55;
+  text-wrap: pretty;
 }
-.d-cuts-stage p a {
-  color: var(--d-accent);
-  font-weight: 600;
+.d-cuts-says strong {
+  color: var(--d-ink);
+  font-weight: 550;
+}
+.d-cuts-says a {
+  color: var(--d-ink);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--d-faint);
+  text-underline-offset: 3px;
+  white-space: nowrap;
 }
 
-/* The parts, in tiles of different sizes: the first one is the big picture. */
-.d-bento {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.d-bento > li:first-child {
-  grid-column: span 2;
-  grid-row: span 2;
-}
-.d-bento a {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  height: 100%;
-  padding: 10px 10px 18px;
-  border-radius: 26px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
-  transition:
-    transform 0.35s var(--d-ease),
-    box-shadow 0.35s;
-}
-.d-bento a:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--d-g2) 50%, transparent),
-    0 26px 50px -28px var(--d-g2);
-}
-.d-bento .d-card-stage {
-  flex: 1;
-  margin-bottom: 10px;
-}
-/* The big tile gives its stage a plate to stand on, like a preview on a docs page. */
-.d-bento > li:first-child .d-card-stage {
-  padding: clamp(14px, 2.4vw, 32px);
-  border-radius: 18px;
-  background:
-    radial-gradient(70% 60% at 50% 108%, color-mix(in oklch, var(--d-g2) 44%, transparent), transparent 72%),
-    var(--d-sunk);
-  box-shadow: inset 0 0 0 1px var(--d-line);
-}
-.d-bento > li:first-child .d-fit {
-  box-shadow:
-    0 30px 60px -30px var(--d-shadow),
-    0 0 80px -30px var(--d-g2);
-}
-.d-bento strong {
-  padding: 0 10px;
-  font-family: var(--d-display);
-  font-size: 1.1875rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-.d-bento > li:first-child strong {
-  font-size: 1.5rem;
-}
-.d-bento a > span:not(.d-card-stage) {
-  padding: 0 10px;
-  color: var(--d-dim);
-  font-size: 14.5px;
-  line-height: 1.45;
-}
-
-/* The palettes, as the one control that repaints the whole site. */
+/* The palettes, in one row under the parts. */
 .d-wear {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 20px 40px;
-  margin-top: 12px;
-  padding: clamp(20px, 3vw, 34px);
-  border-radius: 26px;
-  background:
-    linear-gradient(
-      100deg,
-      color-mix(in oklch, var(--d-g1) 30%, transparent),
-      color-mix(in oklch, var(--d-g2) 16%, transparent) 55%,
-      color-mix(in oklch, var(--d-hot) 14%, transparent)
-    ),
-    var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line-strong),
-    inset 0 1px 0 var(--d-sheen);
-}
-.d-wear h3 {
-  font-family: var(--d-display);
-  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  gap: 16px 40px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--d-line);
 }
 .d-wear p {
-  max-width: 46ch;
-  margin-top: 6px;
   color: var(--d-dim);
   font-size: 15px;
 }
+.d-wear p strong {
+  color: var(--d-ink);
+  font-weight: 550;
+}
 .d-wear p a {
-  color: var(--d-accent);
-  font-weight: 600;
-  white-space: nowrap;
+  color: var(--d-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--d-faint);
+  text-underline-offset: 3px;
 }
 .d-wear .d-look-swatches {
   gap: 10px;
 }
 .d-wear .d-look-swatches button {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 }
 
 .d-packages {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 40px;
-  margin: 28px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 .d-packages li {
   display: grid;
-  grid-template-columns: minmax(0, 13.5em) minmax(0, 1fr);
-  gap: 4px 16px;
-  padding: 12px 0;
-  border-top: 1px solid var(--d-line);
-  font-size: 14.5px;
+  grid-template-columns: minmax(0, 17em) minmax(0, 1fr);
+  gap: 4px 24px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--d-line);
+  font-size: 15px;
 }
 .d-packages code {
-  color: var(--d-accent);
-  font-family: var(--d-mono);
-  font-size: 13px;
-  font-weight: 600;
+  font: 500 13.5px var(--d-mono);
 }
 .d-packages span {
   color: var(--d-dim);
 }
 
-/* The one place the site sells something: where the library runs for real. In Hype Stack's own colour. */
+/* The one place the home page sells something: where the library runs for real. */
 .d-promo {
-  position: relative;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 24px 48px;
-  max-width: 1400px;
-  margin: 12px auto 0;
-  padding: clamp(28px, 5vw, 72px);
-  overflow: hidden;
-  border-radius: 36px;
-  background:
-    radial-gradient(
-      70% 140% at 100% 100%,
-      color-mix(in oklch, var(--d-hype) 62%, transparent),
-      color-mix(in oklch, var(--d-hot) 22%, transparent) 42%,
-      transparent 72%
-    ),
-    radial-gradient(50% 90% at 0% 0%, color-mix(in oklch, var(--d-g1) 30%, transparent), transparent 70%),
-    var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line-strong),
-    inset 0 1px 0 var(--d-sheen);
+  gap: 28px 48px;
+  margin-top: clamp(80px, 10vw, 128px);
+  padding: clamp(28px, 5vw, 64px);
+  border: 1px solid var(--d-line-strong);
+  border-radius: 16px;
 }
 .d-promo > div:first-child {
   max-width: 60ch;
-}
-.d-promo p {
-  color: color-mix(in oklch, var(--d-ink) 78%, transparent);
 }
 .d-promo-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-.d-pill-hype {
-  background: var(--d-ink);
-  color: var(--d-on-ink) !important;
-  box-shadow: 0 18px 40px -16px var(--d-hype);
-}
-.d-pill-hype:hover {
-  background: var(--d-ink);
-}
 
 /* ---------- footer ---------- */
 
 .d-foot {
-  padding: 12px 16px 28px;
+  margin-top: clamp(80px, 10vw, 128px);
+  padding: 0 var(--d-gutter);
+  border-top: 1px solid var(--d-line);
 }
 .d-foot-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
-  gap: 28px 32px;
-  max-width: 1400px;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  max-width: var(--d-wrap);
   margin: 0 auto;
-  padding: clamp(24px, 4vw, 48px);
-  border-radius: 36px;
-  background: var(--d-panel);
-  box-shadow:
-    inset 0 0 0 1px var(--d-line),
-    inset 0 1px 0 var(--d-sheen);
+  padding: 56px 0 32px;
   color: var(--d-dim);
-  font-size: 14.5px;
+  font-size: 14px;
 }
 .d-foot-about .d-brand {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   color: var(--d-ink);
 }
 .d-foot p {
-  max-width: 40ch;
+  max-width: 38ch;
   margin: 0;
 }
 .d-foot p a {
   color: var(--d-ink);
-  font-weight: 600;
 }
 .d-foot nav h2 {
-  margin: 0 0 10px;
-  color: var(--d-ink);
-  font-size: 13.5px;
-  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--d-faint);
+  font: 500 12px var(--d-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .d-foot nav ul {
   display: grid;
-  gap: 7px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2251,67 +1888,80 @@ main:has(> .d-example) > .d-plain:last-child {
 }
 .d-foot-legal {
   grid-column: 1 / -1;
-  padding-top: 20px;
+  max-width: none !important;
+  padding-top: 24px;
   border-top: 1px solid var(--d-line);
   color: var(--d-faint);
-  font-size: 13.5px;
+  font: 12.5px var(--d-mono);
 }
 
 /* ---------- wider and narrower ---------- */
 
 @media (min-width: 1240px) {
   .d-article-grid {
-    grid-template-columns: minmax(0, 1fr) 200px;
+    grid-template-columns: minmax(0, 780px) 232px;
+    justify-content: space-between;
+  }
+  .d-rail {
+    position: sticky;
+    top: calc(var(--d-bar) + 48px);
+    align-self: start;
+    max-height: calc(100vh - var(--d-bar) - 72px);
+    overflow-y: auto;
+    scrollbar-width: none;
   }
   .d-toc {
     display: block;
-    position: sticky;
-    top: calc(var(--d-bar) + 28px);
-    align-self: start;
-    font-size: 14px;
+    font-size: 13.5px;
   }
   .d-toc h2 {
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     color: var(--d-faint);
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    font: 500 12px var(--d-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .d-toc ul {
+    display: grid;
+    gap: 8px;
     margin: 0;
     padding: 0;
-    border-left: 1px solid var(--d-line);
     list-style: none;
   }
   .d-toc a {
     display: block;
-    margin-left: -1px;
-    padding: 4px 0 4px 14px;
-    border-left: 1px solid transparent;
     color: var(--d-dim);
-    transition:
-      color 0.2s,
-      border-color 0.2s;
+    line-height: 1.4;
+    transition: color 0.2s;
   }
-  .d-toc a:hover {
-    color: var(--d-ink);
-  }
+  .d-toc a:hover,
   .d-toc a[aria-current="location"] {
-    border-left-color: var(--d-accent);
-    color: var(--d-accent);
-    font-weight: 600;
+    color: var(--d-ink);
   }
 }
 
-@media (max-width: 1180px) {
-  .d-float {
+@media (max-width: 1320px) {
+  .d-fan-far {
     display: none;
   }
+}
+
+@media (max-width: 1080px) {
   .d-made {
     grid-template-columns: minmax(0, 1fr);
   }
   .d-made-player {
     justify-self: center;
+  }
+  .d-search-button {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+    border: 0;
+  }
+  .d-search-button span,
+  .d-search-button kbd {
+    display: none;
   }
 }
 
@@ -2322,45 +1972,44 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-side-rail {
     display: none;
   }
+  .d-docs-main {
+    padding-left: 0;
+  }
   .d-menu-button {
     display: inline-grid;
   }
-  .d-bar-wide {
-    display: none;
-  }
-  .d-search-button span,
-  .d-search-button kbd,
+  .d-bar-wide,
   .d-spin-button span {
     display: none;
   }
-  .d-search-button,
   .d-spin-button {
-    width: 38px;
+    width: 34px;
     padding: 0;
     justify-content: center;
   }
-  .d-search-button {
-    background: none;
+  .d-fan-card {
+    display: none;
   }
-  .d-bar-end {
-    gap: 2px;
+  .d-fan-player {
+    height: clamp(480px, 72vh, 600px);
   }
-  .d-hero,
-  .d-split,
   .d-cuts {
     grid-template-columns: minmax(0, 1fr);
   }
   .d-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-bottom: 0;
   }
-  .d-bento {
+  .d-facts p {
+    padding: 26px 16px 26px 20px;
+    border-bottom: 1px solid var(--d-line);
+  }
+  .d-facts p:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .d-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .d-packages {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .d-hero-player {
-    height: clamp(480px, 70vh, 620px);
   }
   .d-foot-inner {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2371,44 +2020,36 @@ main:has(> .d-example) > .d-plain:last-child {
 }
 
 @media (max-width: 560px) {
+  :root {
+    --d-gutter: 16px;
+  }
   .d-bar nav {
     display: none;
   }
-  /* On a phone the mark stands for the name: the bar has six things to hold. */
+  /* On a phone the mark stands for the name: the bar has five things to hold. */
   .d-brand {
     margin-right: 0;
   }
   .d-bar .d-brand span {
     display: none;
   }
-  .d-bar-inner {
-    padding-left: 12px;
-  }
   .d-bar-end > a.d-icon-button {
     display: none;
   }
-  /* On a phone the bar holds six things. The link to Hype Stack keeps its words and gives up its arrow. */
-  .d-pill-brand {
-    padding: 0 12px;
-  }
-  .d-pill-brand svg {
-    display: none;
+  .d-bar-end {
+    gap: 2px;
   }
   .d-pager {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .d-packages li {
     grid-template-columns: minmax(0, 1fr);
   }
   .d-pager a[rel="next"] {
     grid-column: 1;
   }
-  .d-bento {
+  .d-packages li {
     grid-template-columns: minmax(0, 1fr);
   }
-  .d-bento > li:first-child {
-    grid-column: auto;
-    grid-row: auto;
+  .d-grid.d-grid-stack {
+    grid-template-columns: minmax(0, 1fr);
   }
   .d-foot-inner {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2425,11 +2066,8 @@ main:has(> .d-example) > .d-plain:last-child {
   * {
     transition: none !important;
   }
-  /* The site's own loops stand still. The library's stages keep theirs: playing is what they are for. */
-  .d-aurora i,
+  /* The site's own entrances stand still. The library's stages keep theirs: playing is what they are for. */
   .d-hero-copy > *,
-  .d-float,
-  .d-dot,
   .d-search[open],
   .d-spin[open],
   .d-drawer-panel {

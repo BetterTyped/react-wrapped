@@ -3,7 +3,7 @@
  * to a domain of its own is a change to `origin` and `base` and nothing else.
  */
 
-type Campaign = "docs-navbar" | "docs-footer" | "docs-home" | "docs-page";
+type Campaign = "docs-sidebar" | "docs-footer" | "docs-home" | "docs-page";
 
 export const SITE = {
   /** The package scope and the repository, as people type it. */
@@ -27,7 +27,7 @@ export const SITE = {
 
 /** A link to Hype Stack that says which part of this site sent the visitor. */
 export const hypeStack = (campaign: Campaign, path = "/") =>
-  `https://www.hype-stack.dev${path}?utm_source=react-wrapped&utm_medium=referral&utm_campaign=${campaign}`;
+  `https://www.hype-stack.dev${path}?ref=react-wrapped&utm_source=react-wrapped&utm_medium=referral&utm_campaign=${campaign}`;
 
 /** The full address of a page, from its path on the site ("/docs/charts/spark/"). */
 export const absoluteUrl = (path: string) => `${SITE.origin}${SITE.base}${path.replace(/^\/+/, "")}`;

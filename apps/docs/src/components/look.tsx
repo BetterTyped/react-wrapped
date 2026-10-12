@@ -96,10 +96,7 @@ export function PaletteSwatches() {
           aria-label={palette.label}
           aria-pressed={look.palette === id}
           onClick={() => setLook({ ...look, palette: id })}
-          style={{
-            background: `linear-gradient(140deg, ${palette.levels[4]}, ${palette.levels[3]})`,
-            color: palette.levels[3],
-          }}
+          style={{ background: palette.levels[3] }}
         />
       ))}
     </div>

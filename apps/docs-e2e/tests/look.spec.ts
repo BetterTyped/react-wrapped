@@ -168,8 +168,9 @@ test.describe("the bar", () => {
     expect(await light()).toBe(picked);
   });
 
-  test("Spin runs the reel and opens the page it lands on", async ({ page }) => {
-    // Arrange
+  test("Spin lands on a page and opens it when asked", async ({ page }) => {
+    // Arrange: with less motion asked for, the reel shows its pick at once and waits for the reader.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(at("/docs/"));
     await hydrated(page, ".d-bar");
 
@@ -201,15 +202,18 @@ test.describe("the bar", () => {
     await expect(page).toHaveURL(/\/docs\/(charts|scenes|transitions)\/[a-z-]+\/$/, { timeout: 15_000 });
   });
 
-  test("the Hype Stack link says where the visitor came from", async ({ page }) => {
+  test("the Hype Stack card beside a docs page says where the visitor came from", async ({ page }) => {
     // Act
-    await page.goto(at("/"));
-    const link = page.locator("header").getByRole("link", { name: "Hype Stack" });
+    await page.goto(at("/docs/"));
+    const card = page.getByRole("link", { name: /Build your SaaS on Hype Stack/ });
 
-    // Assert
-    await expect(link).toHaveCount(1);
-    const href = (await link.getAttribute("href")) ?? "";
+    // Assert: one card, and no link to Hype Stack left in the bar.
+    await expect(card).toHaveCount(1);
+    await expect(page.locator("header").getByRole("link", { name: /Hype Stack/ })).toHaveCount(0);
+    const href = (await card.getAttribute("href")) ?? "";
     expect(href.startsWith("https://www.hype-stack.dev/"), `href is ${href}`).toBe(true);
+    expect(href).toContain("ref=react-wrapped");
     expect(href).toContain("utm_source=react-wrapped");
+    expect(href).toContain("utm_campaign=docs-sidebar");
   });
 });

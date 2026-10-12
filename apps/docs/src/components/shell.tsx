@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { type ReactNode, useEffect, useId, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { SECTIONS } from "../registry/pages";
 import { hypeStack, SITE } from "../site";
@@ -60,32 +60,19 @@ function ThemeToggle() {
   );
 }
 
-/**
- * The mark: a W drawn the way the library draws a chart, a glowing line that ends on its lit point, on a piece of
- * the stage. It is drawn in the palette the reader picked, like the rest of the site. Each one on a page needs its
- * own gradient id, so the id is made here.
- */
+/** The mark: a W on a white tile. One colour, like the rest of the site. */
 export function Mark({ className = "d-mark" }: { className?: string }) {
-  const light = useId();
   return (
-    <svg className={className} viewBox="0 0 64 64" aria-hidden>
-      <defs>
-        <radialGradient id={light} cx="0.2" cy="0.05" r="0.95">
-          <stop offset="0" stopOpacity="0.9" style={{ stopColor: "var(--d-g1)" }} />
-          <stop offset="0.65" stopOpacity="0" style={{ stopColor: "var(--d-g1)" }} />
-        </radialGradient>
-      </defs>
-      <rect width="64" height="64" rx="15" fill="#090a0e" />
-      <rect width="64" height="64" rx="15" fill={`url(#${light})`} />
+    <svg className={className} viewBox="0 0 24 24" aria-hidden>
+      <rect width="24" height="24" rx="6.5" style={{ fill: "var(--d-ink)" }} />
       <path
-        d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5"
+        d="M5.5 8 9 16.5 12 9.5 15 16.5 18.5 8"
         fill="none"
-        strokeWidth="6.6"
+        strokeWidth="2.3"
         strokeLinecap="round"
         strokeLinejoin="round"
-        style={{ stroke: "var(--d-g3)" }}
+        style={{ stroke: "var(--d-on-ink)" }}
       />
-      <circle cx="52.5" cy="19.5" r="7.2" stroke="#090a0e" strokeWidth="2.6" style={{ fill: "var(--d-hot)" }} />
     </svg>
   );
 }
@@ -110,9 +97,7 @@ function Navbar({ onMenu }: { onMenu: () => void }) {
         </button>
         <SiteLink path="/" className="d-brand" aria-label={`${SITE.title} home`}>
           <Mark />
-          <span>
-            react<b>-</b>wrapped
-          </span>
+          <span>react-wrapped</span>
         </SiteLink>
         <nav aria-label="Site">
           <SiteLink path="/docs/" aria-current={section === "docs" ? "page" : undefined}>
@@ -151,12 +136,6 @@ function Navbar({ onMenu }: { onMenu: () => void }) {
             </svg>
           </a>
           <ThemeToggle />
-          <a className="d-pill d-pill-brand" href={hypeStack("docs-navbar")} target="_blank" rel="noopener">
-            Hype Stack
-            <svg viewBox="0 0 24 24" aria-hidden>
-              <path d="M7 17 17 7M9 7h8v8" />
-            </svg>
-          </a>
         </div>
       </div>
     </header>
@@ -206,9 +185,7 @@ function Footer() {
         <div className="d-foot-about">
           <SiteLink path="/" className="d-brand" aria-label={`${SITE.title} home`}>
             <Mark />
-            <span>
-              react<b>-</b>wrapped
-            </span>
+            <span>react-wrapped</span>
           </SiteLink>
           <p>
             A free tool from{" "}
@@ -294,13 +271,6 @@ function Chrome({ children }: { children: ReactNode }) {
   }, [open]);
   return (
     <>
-      {/* The lights behind every page, in the palette the reader picked. */}
-      <div className="d-aurora" aria-hidden>
-        <i />
-        <i />
-        <i />
-        <b />
-      </div>
       <a className="d-skip" href="#content">
         Skip to content
       </a>

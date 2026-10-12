@@ -73,26 +73,3 @@ export function CountUp({ value }: { value: number }) {
   }, [value]);
   return <span ref={ref}>{shown}</span>;
 }
-
-/**
- * Slides a row sideways as the page is scrolled, by a share of how far the page moved. The row stays an ordinary
- * scrolling row: it can be dragged, tabbed through and read without scripts, and this only nudges it.
- */
-export function useScrollDrift(direction: 1 | -1) {
-  const ref = useRef<HTMLUListElement>(null);
-  useEffect(() => {
-    const row = ref.current;
-    if (!row || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // The row that runs backwards starts from its far end, so it has somewhere to go.
-    if (direction === -1) row.scrollLeft = row.scrollWidth;
-    let last = window.scrollY;
-    const onScroll = () => {
-      const now = window.scrollY;
-      row.scrollLeft += (now - last) * 0.45 * direction;
-      last = now;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [direction]);
-  return ref;
-}

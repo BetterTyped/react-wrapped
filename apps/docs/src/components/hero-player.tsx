@@ -28,7 +28,7 @@ export function HeroPlayer() {
     return () => cancelAnimationFrame(id);
   }, []);
   return (
-    <div className="d-hero-player">
+    <div className="d-fan-player">
       {ready ? (
         <WrappedPlayer subject={cut.subject} seed={cut.seed} scenes={cut.scenes} config={config} autoplay />
       ) : null}
