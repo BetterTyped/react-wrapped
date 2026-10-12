@@ -12,7 +12,7 @@ const NAME = "Build your SaaS on Hype Stack";
 const POINTS = ["Full-stack TypeScript", "Copy, paste, customize", "Save 100+ hours of development"] as const;
 
 /**
- * What both cards hold. The picture and the words are Hype Stack's own pitch; the layout is the one its first
+ * What both cards hold. The picture is apps built on Hype Stack and the words are its own pitch; the layout is the one its first
  * sidebar offer had: a small lit label, a headline that ends on the name in its colour, one line of why, three
  * short points, the price, and a button the full width of the card.
  */
@@ -20,7 +20,7 @@ function Pitch() {
   return (
     <>
       <span className="d-ad-art" aria-hidden>
-        <img src={`${SITE.base}hype-stack.png`} alt="" width={56} height={56} loading="lazy" />
+        <img src={`${SITE.base}hype-stack-apps.jpg`} alt="" width={720} height={400} loading="lazy" />
       </span>
       <span className="d-ad-label">
         <svg viewBox="0 0 24 24" aria-hidden>

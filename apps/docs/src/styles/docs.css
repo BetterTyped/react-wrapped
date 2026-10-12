@@ -774,18 +774,19 @@ body {
 }
 
 /*
- * The card that sends a reader on to Hype Stack: the one thing on a page that sells. It is laid out the way Hype
- * Stack's first sidebar offer was: a small lit label, a headline that ends on the name in its colour, one line of
- * why, three short points, the price, and a button the full width of the card.
+ * The card that sends a reader on to Hype Stack: the one thing on a page that sells. Its picture is three apps
+ * built on Hype Stack, framed like a print. Under it the layout is the one Hype Stack's first sidebar offer had: a
+ * small lit label, a headline that ends on the name in its colour, one line of why, three short points, the
+ * price, and a button the full width of the card.
  */
 .d-ad {
   --hs: oklch(0.68 0.2 50);
   display: grid;
-  padding: 20px;
+  padding: 8px 8px 16px;
   border: 1px solid var(--d-line-strong);
-  border-radius: 14px;
+  border-radius: 18px;
   background: var(--d-solid);
-  box-shadow: 0 26px 60px -34px color-mix(in oklch, var(--hs) 70%, transparent);
+  box-shadow: 0 26px 60px -34px color-mix(in oklch, var(--hs) 75%, transparent);
   color: var(--d-ink);
   transition:
     border-color 0.25s,
@@ -794,62 +795,62 @@ body {
 }
 .d-ad:hover {
   border-color: color-mix(in oklch, var(--hs) 60%, var(--d-line-strong));
-  box-shadow: 0 30px 64px -30px color-mix(in oklch, var(--hs) 85%, transparent);
+  box-shadow: 0 30px 64px -30px color-mix(in oklch, var(--hs) 90%, transparent);
   transform: translateY(-2px);
 }
-/* The picture: Hype Stack's mark on its two colours, fading down into the card. */
+.d-ad > :not(.d-ad-art) {
+  margin-inline: 10px;
+}
+/* The picture, in a frame of its own inside the card: it keeps its edges on a dark page and on a light one. */
 .d-ad-art {
   position: relative;
-  display: grid;
-  place-items: center;
-  height: 104px;
-  margin: -20px -20px 16px;
+  display: block;
+  aspect-ratio: 9 / 5;
+  margin-bottom: 16px;
   overflow: hidden;
-  border-radius: 13px 13px 0 0;
-  background:
-    radial-gradient(60% 90% at 28% 40%, rgb(255 138 30 / 0.4), transparent 70%),
-    radial-gradient(60% 90% at 74% 62%, rgb(48 130 255 / 0.38), transparent 70%), #0b0d14;
+  border-radius: 11px;
+  background: #0a0c13;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
 }
 .d-ad-art::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(transparent 55%, var(--d-solid));
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
 }
 .d-ad-art img {
-  position: relative;
-  z-index: 1;
-  width: 56px;
-  height: 56px;
-  filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.5));
-  transition: transform 0.4s var(--d-ease);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.9s var(--d-ease);
 }
 .d-ad:hover .d-ad-art img {
-  transform: scale(1.08) rotate(-4deg);
+  transform: scale(1.07);
 }
 .d-ad-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   color: var(--hs);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .d-ad-label svg,
 .d-ad-points svg {
   flex: none;
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   fill: var(--hs);
 }
 .d-ad strong {
-  margin-top: 12px;
+  margin-top: 10px;
   font-size: 1.125rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.25;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 .d-ad strong b {
   display: block;
@@ -864,10 +865,12 @@ body {
 }
 .d-ad-points {
   display: grid;
-  gap: 8px;
-  margin-top: 16px;
-  color: var(--d-dim);
-  font-size: 13.5px;
+  gap: 7px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--d-line);
+  color: color-mix(in oklch, var(--d-ink) 78%, var(--d-page));
+  font-size: 13px;
   line-height: 1.35;
 }
 .d-ad-points > span {
@@ -879,16 +882,17 @@ body {
   margin-top: 2px;
 }
 .d-ad-price {
-  margin-top: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 16px;
   color: var(--d-dim);
-  font-size: 13.5px;
-  text-align: center;
+  font-size: 13px;
 }
 .d-ad-price b {
-  margin-right: 4px;
   color: var(--d-ink);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.375rem;
+  font-weight: 650;
   letter-spacing: -0.03em;
 }
 .d-ad-go {
@@ -897,16 +901,20 @@ body {
   justify-content: center;
   gap: 6px;
   height: 42px;
-  margin-top: 16px;
-  border-radius: 9px;
-  background: var(--hs);
+  margin-top: 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, color-mix(in oklch, var(--hs) 88%, #fff), var(--hs));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    0 10px 22px -10px var(--hs);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.14);
   transition: filter 0.2s;
 }
 .d-ad:hover .d-ad-go {
-  filter: brightness(1.08);
+  filter: brightness(1.07);
 }
 .d-ad-go i {
   font-style: normal;
@@ -921,6 +929,15 @@ body {
   font-size: 12px;
   text-align: center;
 }
+.d-float .d-ad small {
+  display: none;
+}
+/* On a short window the three points step aside, so the card and the page's headings both stay in sight. */
+@media (max-height: 800px) {
+  .d-rail .d-ad-points {
+    display: none;
+  }
+}
 
 /*
  * The same card in the corner of the window, on every page that has no column for it: the home page, the designs,
@@ -932,7 +949,7 @@ body {
   bottom: 20px;
   z-index: 30;
   width: 280px;
-  border-radius: 14px;
+  border-radius: 18px;
   box-shadow: 0 30px 70px -20px rgb(0 0 0 / 0.75);
   animation: d-float-in 0.7s var(--d-ease) 0.5s both;
 }
@@ -942,12 +959,8 @@ body {
     transform: translateY(24px);
   }
 }
-.d-float .d-ad-points,
-.d-float .d-ad small {
+.d-float .d-ad-points {
   display: none;
-}
-.d-float .d-ad-art {
-  height: 84px;
 }
 .d-float-close {
   position: absolute;
