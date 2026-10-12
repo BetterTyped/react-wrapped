@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useState } from "react";
 
 import { SECTIONS } from "../registry/pages";
 import { hypeStack, SITE } from "../site";
+import { HypeStackFloat } from "./hype-card";
 import { LIGHT_PROPERTIES, LOOK_KEY, PALETTE_LIGHTS } from "./look";
 import { useSiteMotion } from "./motion";
 import { Search } from "./search";
@@ -285,6 +286,7 @@ function Chrome({ children }: { children: ReactNode }) {
         </div>
       ) : null}
       <Footer />
+      <HypeStackFloat />
     </>
   );
 }

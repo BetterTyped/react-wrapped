@@ -157,7 +157,7 @@ body {
   top: 12px;
 }
 
-:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-home, .d-rail, .d-drawer, .d-spin) a {
+:where(.d-bar, .d-side, .d-foot, .d-article, .d-plain, .d-home, .d-rail, .d-float, .d-drawer, .d-spin) a {
   color: inherit;
   text-decoration: none;
 }
@@ -762,11 +762,12 @@ body {
   min-width: 0;
   max-width: 780px;
 }
-/* Beside the page: where you are in it, and where the library comes from. Under the page on a narrow screen. */
+/*
+ * Beside the page on a wide screen: where you are in it, and where the library comes from. On a narrower one the
+ * column goes, and the card moves to the corner of the window.
+ */
 .d-rail {
-  display: grid;
-  gap: 28px;
-  max-width: 360px;
+  display: none;
 }
 .d-toc {
   display: none;
@@ -842,6 +843,63 @@ body {
   color: var(--d-faint);
   font-size: 12px;
   text-align: center;
+}
+
+/*
+ * The same card in the corner of the window, on every page that has no column for it: the home page, the designs,
+ * the examples, and a docs page on a screen too narrow to keep the column beside the text.
+ */
+.d-float {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 30;
+  width: 288px;
+  border-radius: 14px;
+  box-shadow:
+    0 30px 70px -20px rgb(0 0 0 / 0.75),
+    0 0 60px -24px rgb(255 138 30 / 0.55);
+  animation: d-float-in 0.7s var(--d-ease) 0.5s both;
+}
+@keyframes d-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+.d-float .d-ad {
+  border-color: var(--d-faint);
+}
+.d-float .d-ad-art {
+  height: 88px;
+}
+.d-float-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.d-float-close:hover {
+  background: rgb(0 0 0 / 0.8);
+}
+.d-float-close svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
 }
 
 .d-drawer {
@@ -1902,17 +1960,29 @@ main:has(> .d-example) > .d-plain:last-child {
     grid-template-columns: minmax(0, 780px) 232px;
     justify-content: space-between;
   }
+  /* The card is always in sight: a long list of headings scrolls by itself above it. */
   .d-rail {
     position: sticky;
     top: calc(var(--d-bar) + 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
     align-self: start;
     max-height: calc(100vh - var(--d-bar) - 72px);
-    overflow-y: auto;
-    scrollbar-width: none;
+  }
+  .d-rail .d-ad {
+    flex: none;
   }
   .d-toc {
     display: block;
+    min-height: 0;
+    overflow-y: auto;
     font-size: 13.5px;
+    scrollbar-width: none;
+  }
+  /* Beside a docs page the card is in the column, so the one in the corner steps aside. */
+  body:has(.d-rail) .d-float {
+    display: none;
   }
   .d-toc h2 {
     margin: 0 0 12px;
@@ -2060,6 +2130,41 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-reel-card {
     width: 128px;
   }
+  /* On a phone the card is a strip along the bottom: the mark, the headline and the way in. */
+  .d-float {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    width: auto;
+  }
+  .d-float .d-ad {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .d-float .d-ad-art {
+    height: auto;
+  }
+  .d-float .d-ad-art::after {
+    display: none;
+  }
+  .d-float .d-ad-art img {
+    width: 38px;
+    height: 38px;
+  }
+  .d-float .d-ad-body {
+    padding: 12px 40px 12px 12px;
+  }
+  .d-float .d-ad-text,
+  .d-float .d-ad-go {
+    display: none;
+  }
+  .d-float .d-ad strong::after {
+    content: " →";
+  }
+  .d-foot-inner {
+    padding-bottom: 96px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2068,6 +2173,7 @@ main:has(> .d-example) > .d-plain:last-child {
   }
   /* The site's own entrances stand still. The library's stages keep theirs: playing is what they are for. */
   .d-hero-copy > *,
+  .d-float,
   .d-search[open],
   .d-spin[open],
   .d-drawer-panel {

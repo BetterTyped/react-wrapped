@@ -216,4 +216,29 @@ test.describe("the bar", () => {
     expect(href).toContain("utm_source=react-wrapped");
     expect(href).toContain("utm_campaign=docs-sidebar");
   });
+
+  test("away from the docs the Hype Stack card sits in the corner, and can be closed for the visit", async ({
+    page,
+  }) => {
+    // Arrange
+    await page.goto(at("/"));
+    await hydrated(page, ".d-bar");
+    const card = page.getByRole("complementary", { name: "From Hype Stack" });
+
+    // Assert: there, and in the window without scrolling.
+    await expect(card).toBeVisible();
+    await expect(card).toBeInViewport();
+    const href = (await card.getByRole("link").getAttribute("href")) ?? "";
+    expect(href).toContain("ref=react-wrapped");
+    expect(href).toContain("utm_campaign=docs-float");
+
+    // Act
+    await card.getByRole("button", { name: "Close the Hype Stack card" }).click();
+
+    // Assert: gone, and still gone on the next page of the same visit.
+    await expect(card).toHaveCount(0);
+    await page.goto(at("/designs/"));
+    await hydrated(page, ".d-bar");
+    await expect(card).toHaveCount(0);
+  });
 });
