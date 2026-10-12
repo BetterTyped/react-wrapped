@@ -48,8 +48,10 @@ function Pitch() {
         <b>Free</b> MIT template
       </span>
       <span className="d-ad-go">
-        Explore the stack
-        <i aria-hidden>›</i>
+        <span>Explore the stack</span>
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
       </span>
       <small>Paid packs optional.</small>
     </>
@@ -65,42 +67,55 @@ export function HypeStackCard() {
   );
 }
 
-/** Closed for this visit: the card stays away until the tab is closed, and comes back the next time. */
-const CLOSED = "react-wrapped:docs:hype-card";
+/** Shrunk for this visit: the card stays small until the tab is closed, and comes back whole the next time. */
+const SMALL = "react-wrapped:docs:hype-card";
+
+/** A phone has no room for the whole card, so there it is always the small one. */
+const PHONE = "(max-width: 560px)";
 
 /**
- * The same card pinned to the corner of the window, for every page that has no column to put it in. It can be
- * closed, and it is drawn only once the page runs, so someone who closed it never sees it flash back.
+ * The same card pinned to the corner of the window, for every page that has no column to put it in. Its cross does
+ * not take it away: it shrinks the card to one line with the way in still on it. It is drawn only once the page
+ * runs, so someone who shrank it never sees the whole card flash back.
  */
 export function HypeStackFloat() {
-  const [shown, setShown] = useState(false);
+  const [small, setSmall] = useState<boolean | null>(null);
+  const [phone, setPhone] = useState(false);
   useEffect(() => {
     try {
-      setShown(window.sessionStorage.getItem(CLOSED) === null);
+      setSmall(window.sessionStorage.getItem(SMALL) !== null);
     } catch {
-      // Blocked storage: the card shows, and closing it lasts for this page.
-      setShown(true);
+      // Blocked storage: the card shows whole, and shrinking it lasts for this page.
+      setSmall(false);
     }
+    const query = window.matchMedia(PHONE);
+    const read = () => setPhone(query.matches);
+    read();
+    query.addEventListener("change", read);
+    return () => query.removeEventListener("change", read);
   }, []);
-  if (!shown) return null;
-  const close = () => {
-    setShown(false);
+  if (small === null) return null;
+  const shrink = () => {
+    setSmall(true);
     try {
-      window.sessionStorage.setItem(CLOSED, "1");
+      window.sessionStorage.setItem(SMALL, "1");
     } catch {
-      // Blocked storage: closed for this page only.
+      // Blocked storage: small for this page only.
     }
   };
+  const compact = small || phone;
   return (
-    <aside className="d-float" aria-label="From Hype Stack">
+    <aside className="d-float" data-small={compact ? "" : undefined} aria-label="From Hype Stack">
       <a className="d-ad" href={hypeStack("docs-float")} target="_blank" rel="noopener" aria-label={NAME}>
         <Pitch />
       </a>
-      <button type="button" className="d-float-close" onClick={close} aria-label="Close the Hype Stack card">
-        <svg viewBox="0 0 24 24" aria-hidden>
-          <path d="M6 6l12 12M18 6 6 18" />
-        </svg>
-      </button>
+      {compact ? null : (
+        <button type="button" className="d-float-close" onClick={shrink} aria-label="Shrink the Hype Stack card">
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+      )}
     </aside>
   );
 }

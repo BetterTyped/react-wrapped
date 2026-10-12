@@ -217,28 +217,40 @@ test.describe("the bar", () => {
     expect(href).toContain("utm_campaign=docs-sidebar");
   });
 
-  test("away from the docs the Hype Stack card sits in the corner, and can be closed for the visit", async ({
+  test("away from the docs the Hype Stack card sits in the corner, and its cross shrinks it to one line", async ({
     page,
   }) => {
     // Arrange
     await page.goto(at("/"));
     await hydrated(page, ".d-bar");
     const card = page.getByRole("complementary", { name: "From Hype Stack" });
+    const link = card.getByRole("link", { name: "Build your SaaS on Hype Stack" });
 
-    // Assert: there, and in the window without scrolling.
+    // Assert: there, whole, and in the window without scrolling.
     await expect(card).toBeVisible();
     await expect(card).toBeInViewport();
-    const href = (await card.getByRole("link").getAttribute("href")) ?? "";
+    await expect(card.getByText("Free React and Hono template", { exact: false })).toBeVisible();
+    const href = (await link.getAttribute("href")) ?? "";
     expect(href).toContain("ref=react-wrapped");
     expect(href).toContain("utm_campaign=docs-float");
+    const whole = (await card.boundingBox())?.height ?? 0;
 
     // Act
-    await card.getByRole("button", { name: "Close the Hype Stack card" }).click();
+    await card.getByRole("button", { name: "Shrink the Hype Stack card" }).click();
 
-    // Assert: gone, and still gone on the next page of the same visit.
-    await expect(card).toHaveCount(0);
+    // Assert: still there with the way in, only small, and the cross has nothing left to do.
+    await expect(card).toBeVisible();
+    await expect(link).toBeVisible();
+    await expect(card.getByText("Free React and Hono template", { exact: false })).toBeHidden();
+    await expect(card.getByRole("button")).toHaveCount(0);
+    expect((await card.boundingBox())?.height ?? 0).toBeLessThan(whole / 3);
+
+    // Act: the next page of the same visit.
     await page.goto(at("/designs/"));
     await hydrated(page, ".d-bar");
-    await expect(card).toHaveCount(0);
+
+    // Assert: it comes up small.
+    await expect(card).toBeVisible();
+    await expect(card.getByText("Free React and Hono template", { exact: false })).toBeHidden();
   });
 });

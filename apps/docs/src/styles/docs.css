@@ -916,11 +916,18 @@ body {
 .d-ad:hover .d-ad-go {
   filter: brightness(1.07);
 }
-.d-ad-go i {
-  font-style: normal;
+.d-ad-go svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   transition: transform 0.2s var(--d-ease);
 }
-.d-ad:hover .d-ad-go i {
+.d-ad:hover .d-ad-go svg {
   transform: translateX(3px);
 }
 .d-ad small {
@@ -961,6 +968,49 @@ body {
 }
 .d-float .d-ad-points {
   display: none;
+}
+/*
+ * Shrunk: one line with the label, the headline and an orange arrow to go there. The cross turns the card into
+ * this, and a phone only ever shows this.
+ */
+.d-float[data-small] {
+  width: auto;
+}
+.d-float[data-small] .d-ad {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 14px;
+  padding: 9px 9px 9px 6px;
+  border-radius: 16px;
+}
+.d-float[data-small] .d-ad-art,
+.d-float[data-small] .d-ad-text,
+.d-float[data-small] .d-ad-price {
+  display: none;
+}
+.d-float[data-small] .d-ad strong {
+  grid-column: 1;
+  margin-top: 0;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.d-float[data-small] .d-ad strong b {
+  display: inline;
+}
+.d-float[data-small] .d-ad-go {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  border-radius: 11px;
+}
+.d-float[data-small] .d-ad-go span {
+  display: none;
+}
+.d-float[data-small] .d-ad-go svg {
+  width: 18px;
+  height: 18px;
 }
 .d-float-close {
   position: absolute;
@@ -2219,42 +2269,11 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-reel-card {
     width: 128px;
   }
-  /* On a phone the card is a strip along the bottom: the label, the headline and the way in. */
+  /* On a phone the small card runs the width of the window. */
   .d-float {
     right: 10px;
     bottom: 10px;
     left: 10px;
-    width: auto;
-  }
-  .d-float .d-ad {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 2px 12px;
-    padding: 10px 10px 10px 14px;
-  }
-  .d-float .d-ad-text,
-  .d-float .d-ad-price,
-  .d-float .d-ad-art {
-    display: none;
-  }
-  .d-float .d-ad strong {
-    grid-column: 1;
-    margin: 0;
-    font-size: 15px;
-  }
-  .d-float .d-ad strong b {
-    display: inline;
-  }
-  .d-float .d-ad-go {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    width: 40px;
-    height: 40px;
-    margin: 0;
-    font-size: 0;
-  }
-  .d-float .d-ad-go i {
-    font-size: 20px;
   }
   .d-foot-inner {
     padding-bottom: 96px;
