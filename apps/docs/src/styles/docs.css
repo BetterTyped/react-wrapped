@@ -773,27 +773,42 @@ body {
   display: none;
 }
 
-/* The card that sends a reader on to Hype Stack: the one thing on a docs page that sells. */
+/*
+ * The card that sends a reader on to Hype Stack: the one thing on a page that sells. It is laid out the way Hype
+ * Stack's first sidebar offer was: a small lit label, a headline that ends on the name in its colour, one line of
+ * why, three short points, the price, and a button the full width of the card.
+ */
 .d-ad {
-  display: block;
-  overflow: hidden;
+  --hs: oklch(0.68 0.2 50);
+  display: grid;
+  padding: 20px;
   border: 1px solid var(--d-line-strong);
   border-radius: 14px;
   background: var(--d-solid);
-  transition: border-color 0.2s;
+  box-shadow: 0 26px 60px -34px color-mix(in oklch, var(--hs) 70%, transparent);
+  color: var(--d-ink);
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s,
+    transform 0.3s var(--d-ease);
 }
 .d-ad:hover {
-  border-color: var(--d-faint);
+  border-color: color-mix(in oklch, var(--hs) 60%, var(--d-line-strong));
+  box-shadow: 0 30px 64px -30px color-mix(in oklch, var(--hs) 85%, transparent);
+  transform: translateY(-2px);
 }
+/* The picture: Hype Stack's mark on its two colours, fading down into the card. */
 .d-ad-art {
   position: relative;
   display: grid;
   place-items: center;
-  height: 112px;
+  height: 104px;
+  margin: -20px -20px 16px;
   overflow: hidden;
+  border-radius: 13px 13px 0 0;
   background:
-    radial-gradient(60% 90% at 28% 40%, rgb(255 138 30 / 0.34), transparent 70%),
-    radial-gradient(60% 90% at 74% 62%, rgb(48 130 255 / 0.34), transparent 70%), #0b0d14;
+    radial-gradient(60% 90% at 28% 40%, rgb(255 138 30 / 0.4), transparent 70%),
+    radial-gradient(60% 90% at 74% 62%, rgb(48 130 255 / 0.38), transparent 70%), #0b0d14;
 }
 .d-ad-art::after {
   content: "";
@@ -812,34 +827,96 @@ body {
 .d-ad:hover .d-ad-art img {
   transform: scale(1.08) rotate(-4deg);
 }
-.d-ad-body {
-  display: grid;
+.d-ad-label {
+  display: flex;
+  align-items: center;
   gap: 8px;
-  padding: 4px 16px 16px;
+  color: var(--hs);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.d-ad-label svg,
+.d-ad-points svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: var(--hs);
 }
 .d-ad strong {
-  font-size: 15.5px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  margin-top: 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   line-height: 1.25;
 }
+.d-ad strong b {
+  display: block;
+  color: var(--hs);
+  font-weight: inherit;
+}
 .d-ad-text {
+  margin-top: 8px;
   color: var(--d-dim);
   font-size: 13.5px;
   line-height: 1.5;
 }
-.d-ad-go {
+.d-ad-points {
   display: grid;
-  place-items: center;
-  height: 40px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--d-dim);
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+.d-ad-points > span {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.d-ad-points svg {
+  margin-top: 2px;
+}
+.d-ad-price {
+  margin-top: 20px;
+  color: var(--d-dim);
+  font-size: 13.5px;
+  text-align: center;
+}
+.d-ad-price b {
+  margin-right: 4px;
+  color: var(--d-ink);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.d-ad-go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  margin-top: 16px;
   border-radius: 9px;
-  background: var(--d-ink);
-  color: var(--d-on-ink);
+  background: var(--hs);
+  color: #fff;
   font-size: 14px;
-  font-weight: 550;
+  font-weight: 600;
+  transition: filter 0.2s;
+}
+.d-ad:hover .d-ad-go {
+  filter: brightness(1.08);
+}
+.d-ad-go i {
+  font-style: normal;
+  transition: transform 0.2s var(--d-ease);
+}
+.d-ad:hover .d-ad-go i {
+  transform: translateX(3px);
 }
 .d-ad small {
+  margin-top: 10px;
   color: var(--d-faint);
   font-size: 12px;
   text-align: center;
@@ -854,11 +931,9 @@ body {
   right: 20px;
   bottom: 20px;
   z-index: 30;
-  width: 288px;
+  width: 280px;
   border-radius: 14px;
-  box-shadow:
-    0 30px 70px -20px rgb(0 0 0 / 0.75),
-    0 0 60px -24px rgb(255 138 30 / 0.55);
+  box-shadow: 0 30px 70px -20px rgb(0 0 0 / 0.75);
   animation: d-float-in 0.7s var(--d-ease) 0.5s both;
 }
 @keyframes d-float-in {
@@ -867,16 +942,17 @@ body {
     transform: translateY(24px);
   }
 }
-.d-float .d-ad {
-  border-color: var(--d-faint);
+.d-float .d-ad-points,
+.d-float .d-ad small {
+  display: none;
 }
 .d-float .d-ad-art {
-  height: 88px;
+  height: 84px;
 }
 .d-float-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: -9px;
+  right: -9px;
   z-index: 2;
   display: grid;
   place-items: center;
@@ -885,13 +961,13 @@ body {
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgb(0 0 0 / 0.5);
-  color: #fff;
+  background: var(--d-ink);
+  color: var(--d-on-ink);
   cursor: pointer;
   transition: background-color 0.15s;
 }
 .d-float-close:hover {
-  background: rgb(0 0 0 / 0.8);
+  opacity: 0.8;
 }
 .d-float-close svg {
   width: 13px;
@@ -2130,7 +2206,7 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-reel-card {
     width: 128px;
   }
-  /* On a phone the card is a strip along the bottom: the mark, the headline and the way in. */
+  /* On a phone the card is a strip along the bottom: the label, the headline and the way in. */
   .d-float {
     right: 10px;
     bottom: 10px;
@@ -2138,29 +2214,34 @@ main:has(> .d-example) > .d-plain:last-child {
     width: auto;
   }
   .d-float .d-ad {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr);
-    align-items: stretch;
-  }
-  .d-float .d-ad-art {
-    height: auto;
-  }
-  .d-float .d-ad-art::after {
-    display: none;
-  }
-  .d-float .d-ad-art img {
-    width: 38px;
-    height: 38px;
-  }
-  .d-float .d-ad-body {
-    padding: 12px 40px 12px 12px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 12px;
+    padding: 10px 10px 10px 14px;
   }
   .d-float .d-ad-text,
-  .d-float .d-ad-go {
+  .d-float .d-ad-price,
+  .d-float .d-ad-art {
     display: none;
   }
-  .d-float .d-ad strong::after {
-    content: " →";
+  .d-float .d-ad strong {
+    grid-column: 1;
+    margin: 0;
+    font-size: 15px;
+  }
+  .d-float .d-ad strong b {
+    display: inline;
+  }
+  .d-float .d-ad-go {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    font-size: 0;
+  }
+  .d-float .d-ad-go i {
+    font-size: 20px;
   }
   .d-foot-inner {
     padding-bottom: 96px;

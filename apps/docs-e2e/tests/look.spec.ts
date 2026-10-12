@@ -205,7 +205,7 @@ test.describe("the bar", () => {
   test("the Hype Stack card beside a docs page says where the visitor came from", async ({ page }) => {
     // Act
     await page.goto(at("/docs/"));
-    const card = page.getByRole("link", { name: /Build your SaaS on Hype Stack/ });
+    const card = page.getByRole("link", { name: "Build your SaaS on Hype Stack" });
 
     // Assert: one card, and no link to Hype Stack left in the bar.
     await expect(card).toHaveCount(1);
