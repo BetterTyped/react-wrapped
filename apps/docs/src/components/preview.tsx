@@ -8,6 +8,7 @@ import { isPart } from "../registry/parts";
 import { demoScene } from "../registry/scenes";
 import { LookControls, useLook, useLookConfig } from "./look";
 import { PART_CSS } from "./part-styles";
+import { useTurn } from "./turns";
 import {
   CutPreview,
   factScene,
@@ -37,16 +38,18 @@ const WIDEST = { story: 340, square: 520, landscape: 720 } as const;
 
 /**
  * Sizes a stage to the room it has. The box keeps the format's shape from the first paint, so nothing below it
- * moves when the stage inside is measured and drawn to fit.
+ * moves when the stage inside is measured and drawn to fit. The stage is in the HTML from the start, so a crawler
+ * reads every scene, but it plays only once its turn comes (`components/turns.ts`): until then `on` is false, the
+ * stage is a still with no timeline behind it, and the box shows a quiet plate in its place.
  */
-function Fit({
+export function Fit({
   max,
   format: held,
   children,
 }: {
   max?: number;
   format?: WrappedConfig["format"];
-  children: (width: number) => ReactNode;
+  children: (width: number, on: boolean) => ReactNode;
 }) {
   const { look } = useLook();
   const id = held ?? look.format;
@@ -54,6 +57,7 @@ function Fit({
   const widest = Math.min(max ?? Infinity, WIDEST[id]);
   const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(widest);
+  const on = useTurn(boxRef);
   useLayoutEffect(() => {
     const box = boxRef.current;
     if (!box) return;
@@ -64,8 +68,13 @@ function Fit({
     return () => observer.disconnect();
   }, [widest]);
   return (
-    <div ref={boxRef} className="d-fit" style={{ maxWidth: widest, aspectRatio: `${format.width} / ${format.height}` }}>
-      {children(width)}
+    <div
+      ref={boxRef}
+      className="d-fit"
+      data-on={on ? "" : undefined}
+      style={{ maxWidth: widest, aspectRatio: `${format.width} / ${format.height}` }}
+    >
+      {children(width, on)}
     </div>
   );
 }
@@ -123,6 +132,7 @@ export function DemoStage({
     const style = demo.id;
     return (
       <Fit max={max} format={format}>
+        {/* A cut has no still: its loop is built with it, and is only shown once its turn comes. */}
         {(width) => <CutPreview style={style} first={FIRST} second={SECOND} config={config} width={width} />}
       </Fit>
     );
@@ -131,7 +141,7 @@ export function DemoStage({
   if (!scene) return null;
   return (
     <Fit max={max} format={format}>
-      {(width) => <SceneThumb scene={scene} config={config} width={width} loop />}
+      {(width, on) => <SceneThumb scene={scene} config={config} width={width} loop={on} />}
     </Fit>
   );
 }

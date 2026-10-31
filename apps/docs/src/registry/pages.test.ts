@@ -311,7 +311,7 @@ describe("the files beside the pages", () => {
     const listed = [...sitemap().matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 
     // Assert
-    expect(listed).toHaveLength(PAGES.length + 4);
+    expect(listed).toHaveLength(PAGES.length + 5);
     expect(listed).toContain("https://bettertyped.github.io/react-wrapped/examples/from-parts/");
     expect(new Set(listed).size).toBe(listed.length);
     expect(listed.every((address) => address.startsWith("https://bettertyped.github.io/react-wrapped/"))).toBe(true);

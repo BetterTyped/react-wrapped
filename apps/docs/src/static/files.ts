@@ -17,6 +17,7 @@ export interface StaticFile {
 const OTHER_PAGES = [
   { path: "/", updated: "2026-10-11" },
   { path: "/designs/", updated: "2026-10-11" },
+  { path: "/directory/", updated: "2026-10-31" },
   { path: "/examples/full-wrapped/", updated: "2026-10-11" },
   { path: "/examples/from-parts/", updated: "2026-10-11" },
 ] as const;
@@ -46,7 +47,7 @@ export function llmsTxt(): string {
     `> ${SITE.description}`,
     `react-wrapped is a set of React packages published under the @react-wrapped scope on npm. Every motion runs on GSAP timelines, so a video can be seeked, scrubbed and exported frame by frame. Source: ${SITE.repo}`,
     ...sections,
-    `## Optional\n\n- [Every page in one file](${absoluteUrl("/llms-full.txt")})\n- [Designs](${absoluteUrl("/designs/")}): every chart and transition playing live`,
+    `## Optional\n\n- [Every page in one file](${absoluteUrl("/llms-full.txt")})\n- [Designs](${absoluteUrl("/designs/")}): every chart and transition playing live\n- [Directory](${absoluteUrl("/directory/")}): every Wrapped built with react-wrapped, playing on Hype Stack`,
   ].join("\n\n");
 }
 

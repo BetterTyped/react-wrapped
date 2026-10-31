@@ -960,6 +960,10 @@ body {
   box-shadow: 0 30px 70px -20px rgb(0 0 0 / 0.75);
   animation: d-float-in 0.7s var(--d-ease) 0.5s both;
 }
+/* Under a hero that is still playing in, the card waits until it has. */
+body:has(.d-fan) .d-float {
+  animation-delay: 2.6s;
+}
 @keyframes d-float-in {
   from {
     opacity: 0;
@@ -1312,6 +1316,25 @@ body {
 .d-fit > * {
   position: absolute;
   inset: 0 auto auto 0;
+}
+/*
+ * Until its turn comes, the box is a quiet plate the shape of the stage, and the still inside it waits out of sight:
+ * shown, it would stand finished and then jump back to the start when it began to play. Once its loop is built it
+ * fades in from its first frame. Without scripts the still simply stands.
+ */
+.js .d-fit:not([data-on]) {
+  background: var(--d-sunk);
+}
+.js .d-fit:not([data-on]) > * {
+  opacity: 0;
+}
+.d-fit[data-on] > * {
+  animation: d-stage-in 0.6s var(--d-ease) both;
+}
+@keyframes d-stage-in {
+  from {
+    opacity: 0;
+  }
 }
 .d-preview {
   margin: 28px 0 0;
@@ -1724,6 +1747,7 @@ main:has(> .d-example) > .d-plain:last-child {
 }
 .d-fan-player > * {
   flex: 1;
+  animation: d-player-in 1s var(--d-ease) both;
 }
 .d-fan-player::before,
 .d-fan-card::before {
@@ -1737,14 +1761,45 @@ main:has(> .d-example) > .d-plain:last-child {
 }
 .d-fan-player::before {
   inset: 6% 8% 6%;
+  opacity: 0;
+  scale: 0.8;
+  transition:
+    opacity 1.4s var(--d-ease),
+    scale 1.4s var(--d-ease);
+}
+/*
+ * The order the hero arrives in: the words, then the player rising onto its light, then the scenes beside it coming
+ * out from behind it, the near pair first. Each part moves only once it is built and ready to play (see
+ * `components/turns.ts`), and only on the compositor, so a busy page never makes it stutter.
+ */
+.d-fan-player[data-on]::before {
+  opacity: var(--d-glow);
+  scale: 1;
+}
+@keyframes d-player-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
 }
 .d-fan-card {
   position: absolute;
   top: var(--top);
   left: 50%;
   margin-left: var(--x);
-  opacity: var(--o);
+  opacity: 0;
+  translate: calc(var(--from)) 24px;
+  scale: 0.92;
   pointer-events: none;
+  transition:
+    opacity 0.9s var(--d-ease) var(--delay),
+    translate 1.2s var(--d-ease) var(--delay),
+    scale 1.2s var(--d-ease) var(--delay);
+}
+.d-fan-card[data-on] {
+  opacity: var(--o);
+  translate: 0 0;
+  scale: 1;
 }
 .d-hero-note {
   margin: 18px 0 0;
@@ -2035,6 +2090,287 @@ main:has(> .d-example) > .d-plain:last-child {
   gap: 10px;
 }
 
+/* ---------- the directory: every Wrapped built on the library ---------- */
+
+/* Every platform's logo in one row: the whole directory at a glance, and a jump to any card. */
+.d-dir-index {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 720px;
+  margin: clamp(40px, 5vw, 56px) auto 0;
+  padding: 0;
+  list-style: none;
+}
+.d-dir-index li {
+  animation: d-rise 0.9s var(--d-ease) both;
+  animation-delay: calc(0.24s + var(--i, 0) * 40ms);
+}
+.d-dir-index a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 13px;
+  background: var(--d-solid);
+  transition:
+    translate 0.3s var(--d-ease),
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+.d-dir-index a:hover {
+  translate: 0 -3px;
+  border-color: color-mix(in oklch, var(--accent) 60%, var(--d-line-strong));
+  box-shadow: 0 10px 30px -10px color-mix(in oklch, var(--accent) 70%, transparent);
+}
+.d-dir-index svg {
+  width: 22px;
+  height: 22px;
+}
+
+.d-chips button small {
+  margin-left: 2px;
+  opacity: 0.6;
+  font: 500 12px var(--d-mono);
+}
+
+.d-dir {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.d-dir > li {
+  scroll-margin-top: calc(var(--d-bar) + 24px);
+}
+.d-dir > li:target .d-dir-card {
+  border-color: var(--accent);
+}
+.d-dir-card {
+  --spot: color-mix(in oklch, var(--accent, var(--d-ink)) 22%, transparent);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px 12px 22px;
+  border: 1px solid var(--d-line-strong);
+  border-radius: 20px;
+  background: var(--d-panel);
+  transition:
+    translate 0.5s var(--d-ease),
+    border-color 0.3s;
+}
+.d-dir-card:hover {
+  translate: 0 -4px;
+  border-color: color-mix(in oklch, var(--accent, var(--d-ink)) 55%, var(--d-line-strong));
+}
+/* The stage stands on its own colour, the way the scenes beside the home page's player do. */
+.d-dir-stage {
+  position: relative;
+  display: block;
+  isolation: isolate;
+}
+.d-dir-stage::before {
+  content: "";
+  position: absolute;
+  inset: 12% -6% -10%;
+  z-index: -1;
+  background: radial-gradient(closest-side, var(--accent), transparent);
+  opacity: calc(var(--d-glow) * 0.45);
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.d-dir-card:hover .d-dir-stage::before {
+  opacity: var(--d-glow);
+}
+.d-dir-stage .d-fit {
+  margin: 0 auto;
+}
+.d-dir-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 8px 0;
+}
+.d-dir-name strong {
+  flex: 1;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.d-dir-logo {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+.d-dir-arrow {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--d-faint);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    translate 0.3s var(--d-ease),
+    stroke 0.3s;
+}
+.d-dir-card:hover .d-dir-arrow {
+  translate: 2px -2px;
+  stroke: var(--d-ink);
+}
+.d-dir-text {
+  margin: 8px 8px 0;
+  color: var(--d-dim);
+  font-size: 14.5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.d-dir-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: auto 8px 0;
+  padding-top: 18px;
+  color: var(--d-faint);
+  font: 12px var(--d-mono);
+}
+.d-dir-tag {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
+  color: var(--d-ink);
+}
+/* The way in, said once the card is pointed at: the card is the link, the line names where it goes. */
+.d-dir-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 8px 0;
+  color: var(--d-ink);
+  font-size: 14px;
+  font-weight: 550;
+}
+.d-dir-go::after {
+  content: "→";
+  transition: translate 0.3s var(--d-ease);
+}
+.d-dir-card:hover .d-dir-go::after {
+  translate: 4px 0;
+}
+@media (hover: hover) {
+  .d-dir-go {
+    opacity: 0;
+    translate: 0 4px;
+    transition:
+      opacity 0.3s,
+      translate 0.3s var(--d-ease);
+  }
+  .d-dir-card:hover .d-dir-go,
+  .d-dir-card:focus-visible .d-dir-go {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* The last card is the reader's own: the library, for a product of theirs. */
+.d-dir-build {
+  border-style: dashed;
+  background: none;
+}
+.d-dir-build .d-dir-go {
+  opacity: 1;
+  translate: 0 0;
+}
+.d-dir-build .d-dir-tag {
+  background: var(--d-sunk);
+  font: inherit;
+}
+/* Where a stage would be: the same square, empty, waiting for a product of the reader's. */
+.d-dir-ghost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border: 1px dashed var(--d-line-strong);
+  border-radius: 12px;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 10px,
+    color-mix(in oklch, var(--d-ink) 2.5%, transparent) 10px 11px
+  );
+}
+.d-dir-ghost small {
+  color: var(--d-faint);
+  font: 12.5px var(--d-mono);
+}
+.d-dir-plus {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px dashed var(--d-faint);
+  border-radius: 18px;
+  color: var(--d-dim);
+  font: 300 34px var(--d-font);
+  transition:
+    rotate 0.5s var(--d-ease),
+    color 0.3s,
+    border-color 0.3s;
+}
+.d-dir-build:hover .d-dir-plus {
+  rotate: 90deg;
+  border-color: var(--d-ink);
+  color: var(--d-ink);
+}
+
+.d-dir-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--d-line);
+}
+.d-dir-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px 28px 6px;
+  border-left: 1px solid var(--d-line);
+}
+.d-dir-steps li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.d-dir-steps small {
+  color: var(--d-faint);
+  font: 12.5px var(--d-mono);
+}
+.d-dir-steps strong {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.d-dir-steps span {
+  color: var(--d-dim);
+  font-size: 15px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
 /* ---------- footer ---------- */
 
 .d-foot {
@@ -2220,6 +2556,17 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .d-dir {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .d-dir-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .d-dir-steps li {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--d-line);
+    border-left: 0;
+  }
   .d-foot-inner {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2257,8 +2604,21 @@ main:has(> .d-example) > .d-plain:last-child {
   .d-packages li {
     grid-template-columns: minmax(0, 1fr);
   }
-  .d-grid.d-grid-stack {
+  .d-grid.d-grid-stack,
+  .d-dir {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .d-dir-index {
+    gap: 8px;
+  }
+  .d-dir-index a {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+  .d-dir-index svg {
+    width: 20px;
+    height: 20px;
   }
   .d-foot-inner {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2286,6 +2646,9 @@ main:has(> .d-example) > .d-plain:last-child {
   }
   /* The site's own entrances stand still. The library's stages keep theirs: playing is what they are for. */
   .d-hero-copy > *,
+  .d-fan-player > *,
+  .d-fit[data-on] > *,
+  .d-dir-index li,
   .d-float,
   .d-search[open],
   .d-spin[open],

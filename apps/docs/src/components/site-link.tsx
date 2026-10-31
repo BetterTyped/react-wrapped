@@ -47,6 +47,13 @@ export function SiteLink({ path, children, ...rest }: { path: string; children: 
       </Link>
     );
   }
+  if (bare === "/directory/") {
+    return (
+      <Link to="/directory/" hash={hash} activeOptions={EXACT} {...rest}>
+        {children}
+      </Link>
+    );
+  }
   if (bare === "/docs/") {
     return (
       <Link to="/docs/" hash={hash} activeOptions={EXACT} {...rest}>

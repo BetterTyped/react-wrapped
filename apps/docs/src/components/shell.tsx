@@ -121,6 +121,9 @@ function Navbar({ onMenu }: { onMenu: () => void }) {
           <SiteLink path="/designs/" aria-current={path === "/designs/" ? "page" : undefined}>
             Designs
           </SiteLink>
+          <SiteLink path="/directory/" aria-current={path === "/directory/" ? "page" : undefined}>
+            Directory
+          </SiteLink>
         </nav>
         <div className="d-bar-end">
           <Search />
@@ -227,6 +230,9 @@ function Footer() {
               <a href={hypeStack("docs-footer", "/wrapped")} target="_blank" rel="noopener">
                 See it live
               </a>
+            </li>
+            <li>
+              <SiteLink path="/directory/">Directory</SiteLink>
             </li>
             <li>
               <a href={SITE.repo} target="_blank" rel="noreferrer">

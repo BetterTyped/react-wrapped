@@ -623,6 +623,7 @@ export const pageAt = (path: string) => BY_PATH.get(path);
 const OTHER_TITLES: Readonly<Record<string, string>> = {
   "/": "React Wrapped",
   "/designs/": "Designs",
+  "/directory/": "Directory",
   "/examples/full-wrapped/": "Full Wrapped example",
   "/examples/from-parts/": "From parts example",
 };

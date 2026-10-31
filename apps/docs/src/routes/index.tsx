@@ -7,6 +7,7 @@ import { CountUp } from "../components/motion";
 import { DemoStage, FixedStage, LookControls, useLookConfig } from "../components/preview";
 import { SiteFrame } from "../components/shell";
 import { SiteLink } from "../components/site-link";
+import { useTurn } from "../components/turns";
 import { CHART_DOCS, CHART_TYPES, type ChartType, examplesOf } from "../registry/charts";
 import { SCENE_IDS } from "../registry/scenes";
 import { TRANSITIONS } from "../registry/transitions";
@@ -164,7 +165,42 @@ const fanStyle = (card: (typeof FAN)[number]) =>
     "--top": `${card.top}px`,
     "--o": card.o,
     "--glow": WRAPPED_PALETTES[card.palette].levels[3],
+    // Each card comes out from behind the player, so it starts nearer the middle than it ends.
+    "--from": `${card.x < 0 ? 1 : -1} * ${card.far ? 140 : 90}px`,
+    "--delay": card.far ? "160ms" : "0ms",
   }) as CSSProperties;
+
+/** The cards after the player, the near pair before the far one: each mounts once the player stands. */
+const NEAR_CARD = { order: 1, idle: false } as const;
+const FAR_CARD = { order: 2, idle: false } as const;
+
+/**
+ * One scene beside the hero's player. It is built only once the player is, and comes out from behind it only once
+ * its scene stands ready to play, so nothing is ever seen arriving half drawn. A card the screen is too narrow for is
+ * never built at all.
+ */
+function FanCard({ card }: { card: (typeof FAN)[number] }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const on = useTurn(boxRef, card.far ? FAR_CARD : NEAR_CARD);
+  const [out, setOut] = useState(false);
+  useEffect(() => {
+    if (!on) return;
+    // The scene's timeline has set its first frame by now: show the card on the next one.
+    const id = requestAnimationFrame(() => setOut(true));
+    return () => cancelAnimationFrame(id);
+  }, [on]);
+  return (
+    <div
+      ref={boxRef}
+      className={card.far ? "d-fan-card d-fan-far" : "d-fan-card"}
+      style={fanStyle(card)}
+      data-on={out ? "" : undefined}
+      aria-hidden
+    >
+      {on ? <FixedStage demo={card.demo} width={card.width} format="story" palette={card.palette} /> : null}
+    </div>
+  );
+}
 
 const WALL_COLUMNS = { "--cols": 4 } as CSSProperties;
 const PARTS_COLUMNS = { "--cols": 3 } as CSSProperties;
@@ -200,14 +236,11 @@ const MADE_CLASSES = { timeline: "d-made-quiet" } as const;
 function MadePlayer() {
   const look = useLookConfig();
   const config = useMemo(() => ({ ...look, format: "story" as const }), [look]);
-  // After the first paint, like the hero's: the words come first.
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+  // Built when its turn comes, like every stage on the page: never while the hero plays in.
+  const boxRef = useRef<HTMLDivElement>(null);
+  const ready = useTurn(boxRef);
   return (
-    <div className="d-made-player">
+    <div ref={boxRef} className="d-made-player">
       {ready ? (
         <WrappedPlayer
           subject={MADE_SUBJECT}
@@ -312,14 +345,7 @@ function Home() {
           </div>
           <div className="d-fan">
             {FAN.map((card) => (
-              <div
-                key={card.palette}
-                className={card.far ? "d-fan-card d-fan-far" : "d-fan-card"}
-                style={fanStyle(card)}
-                aria-hidden
-              >
-                <FixedStage demo={card.demo} width={card.width} format="story" palette={card.palette} />
-              </div>
+              <FanCard key={card.palette} card={card} />
             ))}
             <HeroPlayer />
           </div>
