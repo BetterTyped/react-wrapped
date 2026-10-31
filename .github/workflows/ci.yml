@@ -22,7 +22,10 @@ env:
 jobs:
   checks:
     name: Build, lint, typecheck, test, browser tests
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: the browser tests install Chromium through Playwright, which supports only the
+    # Ubuntu releases it lists. When ubuntu-latest moved to 26.04 the install failed before a test ran. Move this
+    # forward together with @playwright/test.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: read
