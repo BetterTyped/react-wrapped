@@ -63,9 +63,11 @@ where it plays real developer years. Use it whole as one component, or take sing
 player, only the share cards.
 
 <p align="center">
-  <a href="https://www.hype-stack.dev/wrapped?utm_source=react-wrapped&utm_medium=referral&utm_campaign=readme">
-    <img width="720" src="./.github/assets/preview.png" alt="A Wrapped playing in the react-wrapped player: 1,687 contributions over a year grid, with the timeline under the video" />
+  <a href="./.github/assets/launch.mp4">
+    <img width="720" src="./.github/assets/launch-preview.gif" alt="From the react-wrapped launch film: a year's monthly numbers rise as the library's bar chart, the busiest month lit, and the react-wrapped name lands over it" />
   </a>
+  <br />
+  <a href="./.github/assets/launch.mp4"><b>▶ Watch the 45 second launch film</b></a>, made from the library's own charts and scenes
 </p>
 
 ## Install
