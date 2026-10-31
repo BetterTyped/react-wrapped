@@ -2,3 +2,5 @@
 # skills and .claude links to the same files for Claude Code.
 .claude
 .agents
+# The launch film (launch-video/README.md) is not a package of this monorepo.
+launch-video

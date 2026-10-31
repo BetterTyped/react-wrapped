@@ -1,0 +1,79 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ground-deep);
+    }
+    #engine-frame {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      transform-origin: 960px 470px;
+      box-shadow: 0 40px 120px -30px rgba(0, 0, 0, 0.8), 0 0 0 1.5px rgba(240, 246, 252, 0.08);
+    }
+    #engine-caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 968px;
+      text-align: center;
+      font-size: 40px;
+    }
+    #engine-caption b {
+      color: var(--ink);
+      font-weight: 800;
+    }
+  </style>
+  <div data-hf-id="hf-7j7h" id="root" data-composition-id="engine" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-zlpi" class="film-light" id="engine-light"></div>
+    <div data-hf-id="hf-cqze" id="engine-frame" data-layout-allow-overflow></div>
+    <p data-hf-id="hf-91cv" id="engine-caption" class="film-quiet">
+      <span data-hf-id="hf-dmd5" class="word">Real</span> <span data-hf-id="hf-z0uw" class="word">scenes,</span> <span data-hf-id="hf-yhox" class="word"><b data-hf-id="hf-mqn3">19</b></span>
+      <span data-hf-id="hf-8kvt" class="word">transitions,</span> <span data-hf-id="hf-786z" class="word">one</span> <span data-hf-id="hf-2dh0" class="word">timeline.</span>
+    </p>
+  </div>
+  <script>
+    (function () {
+      const frame = document.querySelector("#engine-frame");
+      // The sample year playing in the library's own stage: its big number, its week, its biggest day.
+      const run = RW.mountStage(frame, {
+        format: "landscape",
+        keys: ["total", "week", "biggest-day"],
+        cuts: ["slash", "wave"],
+        caps: [2.2, 1.6],
+      });
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(
+        frame,
+        { scale: 1.08, filter: "blur(14px)", opacity: 0 },
+        { scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.4, ease: "expo.out" },
+        0,
+      );
+      tl.add(run.timeline(), 0.1);
+      // The camera pulls back: it was a frame all along.
+      tl.fromTo(
+        frame,
+        { scale: 1, borderRadius: 0 },
+        { scale: 0.8, borderRadius: 34, duration: 0.9, ease: "power2.inOut", immediateRender: false },
+        1.7,
+      );
+      tl.fromTo(
+        "#engine-caption .word",
+        { opacity: 0, filter: "blur(6px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power4.out", stagger: 0.067 },
+        2.5,
+      );
+      tl.to(
+        ["#engine-frame", "#engine-caption"],
+        { opacity: 0, scale: 0.74, filter: "blur(12px)", duration: 0.3, ease: "power3.in" },
+        6.7,
+      );
+      window.__timelines["engine"] = tl;
+    })();
+  </script>
+</template>

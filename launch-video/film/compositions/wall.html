@@ -1,0 +1,143 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ground);
+    }
+    #wall-content {
+      position: absolute;
+      inset: 0;
+    }
+    #wall-grid {
+      position: absolute;
+      left: 118px;
+      top: 92px;
+      width: 1684px;
+      height: 660px;
+      transform-origin: 842px 330px;
+    }
+    .wall-cell {
+      position: absolute;
+      width: 220px;
+      height: 196px;
+    }
+    .wall-chart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 920px;
+    }
+    #wall-title {
+      position: absolute;
+      left: 118px;
+      top: 812px;
+      display: flex;
+      align-items: baseline;
+      gap: 40px;
+    }
+    #wall-title h2 {
+      font-size: 150px;
+    }
+    #wall-count {
+      font-variant-numeric: tabular-nums;
+    }
+    #wall-line {
+      font-size: 60px;
+    }
+    #wall-line b {
+      color: var(--ink);
+      font-weight: 800;
+    }
+    #wall-title .word {
+      display: inline-block;
+    }
+  </style>
+  <div id="root" data-composition-id="wall" data-width="1920" data-height="1080">
+    <div class="film-light"></div>
+    <div id="wall-content">
+      <div id="wall-grid" data-layout-allow-overflow data-layout-allow-overlap></div>
+      <div id="wall-title">
+        <h2 class="film-title"><span id="wall-count">21</span> <span class="word" id="wall-charts">charts.</span></h2>
+        <p id="wall-line" class="film-quiet">
+          <span class="word">Each</span> <span class="word">with</span> <span class="word">its</span>
+          <span class="word"><b>own</b></span> <span class="word"><b>entrance.</b></span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const grid = document.querySelector("#wall-grid");
+      const columns = 7;
+      const cellWidth = 220;
+      const cellHeight = 196;
+      const gapX = (1684 - columns * cellWidth) / (columns - 1);
+      const gapY = 36;
+      const centre = { column: 3, row: 1 };
+
+      // Every chart the library draws, at its own size, scaled into its cell.
+      const charts = RW.CHART_WALL.map(({ chart }, index) => {
+        const column = index % columns;
+        const row = Math.floor(index / columns);
+        const cell = document.createElement("div");
+        cell.className = "wall-cell";
+        cell.style.left = `${column * (cellWidth + gapX)}px`;
+        cell.style.top = `${row * (cellHeight + gapY)}px`;
+        const host = document.createElement("div");
+        host.className = "wall-chart";
+        cell.appendChild(host);
+        grid.appendChild(cell);
+        const mounted = RW.mountChart(host, chart);
+        const height = mounted.stage.offsetHeight;
+        const scale = Math.min(cellWidth / 920, cellHeight / height);
+        gsap.set(host, { height, xPercent: -50, yPercent: -50, scale });
+        const distance = Math.hypot(column - centre.column, (row - centre.row) * 1.4);
+        return { mounted, distance };
+      });
+
+      const tl = gsap.timeline({ paused: true });
+      // The camera starts in on the middle of the wall and pulls back while the charts come in from it, outwards.
+      tl.fromTo(grid, { scale: 2.5 }, { scale: 1, duration: 2.3, ease: "power3.inOut" }, 0);
+      tl.fromTo(grid, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none" }, 0);
+      for (const { mounted, distance } of charts) mounted.animate(tl, 0.05 + distance * 0.16);
+
+      // The count: the one number on screen, climbing to every chart there is.
+      const count = document.querySelector("#wall-count");
+      const box = { value: 0 };
+      tl.fromTo(
+        "#wall-title h2",
+        { opacity: 0, filter: "blur(8px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" },
+        2.0,
+      );
+      tl.fromTo(
+        box,
+        { value: 1 },
+        {
+          value: 21,
+          duration: 1.3,
+          ease: "power2.out",
+          onUpdate: () => {
+            count.textContent = String(Math.round(box.value));
+          },
+        },
+        2.0,
+      );
+      tl.fromTo(
+        "#wall-line .word",
+        { opacity: 0, filter: "blur(6px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power4.out", stagger: 0.08 },
+        2.55,
+      );
+
+      tl.to(
+        "#wall-content",
+        { scale: 0.92, opacity: 0, filter: "blur(12px)", duration: 0.35, ease: "power3.in" },
+        5.1,
+      );
+      window.__timelines["wall"] = tl;
+    })();
+  </script>
+</template>

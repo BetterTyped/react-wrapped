@@ -1,0 +1,11 @@
+/* A stage with nothing around it: what a lone chart or calendar sits in inside the film. */
+.wr-stage.rw-bare {
+  position: relative;
+  height: auto;
+  overflow: visible;
+  background: transparent;
+}
+.wr-stage.rw-bare .wr-chart {
+  max-width: none;
+  margin: 0;
+}

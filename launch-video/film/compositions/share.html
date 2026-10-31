@@ -1,0 +1,111 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ground-deep);
+    }
+    #share-content {
+      position: absolute;
+      inset: 0;
+    }
+    #share-title {
+      position: absolute;
+      left: 120px;
+      top: 76px;
+      font-size: 100px;
+    }
+    #share-row {
+      position: absolute;
+      left: 0;
+      top: 262px;
+      width: 1920px;
+      height: 692px;
+    }
+    .share-phone {
+      position: absolute;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      border-radius: 64px;
+      transform-origin: 0 0;
+      box-shadow: 0 0 0 3px rgba(240, 246, 252, 0.1), 0 60px 140px -40px rgba(0, 0, 0, 0.9);
+    }
+  </style>
+  <div id="root" data-composition-id="share" data-width="1920" data-height="1080">
+    <div class="film-light"></div>
+    <div id="share-content">
+      <h2 id="share-title" class="film-title">
+        <span class="word">Every</span> <span class="word">user</span> <span class="word">gets</span>
+        <span class="word accent">their</span> <span class="word accent">own.</span>
+      </h2>
+      <div id="share-row" data-layout-allow-overflow data-layout-allow-overlap>
+        <div class="share-phone" id="share-lin"></div>
+        <div class="share-phone" id="share-kai"></div>
+        <div class="share-phone" id="share-ada"></div>
+        <div class="share-phone" id="share-mo"></div>
+        <div class="share-phone" id="share-sam"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // Five people, five years, five palettes: the same library, a story-format video each, ending on its share card.
+      const people = [
+        { handle: "lin", palette: "sunset", cut: "iris" },
+        { handle: "kai", palette: "candy", cut: "doors" },
+        { handle: "ada", palette: "evergreen", cut: "bloom" },
+        { handle: "mo", palette: "synthwave", cut: "fan" },
+        { handle: "sam", palette: "ocean", cut: "spin" },
+      ];
+      const scale = 0.36;
+      const width = 1080 * scale;
+      const step = width + 58;
+
+      const tl = gsap.timeline({ paused: true });
+      people.forEach((person, index) => {
+        const phone = document.querySelector("#share-" + person.handle);
+        const offset = index - 2;
+        const start = offset === 0 ? 0.05 : 0.3 + Math.abs(offset) * 0.12;
+        // Their cuts go off left to right, a beat apart, never two at once.
+        const cutAt = 2.0 + index * 0.35;
+        const run = RW.mountStage(phone, {
+          handle: person.handle,
+          palette: person.palette,
+          format: "story",
+          keys: ["total", "share-card"],
+          cuts: [person.cut],
+          caps: [cutAt - start - 0.1],
+        });
+        const left = 960 - width / 2 + offset * step;
+        // Ada's lands first, the others slide in from her sides.
+        tl.fromTo(
+          phone,
+          { x: left + offset * 140, y: 30, scale: scale * 1.04, opacity: 0, filter: "blur(12px)" },
+          { x: left, y: 0, scale, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" },
+          start,
+        );
+        tl.add(run.timeline(), start + 0.1);
+      });
+
+      // The row keeps travelling, at one constant speed.
+      tl.fromTo("#share-row", { x: 150 }, { x: -150, duration: 6.2, ease: "none" }, 0);
+
+      tl.fromTo(
+        "#share-title .word",
+        { opacity: 0, filter: "blur(8px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.09 },
+        0.5,
+      );
+
+      tl.to(
+        "#share-content",
+        { opacity: 0, filter: "blur(12px)", scale: 1.04, duration: 0.3, ease: "power3.in" },
+        5.85,
+      );
+      window.__timelines["share"] = tl;
+    })();
+  </script>
+</template>

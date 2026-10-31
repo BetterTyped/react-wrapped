@@ -1,0 +1,174 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ground);
+    }
+    #code-content {
+      position: absolute;
+      inset: 0;
+    }
+    #code-title {
+      position: absolute;
+      left: 120px;
+      top: 112px;
+      font-size: 104px;
+    }
+    #code-panel {
+      position: absolute;
+      left: 120px;
+      top: 330px;
+      width: 860px;
+      height: 600px;
+      background: var(--card);
+      border-radius: 26px;
+      box-shadow: 0 0 0 1.5px var(--line), 0 40px 100px -40px rgba(0, 0, 0, 0.9);
+      padding: 34px 44px;
+      font-family: var(--mono);
+      font-size: 31px;
+      line-height: 62px;
+      color: #c9d1d9;
+    }
+    #code-file {
+      font-size: 26px;
+      line-height: 40px;
+      color: var(--muted);
+      padding-bottom: 22px;
+      margin-bottom: 18px;
+      border-bottom: 1.5px solid var(--line);
+    }
+    /* Only a line keeps its spaces: the markup's own line breaks between lines are not code. */
+    #code-panel .line {
+      display: block;
+      white-space: pre;
+    }
+    .k {
+      color: #79c0ff;
+    }
+    .s {
+      color: #a5d6ff;
+    }
+    .f {
+      color: #d2a8ff;
+    }
+    .p {
+      color: var(--muted);
+    }
+    /* A word that rolls through its options like a slot machine, one line high. */
+    .slot {
+      display: inline-block;
+      height: 62px;
+      overflow: hidden;
+      vertical-align: top;
+    }
+    .slot > span {
+      display: block;
+    }
+    .slot > .s {
+      color: var(--lime);
+    }
+    #code-charts {
+      position: absolute;
+      left: 1040px;
+      top: 240px;
+      width: 780px;
+      height: 760px;
+    }
+    .code-chart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+    }
+  </style>
+  <div id="root" data-composition-id="code" data-width="1920" data-height="1080">
+    <div class="film-light"></div>
+    <div id="code-content">
+      <h2 id="code-title" class="film-title">
+        <span class="word">A</span> <span class="word">chart</span> <span class="word">is</span>
+        <span class="word accent">just</span> <span class="word accent">data.</span>
+      </h2>
+      <div id="code-panel" data-layout-allow-overflow>
+        <div id="code-file">year.tsx</div>
+        <span class="line"><span class="f">chartScene</span><span class="p">({</span></span>
+        <span class="line">  <span class="k">title</span><span class="p">: [</span><span class="s">"41 days"</span><span class="p">, </span><span class="s">"*in a row.*"</span><span class="p">],</span></span>
+        <span class="line">  <span class="k">chart</span><span class="p">: {</span></span>
+        <span class="line">    <span class="k">type</span><span class="p">: </span><span class="slot" id="code-type"><span class="s">"spark"</span><span class="s">"clock"</span><span class="s">"radar"</span></span><span class="p">,</span></span>
+        <span class="line">    <span class="slot" id="code-data"><span><span class="k">values</span><span class="p">: </span>weeks<span class="p">,</span></span><span><span class="k">hours</span><span class="p">: </span>day<span class="p">,</span></span><span><span class="k">axes</span><span class="p">: </span>skills<span class="p">,</span></span></span></span>
+        <span class="line">  <span class="p">},</span></span>
+        <span class="line"><span class="p">})</span></span>
+      </div>
+      <div id="code-charts" data-layout-allow-overflow>
+        <div class="code-chart" id="code-spark"></div>
+        <div class="code-chart" id="code-clock"></div>
+        <div class="code-chart" id="code-radar"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const chartOf = (type) => RW.CHART_WALL.find((entry) => entry.chart.type === type).chart;
+      // Each chart drawn at its own size, then scaled to fit the right half.
+      const place = (selector, type, fit) => {
+        const host = document.querySelector(selector);
+        const chart = RW.mountChart(host, chartOf(type));
+        const height = chart.stage.offsetHeight;
+        const scale = Math.min(fit / 920, 740 / height);
+        gsap.set(host, { width: 920, height, xPercent: -50, yPercent: -50, scale });
+        return chart;
+      };
+      const spark = place("#code-spark", "spark", 780);
+      const clock = place("#code-clock", "clock", 780);
+      const radar = place("#code-radar", "radar", 700);
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(
+        "#code-title .word",
+        { opacity: 0, filter: "blur(8px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.07 },
+        0.05,
+      );
+      tl.fromTo(
+        "#code-panel",
+        { x: -60, opacity: 0, filter: "blur(10px)" },
+        { x: 0, opacity: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" },
+        0.1,
+      );
+      tl.fromTo(
+        "#code-panel .line",
+        { opacity: 0, x: -14 },
+        { opacity: 1, x: 0, duration: 0.3, ease: "expo.out", stagger: 0.06 },
+        0.3,
+      );
+
+      // The type rolls, and the chart on the right is the one it names, playing its own entrance.
+      const roll = (to, at) => {
+        for (const slot of ["#code-type", "#code-data"]) {
+          tl.to(slot + " > span", { yPercent: -100 * to, duration: 0.28, ease: "power3.inOut" }, at);
+        }
+        tl.fromTo(
+          ["#code-type", "#code-data"],
+          { filter: "blur(0px)" },
+          { keyframes: [{ filter: "blur(3px)", duration: 0.14 }, { filter: "blur(0px)", duration: 0.14 }] },
+          at,
+        );
+      };
+      spark.animate(tl, 0.9);
+      roll(1, 2.8);
+      tl.to("#code-spark", { opacity: 0, filter: "blur(12px)", duration: 0.2, ease: "power2.in" }, 2.8);
+      clock.animate(tl, 2.95);
+      roll(2, 4.7);
+      tl.to("#code-clock", { opacity: 0, filter: "blur(12px)", duration: 0.2, ease: "power2.in" }, 4.7);
+      radar.animate(tl, 4.85);
+
+      // A whip to the left, into the wall of every chart.
+      tl.to(
+        "#code-content",
+        { x: -260, opacity: 0, filter: "blur(14px)", duration: 0.36, ease: "power3.in" },
+        7.1,
+      );
+      window.__timelines["code"] = tl;
+    })();
+  </script>
+</template>

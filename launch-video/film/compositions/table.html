@@ -1,0 +1,340 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #table-ground {
+      position: absolute;
+      inset: 0;
+      background: var(--paper);
+    }
+    #table-light {
+      opacity: 0;
+    }
+    #table-old {
+      position: absolute;
+      inset: 0;
+    }
+    #table-card {
+      position: absolute;
+      left: 120px;
+      top: 150px;
+      width: 1040px;
+      background: #fff;
+      border: 1.5px solid var(--paper-line);
+      border-radius: 14px;
+      color: var(--paper-ink);
+      overflow: hidden;
+    }
+    #table-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 32px;
+      border-bottom: 1.5px solid var(--paper-line);
+      font-size: 30px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+    #table-card header small {
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--paper-muted);
+      border: 1.5px solid var(--paper-line);
+      border-radius: 8px;
+      padding: 6px 16px;
+    }
+    #table-card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 28px;
+      font-variant-numeric: tabular-nums;
+    }
+    #table-card th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--paper-muted);
+      background: #f6f8fa;
+      padding: 12px 32px;
+      border-bottom: 1.5px solid var(--paper-line);
+    }
+    #table-card td {
+      padding: 6px 32px;
+      color: var(--paper-muted);
+      border-bottom: 1px solid #eaeef2;
+    }
+    #table-card td.num,
+    #table-card th.num {
+      text-align: right;
+    }
+    #table-card td.lit {
+      color: #1a7f37;
+      font-weight: 700;
+    }
+    .table-line {
+      position: absolute;
+      left: 1270px;
+      top: 330px;
+      font-size: 112px;
+      color: var(--paper-ink);
+    }
+    .table-line .grey {
+      color: var(--paper-muted);
+    }
+    #table-new {
+      position: absolute;
+      inset: 0;
+    }
+    #table-lockup {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #table-brand {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+    }
+    #table-mark {
+      width: 150px;
+      height: 150px;
+      overflow: visible;
+    }
+    #table-word {
+      font-size: 156px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      padding-bottom: 0.12em;
+    }
+    #table-word .dash {
+      color: var(--green);
+    }
+    #table-word span {
+      display: inline-block;
+    }
+    #table-tag {
+      margin-top: 10px;
+      font-size: 58px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: #c9d1d9;
+    }
+    #table-tag .accent {
+      color: var(--green);
+    }
+    #table-tag span {
+      display: inline-block;
+    }
+    #table-bars {
+      position: absolute;
+      left: 210px;
+      top: 280px;
+      width: 920px;
+      transform-origin: 0 0;
+    }
+  </style>
+  <div data-hf-id="hf-tbrd" id="root" data-composition-id="table" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-n8zh" id="table-ground"></div>
+    <div data-hf-id="hf-vlh6" class="film-light" id="table-light"></div>
+
+    <div data-hf-id="hf-yf8j" id="table-old">
+      <div data-hf-id="hf-43z2" id="table-card">
+        <header data-hf-id="hf-0drs">
+          <span data-hf-id="hf-4auz">Activity report · <span data-hf-id="hf-9lpn" id="table-handle">ada</span></span><small data-hf-id="hf-2skm">Export CSV</small>
+        </header>
+        <table data-hf-id="hf-2j5r">
+          <thead data-hf-id="hf-zd89">
+            <tr data-hf-id="hf-p3r7">
+              <th data-hf-id="hf-l7w9">Month</th>
+              <th data-hf-id="hf-enci" class="num">Contributions</th>
+              <th data-hf-id="hf-bgtg" class="num">Active days</th>
+            </tr>
+          </thead>
+          <tbody data-hf-id="hf-a2vy" id="table-rows"></tbody>
+        </table>
+      </div>
+      <h2 data-hf-id="hf-4ke8" id="table-line-1" class="table-line film-title">
+        <span data-hf-id="hf-556i" class="word">And</span> <span data-hf-id="hf-3qww" class="word">you</span><br data-hf-id="hf-x5px" /><span data-hf-id="hf-nypk" class="word">show</span>
+        <span data-hf-id="hf-s4h3" class="word">them</span><br data-hf-id="hf-rsrt" /><span data-hf-id="hf-6z71" class="word grey">a</span> <span data-hf-id="hf-a1g4" class="word grey">table.</span>
+      </h2>
+      <h2 data-hf-id="hf-96az" id="table-line-2" class="table-line film-title">
+        <span data-hf-id="hf-loqi" class="word">Nobody</span><br data-hf-id="hf-szow" /><span data-hf-id="hf-kgxx" class="word">shares</span><br data-hf-id="hf-sldv" /><span data-hf-id="hf-m0kh" class="word grey">a</span>
+        <span data-hf-id="hf-y50s" class="word grey">table.</span>
+      </h2>
+    </div>
+
+    <div data-hf-id="hf-d1su" id="table-new">
+      <div data-hf-id="hf-pxhj" id="table-bars" data-layout-allow-overflow></div>
+      <div data-hf-id="hf-qv02" id="table-lockup">
+        <div data-hf-id="hf-68iz" id="table-brand">
+          <svg data-hf-id="hf-c2yw" id="table-mark" viewBox="0 0 64 64" aria-hidden="true">
+            <defs data-hf-id="hf-mh0t">
+              <radialGradient data-hf-id="hf-bqre" id="table-mark-light" cx="0.2" cy="0.05" r="0.9">
+                <stop data-hf-id="hf-64pl" offset="0" stop-color="#1f7a3d" stop-opacity="0.75" />
+                <stop data-hf-id="hf-xt0x" offset="0.6" stop-color="#1f7a3d" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <g data-hf-id="hf-81w6" id="table-tile">
+              <rect data-hf-id="hf-c607" width="64" height="64" rx="15" fill="#0d1117" />
+              <rect data-hf-id="hf-wmrq" width="64" height="64" rx="15" fill="url(#table-mark-light)" />
+              <rect data-hf-id="hf-sgc6"
+                x="0.5"
+                y="0.5"
+                width="63"
+                height="63"
+                rx="14.5"
+                fill="none"
+                stroke="#f0f6fc"
+                stroke-opacity="0.14"
+              />
+            </g>
+            <path data-hf-id="hf-49zd"
+              id="table-stroke"
+              d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5"
+              fill="none"
+              stroke="#39d353"
+              stroke-width="6.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle data-hf-id="hf-3s3v" id="table-dot" cx="52.5" cy="19.5" r="7.2" fill="#d2f26b" stroke="#0d1117" stroke-width="2.6" />
+          </svg>
+          <div data-hf-id="hf-7gh8" id="table-word"></div>
+        </div>
+        <p data-hf-id="hf-35ob" id="table-tag">
+          <span data-hf-id="hf-6nsg">Year</span> <span data-hf-id="hf-ftaa">in</span> <span data-hf-id="hf-wsl9">review</span> <span data-hf-id="hf-9k8v">videos,</span>
+          <span data-hf-id="hf-649o" class="accent">in</span> <span data-hf-id="hf-bj62" class="accent">React</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const year = RW.sample("ada");
+      const fmt = (value) => value.toLocaleString("en-US");
+
+      // The old way: the same twelve months as rows in a report.
+      document.querySelector("#table-handle").textContent = `@${year.handle}`;
+      document.querySelector("#table-rows").innerHTML = year.months
+        .map(
+          (month) =>
+            `<tr><td>${month.label}</td><td class="num">${fmt(month.total)}</td><td class="num">${month.activeDays}</td></tr>`,
+        )
+        .join("");
+
+      // The new way: the same twelve numbers as the library's bar chart, the busiest month lit.
+      const peak = Math.max(...year.months.map((month) => month.total));
+      const bars = RW.mountChart(document.querySelector("#table-bars"), {
+        type: "bars",
+        bars: year.months.map((month) => ({ label: month.label, value: month.total, peak: month.total === peak })),
+        peakLabel: fmt(peak),
+      });
+
+      // The name, a letter to a span, so it can arrive a letter at a time.
+      document.querySelector("#table-word").innerHTML = "react-wrapped"
+        .split("")
+        .map((char) => `<span${char === "-" ? ' class="dash"' : ""}>${char}</span>`)
+        .join("");
+
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---- the table ---- */
+      tl.fromTo(
+        "#table-card",
+        { y: 50, opacity: 0, filter: "blur(10px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" },
+        0,
+      );
+      tl.fromTo(
+        "#table-rows tr",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: "power1.out", stagger: 0.035 },
+        0.15,
+      );
+      const first = document.querySelectorAll("#table-line-1 .word");
+      tl.fromTo(
+        first,
+        { opacity: 0, color: "#c4ccd4" },
+        { opacity: 1, color: (i, el) => (el.classList.contains("grey") ? "#59636e" : "#1f2328"), duration: 0.18, stagger: 0.09 },
+        0.35,
+      );
+      // The line swaps on the same spot, and only the words change.
+      tl.to(first, { opacity: 0, filter: "blur(8px)", duration: 0.16, ease: "power2.in", stagger: 0.03 }, 2.1);
+      const second = document.querySelectorAll("#table-line-2 .word");
+      tl.fromTo(
+        second,
+        { opacity: 0, filter: "blur(8px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.15, ease: "power4.out", stagger: 0.09 },
+        2.3,
+      );
+
+      // The numbers people care about are picked out of the report, row by row...
+      const picked = document.querySelectorAll("#table-rows td:nth-child(2)");
+      tl.to(picked, { backgroundColor: "#dafbe1", color: "#1a7f37", fontWeight: 700, duration: 0.2, stagger: 0.04 }, 3.0);
+
+      /* ---- ...and the ground floods to night: the same numbers stand up as bars ---- */
+      tl.to("#table-ground", { backgroundColor: "#0d1117", duration: 0.45, ease: "power2.inOut" }, 3.55);
+      tl.to("#table-light", { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 3.6);
+      tl.to(
+        "#table-old",
+        { opacity: 0, filter: "blur(16px)", scale: 0.96, duration: 0.32, ease: "power2.in" },
+        3.55,
+      );
+      tl.set("#table-bars", { scale: 1.63, x: 0, y: 0 }, 0);
+      bars.animate(tl, 3.7);
+      // The chart steps down and the name lands over it.
+      tl.to("#table-bars", { scale: 1.08, x: 240, y: 330, duration: 0.75, ease: "power2.inOut" }, 5.5);
+
+      /* ---- the mark is drawn, the name follows ---- */
+      tl.fromTo(
+        "#table-tile",
+        { scale: 0.4, opacity: 0, transformOrigin: "50% 50%" },
+        { scale: 1, opacity: 1, duration: 0.75, ease: "elastic.out(1, 0.6)" },
+        5.65,
+      );
+      const stroke = document.querySelector("#table-stroke");
+      const length = stroke.getTotalLength();
+      tl.fromTo(
+        stroke,
+        { strokeDasharray: length, strokeDashoffset: length },
+        { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" },
+        5.75,
+      );
+      // Out of sight until it is drawn: a dash of no length with round ends is still a dot.
+      tl.fromTo(stroke, { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "none" }, 5.75);
+      tl.fromTo(
+        "#table-dot",
+        { scale: 0, y: -18, transformOrigin: "50% 50%" },
+        { scale: 1, y: 0, duration: 0.7, ease: "elastic.out(1, 0.45)" },
+        6.15,
+      );
+      tl.fromTo(
+        "#table-word span",
+        { opacity: 0, filter: "blur(8px)", y: 14 },
+        { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.3, ease: "expo.out", stagger: 0.032 },
+        5.85,
+      );
+      tl.fromTo(
+        "#table-tag span",
+        { opacity: 0, filter: "blur(6px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power4.out", stagger: 0.067 },
+        6.2,
+      );
+
+      /* ---- zoom through, into the code ---- */
+      tl.to(
+        "#table-new",
+        { scale: 1.14, opacity: 0, filter: "blur(14px)", duration: 0.4, ease: "power3.in" },
+        7.9,
+      );
+      window.__timelines["table"] = tl;
+    })();
+  </script>
+</template>

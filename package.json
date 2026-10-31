@@ -15,7 +15,10 @@
     "typecheck": "nx run-many --target=typecheck --parallel=2 --skip-nx-cache",
     "check:packages": "node .github/scripts/check-packages.mjs",
     "e2e": "pnpm --filter @react-wrapped/docs-e2e e2e",
-    "check:consumer": "node .github/scripts/check-consumer.mjs"
+    "check:consumer": "node .github/scripts/check-consumer.mjs",
+    "video:bundle": "vite build -c launch-video/bundle.config.ts && cp node_modules/gsap/dist/gsap.min.js launch-video/film/lib/",
+    "video:preview": "pnpm video:bundle && cd launch-video/film && npx --yes hyperframes@0.8.223 preview",
+    "video:render": "pnpm video:bundle && cd launch-video/film && npx --yes hyperframes@0.8.223 render -q delivery -o renders/react-wrapped-launch.mp4"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

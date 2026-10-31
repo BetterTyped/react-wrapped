@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="lib/gsap.min.js"></script>
+    <!-- The library itself, built from packages/ by `pnpm video:bundle` (see ../README.md): window.RW -->
+    <script src="lib/wrapped.js"></script>
+    <link rel="stylesheet" href="lib/wrapped.css" />
+    <link rel="stylesheet" href="styles/film.css" />
+  </head>
+  <body>
+    <div data-hf-id="hf-cbta"
+      id="root"
+      data-composition-id="main"
+      data-motion-blur="on"
+      data-start="0"
+      data-duration="45.1"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div data-hf-id="hf-8zff"
+        id="hook"
+        data-composition-id="hook"
+        data-composition-src="compositions/hook.html"
+        data-start="0"
+        data-duration="3.2"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 1"
+      ></div>
+      <div data-hf-id="hf-egsh"
+        id="table"
+        data-composition-id="table"
+        data-composition-src="compositions/table.html"
+        data-start="3.1"
+        data-duration="8.3"
+        data-track-index="2"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 2"
+      ></div>
+      <div data-hf-id="hf-z6w4"
+        id="code"
+        data-composition-id="code"
+        data-composition-src="compositions/code.html"
+        data-start="11.3"
+        data-duration="7.5"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 3"
+      ></div>
+      <div data-hf-id="hf-2a6s"
+        id="wall"
+        data-composition-id="wall"
+        data-composition-src="compositions/wall.html"
+        data-start="18.7"
+        data-duration="5.5"
+        data-track-index="2"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 4"
+      ></div>
+      <div data-hf-id="hf-7cxg"
+        id="engine"
+        data-composition-id="engine"
+        data-composition-src="compositions/engine.html"
+        data-start="24.1"
+        data-duration="7"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 5"
+      ></div>
+      <div data-hf-id="hf-p7av"
+        id="share"
+        data-composition-id="share"
+        data-composition-src="compositions/share.html"
+        data-start="31"
+        data-duration="6.2"
+        data-track-index="2"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 6"
+      ></div>
+      <div data-hf-id="hf-ryny"
+        id="finale"
+        data-composition-id="finale"
+        data-composition-src="compositions/finale.html"
+        data-start="37.1"
+        data-duration="8"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+        style="z-index: 7"
+      ></div>
+
+      <!-- Sound: each effect is placed so its peak lands a frame after the picture it belongs to. -->
+      <audio id="sfx-hook-out" class="clip" src="assets/sfx/whoosh.mp3" data-start="2.86" data-duration="0.5" data-volume="0.45" data-track-index="10"></audio>
+      <audio id="sfx-flood" class="clip" src="assets/sfx/whoosh-cinematic.mp3" data-start="4.15" data-duration="4.3" data-volume="0.4" data-fade-out="0.6" data-track-index="11"></audio>
+      <audio id="sfx-peak" class="clip" src="assets/sfx/pop.mp3" data-start="8.2" data-duration="0.7" data-volume="0.55" data-track-index="12"></audio>
+      <audio id="sfx-mark" class="clip" src="assets/sfx/sparkle.mp3" data-start="9.25" data-duration="1.8" data-volume="0.3" data-track-index="13"></audio>
+      <audio id="sfx-zoom" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="11.1" data-duration="0.55" data-volume="0.45" data-track-index="10"></audio>
+      <audio id="sfx-code" class="clip" src="assets/sfx/typing.mp3" data-start="11.2" data-duration="1.0" data-volume="0.4" data-fade-out="0.2" data-track-index="12"></audio>
+      <audio id="sfx-roll-1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="14.0" data-duration="0.55" data-volume="0.3" data-track-index="10"></audio>
+      <audio id="sfx-roll-2" class="clip" src="assets/sfx/click-soft.mp3" data-start="15.95" data-duration="0.36" data-volume="0.8" data-track-index="13"></audio>
+      <audio id="sfx-whip" class="clip" src="assets/sfx/whoosh.mp3" data-start="18.5" data-duration="0.55" data-volume="0.45" data-track-index="10"></audio>
+      <audio id="sfx-count" class="clip" src="assets/sfx/pop.mp3" data-start="21.95" data-duration="0.7" data-volume="0.45" data-track-index="12"></audio>
+      <audio id="sfx-engine-in" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="23.85" data-duration="0.55" data-volume="0.4" data-track-index="10"></audio>
+      <audio id="sfx-cut-1" class="clip" src="assets/sfx/whoosh.mp3" data-start="26.55" data-duration="0.55" data-volume="0.35" data-track-index="11"></audio>
+      <audio id="sfx-cut-2" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="29.4" data-duration="0.55" data-volume="0.35" data-track-index="10"></audio>
+      <audio id="sfx-share-in" class="clip" src="assets/sfx/whoosh.mp3" data-start="31.05" data-duration="0.55" data-volume="0.4" data-track-index="11"></audio>
+      <audio id="sfx-riser" class="clip" src="assets/sfx/riser.mp3" data-start="37.2" data-duration="3.5" data-volume="0.28" data-fade-in="0.8" data-track-index="13"></audio>
+      <audio id="sfx-impact" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="40.58" data-duration="2.1" data-volume="0.35" data-fade-out="0.8" data-track-index="10"></audio>
+      <audio id="sfx-type" class="clip" src="assets/sfx/typing.mp3" data-start="41.15" data-duration="1.15" data-volume="0.45" data-fade-out="0.2" data-track-index="12"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

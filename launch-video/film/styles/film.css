@@ -1,0 +1,67 @@
+/*
+ * The film's look is the library's own: the evergreen palette's night ground with one soft green light from the top
+ * left, Inter set heavy and tight, the accent green rationed to one word or mark per shot, lime for the one dot.
+ */
+:root {
+  --ground: #0d1117;
+  --ground-deep: #090c10;
+  --card: #151b23;
+  --ink: #f0f6fc;
+  --muted: #9198a1;
+  --line: rgba(240, 246, 252, 0.1);
+  --green: #39d353;
+  --green-deep: #1f7a3d;
+  --lime: #d2f26b;
+  --paper: #f6f8fa;
+  --paper-ink: #1f2328;
+  --paper-muted: #59636e;
+  --paper-line: #d0d7de;
+  --font: Inter, sans-serif;
+  --mono: "JetBrains Mono", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--ground);
+  font-family: var(--font);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The one soft light of the stage, as a full-bleed layer a scene can move or dim. */
+.film-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 760px at 6% -8%, rgba(31, 122, 61, 0.55), rgba(31, 122, 61, 0) 70%),
+    radial-gradient(900px 700px at 104% 112%, rgba(31, 122, 61, 0.28), rgba(31, 122, 61, 0) 70%);
+}
+
+.film-title {
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  color: var(--ink);
+}
+.film-title .accent {
+  color: var(--green);
+}
+.film-title .word {
+  display: inline-block;
+}
+
+.film-quiet {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}

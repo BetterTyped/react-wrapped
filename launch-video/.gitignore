@@ -1,0 +1,9 @@
+# Built from packages/ by `pnpm video:bundle`
+film/lib/
+# Renders and HyperFrames' own working files
+film/renders/
+film/.hyperframes/
+film/snapshots/
+# The Studio preview's caches
+film/.thumbnails/
+film/.waveform-cache/

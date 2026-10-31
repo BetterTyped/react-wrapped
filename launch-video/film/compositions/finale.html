@@ -1,0 +1,217 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ground);
+    }
+    #finale-claim {
+      position: absolute;
+      left: 120px;
+      top: 330px;
+      font-size: 176px;
+    }
+    #finale-card {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 20px;
+    }
+    #finale-brand {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    #finale-mark {
+      width: 136px;
+      height: 136px;
+      overflow: visible;
+    }
+    #finale-word {
+      font-size: 124px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      padding-bottom: 0.12em;
+    }
+    #finale-word .dash {
+      color: var(--green);
+    }
+    #finale-tag {
+      margin-top: 6px;
+      font-size: 50px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: #c9d1d9;
+    }
+    #finale-tag span {
+      display: inline-block;
+    }
+    #finale-install {
+      margin-top: 62px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 26px 42px;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 0 0 1.5px rgba(57, 211, 83, 0.35), 0 30px 80px -30px rgba(0, 0, 0, 0.9);
+      font-family: var(--mono);
+      font-size: 44px;
+      white-space: pre;
+    }
+    #finale-install .prompt {
+      color: var(--green);
+    }
+    #finale-install .char {
+      display: inline-block;
+      white-space: pre;
+    }
+    #finale-foot {
+      margin-top: 48px;
+      font-size: 34px;
+    }
+    #finale-foot b {
+      color: var(--ink);
+      font-weight: 700;
+    }
+    #finale-foot span {
+      display: inline-block;
+    }
+  </style>
+  <div id="root" data-composition-id="finale" data-width="1920" data-height="1080">
+    <div class="film-light"></div>
+    <h2 id="finale-claim" class="film-title">
+      <span class="word">Give</span> <span class="word">every</span> <span class="word">user</span><br />
+      <span class="word">their</span> <span class="word accent">year.</span>
+    </h2>
+    <div id="finale-card">
+      <div id="finale-brand">
+        <svg id="finale-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <defs>
+            <radialGradient id="finale-mark-light" cx="0.2" cy="0.05" r="0.9">
+              <stop offset="0" stop-color="#1f7a3d" stop-opacity="0.75" />
+              <stop offset="0.6" stop-color="#1f7a3d" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <g id="finale-tile">
+            <rect width="64" height="64" rx="15" fill="#0d1117" />
+            <rect width="64" height="64" rx="15" fill="url(#finale-mark-light)" />
+            <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="none" stroke="#f0f6fc" stroke-opacity="0.14" />
+          </g>
+          <path
+            id="finale-stroke"
+            d="M11.5 21.5 21.5 44.5 32 25.5 42.5 44.5 52.5 19.5"
+            fill="none"
+            stroke="#39d353"
+            stroke-width="6.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle id="finale-dot" cx="52.5" cy="19.5" r="7.2" fill="#d2f26b" stroke="#0d1117" stroke-width="2.6" />
+        </svg>
+        <div id="finale-word">react<span class="dash">-</span>wrapped</div>
+      </div>
+      <p id="finale-tag">
+        <span>Year</span> <span>in</span> <span>review</span> <span>videos</span> <span>for</span> <span>your</span>
+        <span>product</span>
+      </p>
+      <div id="finale-install"><span class="prompt">$</span><span id="finale-command"></span></div>
+      <p id="finale-foot" class="film-quiet">
+        <span>Free</span> <span>and</span> <span>open</span> <span>source</span> <span>·</span>
+        <span><b>bettertyped.github.io/react-wrapped</b></span>
+      </p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // The install line from the README, a character to a span so it can be typed.
+      const command = "pnpm add @react-wrapped/kit gsap";
+      document.querySelector("#finale-command").innerHTML = command
+        .split("")
+        .map((char) => '<span class="char">' + char + "</span>")
+        .join("");
+
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---- the claim: each word goes from grey to ink, nothing moves ---- */
+      const words = document.querySelectorAll("#finale-claim .word");
+      tl.fromTo(
+        words,
+        { opacity: 0, color: "#3d444d" },
+        {
+          opacity: 1,
+          color: (i, el) => (el.classList.contains("accent") ? "#39d353" : "#f0f6fc"),
+          duration: 0.2,
+          ease: "power2.out",
+          stagger: 0.12,
+        },
+        0.15,
+      );
+      tl.to(words, { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power2.in", stagger: 0.035 }, 2.45);
+
+      /* ---- the end card: the tile is set down, the mark is drawn, the dot drops in ---- */
+      tl.fromTo(
+        "#finale-tile",
+        { scale: 0.3, opacity: 0, transformOrigin: "50% 50%" },
+        { scale: 1, opacity: 1, duration: 0.8, ease: "elastic.out(1, 0.6)" },
+        2.8,
+      );
+      const stroke = document.querySelector("#finale-stroke");
+      const length = stroke.getTotalLength();
+      tl.fromTo(
+        stroke,
+        { strokeDasharray: length, strokeDashoffset: length },
+        { strokeDashoffset: 0, duration: 0.5, ease: "power2.inOut" },
+        2.92,
+      );
+      tl.fromTo(stroke, { opacity: 0 }, { opacity: 1, duration: 0.04, ease: "none" }, 2.92);
+      tl.fromTo(
+        "#finale-dot",
+        { scale: 0, y: -26, transformOrigin: "50% 50%" },
+        { scale: 1, y: 0, duration: 0.75, ease: "elastic.out(1, 0.45)" },
+        3.38,
+      );
+      // The name wipes in from the mark.
+      tl.fromTo(
+        "#finale-word",
+        { clipPath: "inset(-10% 100% -10% 0%)", x: -30 },
+        { clipPath: "inset(-10% 0% -10% 0%)", x: 0, duration: 0.6, ease: "power3.out" },
+        3.3,
+      );
+      tl.fromTo(
+        "#finale-tag span",
+        { opacity: 0, filter: "blur(6px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power4.out", stagger: 0.067 },
+        3.8,
+      );
+
+      /* ---- the call to action: the command is typed ---- */
+      tl.fromTo(
+        "#finale-install",
+        { opacity: 0, y: 24, filter: "blur(8px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" },
+        4.3,
+      );
+      tl.fromTo(
+        "#finale-command .char",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.01, ease: "none", stagger: 0.024 },
+        4.5,
+      );
+      tl.fromTo(
+        "#finale-foot span",
+        { opacity: 0, filter: "blur(6px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.14, ease: "power4.out", stagger: 0.06 },
+        5.2,
+      );
+      // Then it holds, still, to the last frame.
+      tl.to({}, { duration: 0.01 }, 7.6);
+      window.__timelines["finale"] = tl;
+    })();
+  </script>
+</template>

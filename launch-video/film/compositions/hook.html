@@ -1,0 +1,80 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ground);
+    }
+    #hook-content {
+      position: absolute;
+      inset: 0;
+    }
+    #hook-title {
+      position: absolute;
+      left: 98px;
+      top: 168px;
+      font-size: 150px;
+    }
+    #hook-grid {
+      position: absolute;
+      left: 98px;
+      top: 640px;
+    }
+    /* The calendar a little bigger than the landscape stage draws it: it is the whole picture here. */
+    #hook-grid .wr-stage {
+      --wr-cell: 25.6px;
+      --wr-gap: 6.9px;
+    }
+  </style>
+  <div data-hf-id="hf-ktv8" id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-u2ld" class="film-light"></div>
+    <div data-hf-id="hf-wcfs" id="hook-content">
+      <h1 data-hf-id="hf-t38v" id="hook-title" class="film-title">
+        <span data-hf-id="hf-54ly" class="word">Your</span> <span data-hf-id="hf-1bqv" class="word">users</span> <span data-hf-id="hf-45dq" class="word">had</span><br data-hf-id="hf-x5px" />
+        <span data-hf-id="hf-d7bk" class="word">a</span> <span data-hf-id="hf-lzqw" class="word">whole</span> <span data-hf-id="hf-qgt6" class="word accent">year.</span>
+      </h1>
+      <div data-hf-id="hf-z741" id="hook-grid"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // The sample year, as the library's own contribution graph.
+      const calendar = RW.mountCalendar(document.querySelector("#hook-grid"), { handle: "ada" });
+      const cells = [...calendar.querySelectorAll(".wr-cell")];
+      const tl = gsap.timeline({ paused: true });
+
+      // The year fills in from the left, a week a column. Built on its own and joined already under way, so the
+      // first frame (the thumbnail) is a year half lit, never an empty ground.
+      const fill = gsap.timeline();
+      cells.forEach((cell, index) => {
+        const week = Math.floor(index / 7);
+        const day = index % 7;
+        fill.fromTo(
+          cell,
+          { scale: 0.2, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.55, ease: "expo.out" },
+          week * 0.034 + day * 0.012,
+        );
+      });
+      tl.add(fill.tweenFromTo(0.55, fill.duration(), { ease: "none" }), 0);
+
+      const words = document.querySelectorAll("#hook-title .word");
+      tl.set(words[0], { opacity: 1, filter: "blur(0px)" }, 0);
+      tl.fromTo(
+        [...words].slice(1),
+        { opacity: 0, filter: "blur(10px)" },
+        { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power4.out", stagger: 0.12 },
+        0.12,
+      );
+
+      // A whip up and out, the speed the next shot lands with.
+      tl.to(
+        "#hook-content",
+        { y: -160, opacity: 0, filter: "blur(16px)", duration: 0.38, ease: "power3.in" },
+        2.78,
+      );
+      window.__timelines["hook"] = tl;
+    })();
+  </script>
+</template>
